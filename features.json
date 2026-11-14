@@ -86,8 +86,8 @@
       "verify": [
         "npx vitest run tests/unit/bp.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented pure src/core/bp.ts, src/core/index.ts, and tests/unit/bp.test.ts (6/6 pass); gate PASS."
     },
     {
       "id": "F07",

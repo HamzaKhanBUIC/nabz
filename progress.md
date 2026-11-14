@@ -54,3 +54,15 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Added `tests/unit/cards.test.ts` (4/4 pass) verifying catalog source validation against `content/cards.json` and `content/sources.json`, all 17 rule boundaries and precedence rules, `{placeholder}` resolution, and strict error throwing on missing templates or facts.
 - Gate PASS (`npx tsc --noEmit`, `npx eslint .`, `npx vitest run`).
 - Next: F06 guided blood pressure measurement, classification, and next action (`src/core/bp.ts`, `src/core/index.ts`).
+
+## 2026-11-14 — F06 guided blood pressure measurement, classification, and actions
+- Added `src/core/bp.ts` (`averageBpReadings`, `categorizeBp`, `countConsecutiveHighBpDays`, `isSustainedHighBp`, `evaluateBp`) and `src/core/index.ts` barrel export.
+- Added `tests/unit/bp.test.ts` (6/6 pass) verifying half-up averaging, all 13 category boundaries, severe 5-minute retest and retest confirmation, symptomatic severe/low urgent alerts, 3-distinct-day sustained high detection, two-sided personal systolic baseline (`|z| >= 1.5`), and schema rejection of unknown symptom IDs.
+- Finished features: F00, F01, F02, F07, F03, F04, F05, F06
+- Half-done: none
+- Next: F08 (API Must endpoints and JSON store)
+- Gate output (`python scripts/gate.py`):
+  `PASS npx tsc --noEmit`
+  `PASS npx eslint .`
+  `PASS npx vitest run`
+  `GATE: PASS`
