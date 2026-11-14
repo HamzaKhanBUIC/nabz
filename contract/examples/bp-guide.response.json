@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "steps": [
+    {
+      "id": "prep",
+      "text": "Nothing to eat or drink for 30 minutes before.",
+      "detail": "Also no caffeine, smoking or exercise in the last 30 minutes."
+    },
+    {
+      "id": "bladder",
+      "text": "Empty your bladder."
+    },
+    {
+      "id": "cuff",
+      "text": "Put the cuff on your bare upper arm, snug but not tight."
+    },
+    {
+      "id": "anchor",
+      "text": "Anchor yourself so you can stay still and relaxed.",
+      "adaptation": true
+    },
+    {
+      "id": "rest",
+      "text": "Rest quietly for 5 minutes.",
+      "timerSeconds": 300
+    },
+    {
+      "id": "position",
+      "text": "Keep the cuff at chest height. Stay silent while it inflates."
+    },
+    {
+      "id": "reading-1",
+      "text": "Take reading 1."
+    },
+    {
+      "id": "reading-2",
+      "text": "Wait 1 minute, then take reading 2.",
+      "timerSeconds": 60
+    }
+  ],
+  "severeSymptoms": [
+    {
+      "id": "chest-pain",
+      "label": "Chest pain"
+    },
+    {
+      "id": "shortness-of-breath",
+      "label": "Shortness of breath"
+    },
+    {
+      "id": "back-pain",
+      "label": "Back pain"
+    },
+    {
+      "id": "numbness-or-weakness",
+      "label": "Numbness or weakness"
+    },
+    {
+      "id": "vision-change",
+      "label": "Change in vision"
+    },
+    {
+      "id": "trouble-speaking",
+      "label": "Trouble speaking"
+    }
+  ],
+  "lowSymptoms": [
+    {
+      "id": "confusion",
+      "label": "Confusion"
+    },
+    {
+      "id": "dizziness-or-lightheadedness",
+      "label": "Dizziness or lightheadedness"
+    },
+    {
+      "id": "fainting",
+      "label": "Fainting"
+    },
+    {
+      "id": "cold-sweaty-skin",
+      "label": "Cold and sweaty skin"
+    },
+    {
+      "id": "rapid-breathing",
+      "label": "Rapid breathing"
+    },
+    {
+      "id": "weak-rapid-pulse",
+      "label": "Weak and rapid pulse"
+    }
+  ],
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sources": [
+    {
+      "id": "cdc-bp-measure",
+      "title": "Measure Your Blood Pressure (CDC)",
+      "url": "https://www.cdc.gov/high-blood-pressure/measure/index.html"
+    },
+    {
+      "id": "aha-acc-2025-bp",
+      "title": "2025 AHA/ACC Guideline for the Prevention, Detection, Evaluation, and Management of High Blood Pressure in Adults",
+      "url": "https://www.jacc.org/doi/10.1016/j.jacc.2025.05.007"
+    },
+    {
+      "id": "nhlbi-low-bp",
+      "title": "Low Blood Pressure (NHLBI)",
+      "url": "https://www.nhlbi.nih.gov/health/low-blood-pressure"
+    }
+  ]
+}

@@ -25,8 +25,8 @@
       "verify": [
         "npx vitest run tests/contract/examples.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Nov 14: tests/contract/examples.test.ts 31/31 pass; gate PASS (35 tests). 15 example files, 16 endpoints (10 must, 6 reserved), contract/schemas.json exported."
     },
     {
       "id": "F02",

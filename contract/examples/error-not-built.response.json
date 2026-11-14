@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "not_built",
+    "message": "The AI coach is planned but not built yet.",
+    "feature": "coach"
+  }
+}

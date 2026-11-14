@@ -1,0 +1,10 @@
+{
+  "protocolId": "pvt-b-3min",
+  "durationMs": 180000,
+  "isiMinMs": 1000,
+  "isiMaxMs": 4000,
+  "feedbackMs": 1000,
+  "lapseMs": 355,
+  "falseStartMs": 100,
+  "noResponseTimeoutMs": 30000
+}

@@ -1,0 +1,3237 @@
+{
+  "contractVersion": "0.1",
+  "endpoints": {
+    "GET /api/health": {
+      "id": "health",
+      "tier": "must",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/mission": {
+      "id": "mission",
+      "tier": "must",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "profile": {
+            "type": "string",
+            "const": "mars-transit"
+          },
+          "launchDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "missionDay": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "commsDelay": {
+            "type": "object",
+            "properties": {
+              "oneWayMinMinutes": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "oneWayMaxMinutes": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "oneWayMinMinutes",
+              "oneWayMaxMinutes"
+            ],
+            "additionalProperties": false
+          },
+          "crew": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "role"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "name",
+          "profile",
+          "launchDate",
+          "missionDay",
+          "commsDelay",
+          "crew"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/today": {
+      "id": "today",
+      "tier": "must",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "missionDay": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "checkin": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "subjectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "missionDay": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "effectiveDateTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  },
+                  "protocolId": {
+                    "type": "string",
+                    "const": "pvt-b-3min"
+                  },
+                  "metrics": {
+                    "type": "object",
+                    "properties": {
+                      "stimuli": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "validResponses": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "lapses": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "falseStarts": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "meanSpeed": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "medianRtMs": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "performanceScore": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "stimuli",
+                      "validResponses",
+                      "lapses",
+                      "falseStarts",
+                      "meanSpeed",
+                      "medianRtMs",
+                      "performanceScore"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "sleepHours": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "qcFlags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "zone": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "z": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "zone": {
+                        "type": "string",
+                        "enum": [
+                          "not_scored",
+                          "building",
+                          "in_zone",
+                          "watch",
+                          "act"
+                        ]
+                      },
+                      "baseline": {
+                        "type": "object",
+                        "properties": {
+                          "n": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "mean": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "sd": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "ready": {
+                            "type": "boolean"
+                          },
+                          "windowSessions": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "n",
+                          "mean",
+                          "sd",
+                          "ready",
+                          "windowSessions"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "status": {
+                        "type": "object",
+                        "properties": {
+                          "level": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "in_zone",
+                              "watch",
+                              "act",
+                              "urgent"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "iconKey": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "hourglass",
+                              "check",
+                              "eye",
+                              "alert",
+                              "siren"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "level",
+                          "label",
+                          "iconKey"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "code",
+                      "value",
+                      "unit",
+                      "z",
+                      "zone",
+                      "baseline",
+                      "status"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "simulated",
+                      "live"
+                    ]
+                  },
+                  "card": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "ruleId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "severity": {
+                        "type": "string",
+                        "enum": [
+                          "info",
+                          "in_zone",
+                          "watch",
+                          "act",
+                          "urgent"
+                        ]
+                      },
+                      "status": {
+                        "type": "object",
+                        "properties": {
+                          "level": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "in_zone",
+                              "watch",
+                              "act",
+                              "urgent"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "iconKey": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "hourglass",
+                              "check",
+                              "eye",
+                              "alert",
+                              "siren"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "level",
+                          "label",
+                          "iconKey"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "whatChanged": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "whyItMatters": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "whatToDo": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "facts": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": [
+                            "number",
+                            "string",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "sources": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "title": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "title",
+                            "url"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "disclaimer": {
+                        "type": "string",
+                        "const": "Decision support, not a diagnosis."
+                      },
+                      "links": {
+                        "type": "object",
+                        "properties": {
+                          "emergencyProcedureId": {
+                            "type": "string"
+                          },
+                          "measurement": {
+                            "type": "string",
+                            "const": "bp"
+                          },
+                          "routineId": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "ruleId",
+                      "severity",
+                      "status",
+                      "title",
+                      "whatChanged",
+                      "whyItMatters",
+                      "whatToDo",
+                      "facts",
+                      "sources",
+                      "disclaimer"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "subjectId",
+                  "missionDay",
+                  "effectiveDateTime",
+                  "protocolId",
+                  "metrics",
+                  "sleepHours",
+                  "qcFlags",
+                  "zone",
+                  "source",
+                  "card"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bp": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "subjectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "missionDay": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "effectiveDateTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  },
+                  "readings": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "systolic": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 300
+                        },
+                        "diastolic": {
+                          "type": "integer",
+                          "minimum": 20,
+                          "maximum": 200
+                        },
+                        "pulse": {
+                          "type": "integer",
+                          "minimum": 20,
+                          "maximum": 250
+                        }
+                      },
+                      "required": [
+                        "systolic",
+                        "diastolic"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "average": {
+                    "type": "object",
+                    "properties": {
+                      "systolic": {
+                        "type": "integer",
+                        "minimum": 40,
+                        "maximum": 300
+                      },
+                      "diastolic": {
+                        "type": "integer",
+                        "minimum": 20,
+                        "maximum": 200
+                      },
+                      "pulse": {
+                        "type": "integer",
+                        "minimum": 20,
+                        "maximum": 250
+                      }
+                    },
+                    "required": [
+                      "systolic",
+                      "diastolic"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "normal",
+                      "elevated",
+                      "stage1",
+                      "stage2",
+                      "severe"
+                    ]
+                  },
+                  "symptoms": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "chest-pain",
+                            "shortness-of-breath",
+                            "back-pain",
+                            "numbness-or-weakness",
+                            "vision-change",
+                            "trouble-speaking"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "confusion",
+                            "dizziness-or-lightheadedness",
+                            "fainting",
+                            "cold-sweaty-skin",
+                            "rapid-breathing",
+                            "weak-rapid-pulse"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "retestOf": {
+                    "type": "string"
+                  },
+                  "zone": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "z": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "zone": {
+                        "type": "string",
+                        "enum": [
+                          "not_scored",
+                          "building",
+                          "in_zone",
+                          "watch",
+                          "act"
+                        ]
+                      },
+                      "baseline": {
+                        "type": "object",
+                        "properties": {
+                          "n": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "mean": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "sd": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "ready": {
+                            "type": "boolean"
+                          },
+                          "windowSessions": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "n",
+                          "mean",
+                          "sd",
+                          "ready",
+                          "windowSessions"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "status": {
+                        "type": "object",
+                        "properties": {
+                          "level": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "in_zone",
+                              "watch",
+                              "act",
+                              "urgent"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "iconKey": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "hourglass",
+                              "check",
+                              "eye",
+                              "alert",
+                              "siren"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "level",
+                          "label",
+                          "iconKey"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "code",
+                      "value",
+                      "unit",
+                      "z",
+                      "zone",
+                      "baseline",
+                      "status"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "nextAction": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "retest",
+                          "alert_crew"
+                        ]
+                      },
+                      "afterSeconds": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "card": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "ruleId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "severity": {
+                        "type": "string",
+                        "enum": [
+                          "info",
+                          "in_zone",
+                          "watch",
+                          "act",
+                          "urgent"
+                        ]
+                      },
+                      "status": {
+                        "type": "object",
+                        "properties": {
+                          "level": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "in_zone",
+                              "watch",
+                              "act",
+                              "urgent"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "iconKey": {
+                            "type": "string",
+                            "enum": [
+                              "info",
+                              "hourglass",
+                              "check",
+                              "eye",
+                              "alert",
+                              "siren"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "level",
+                          "label",
+                          "iconKey"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "whatChanged": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "whyItMatters": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "whatToDo": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "facts": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": [
+                            "number",
+                            "string",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "sources": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "title": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "title",
+                            "url"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "disclaimer": {
+                        "type": "string",
+                        "const": "Decision support, not a diagnosis."
+                      },
+                      "links": {
+                        "type": "object",
+                        "properties": {
+                          "emergencyProcedureId": {
+                            "type": "string"
+                          },
+                          "measurement": {
+                            "type": "string",
+                            "const": "bp"
+                          },
+                          "routineId": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "ruleId",
+                      "severity",
+                      "status",
+                      "title",
+                      "whatChanged",
+                      "whyItMatters",
+                      "whatToDo",
+                      "facts",
+                      "sources",
+                      "disclaimer"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "simulated",
+                      "live"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "subjectId",
+                  "missionDay",
+                  "effectiveDateTime",
+                  "readings",
+                  "average",
+                  "category",
+                  "symptoms",
+                  "zone",
+                  "nextAction",
+                  "card",
+                  "source"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "card": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "ruleId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "in_zone",
+                      "watch",
+                      "act",
+                      "urgent"
+                    ]
+                  },
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "level": {
+                        "type": "string",
+                        "enum": [
+                          "info",
+                          "in_zone",
+                          "watch",
+                          "act",
+                          "urgent"
+                        ]
+                      },
+                      "label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "iconKey": {
+                        "type": "string",
+                        "enum": [
+                          "info",
+                          "hourglass",
+                          "check",
+                          "eye",
+                          "alert",
+                          "siren"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "level",
+                      "label",
+                      "iconKey"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "whatChanged": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "whyItMatters": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "whatToDo": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "facts": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": [
+                        "number",
+                        "string",
+                        "boolean"
+                      ]
+                    }
+                  },
+                  "sources": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "url": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "url"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "disclaimer": {
+                    "type": "string",
+                    "const": "Decision support, not a diagnosis."
+                  },
+                  "links": {
+                    "type": "object",
+                    "properties": {
+                      "emergencyProcedureId": {
+                        "type": "string"
+                      },
+                      "measurement": {
+                        "type": "string",
+                        "const": "bp"
+                      },
+                      "routineId": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "ruleId",
+                  "severity",
+                  "status",
+                  "title",
+                  "whatChanged",
+                  "whyItMatters",
+                  "whatToDo",
+                  "facts",
+                  "sources",
+                  "disclaimer"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ruleId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "in_zone",
+                    "watch",
+                    "act",
+                    "urgent"
+                  ]
+                },
+                "status": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "in_zone",
+                        "watch",
+                        "act",
+                        "urgent"
+                      ]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "iconKey": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "hourglass",
+                        "check",
+                        "eye",
+                        "alert",
+                        "siren"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "level",
+                    "label",
+                    "iconKey"
+                  ],
+                  "additionalProperties": false
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whatChanged": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whyItMatters": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whatToDo": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "facts": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": [
+                      "number",
+                      "string",
+                      "boolean"
+                    ]
+                  }
+                },
+                "sources": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "disclaimer": {
+                  "type": "string",
+                  "const": "Decision support, not a diagnosis."
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "emergencyProcedureId": {
+                      "type": "string"
+                    },
+                    "measurement": {
+                      "type": "string",
+                      "const": "bp"
+                    },
+                    "routineId": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "id",
+                "ruleId",
+                "severity",
+                "status",
+                "title",
+                "whatChanged",
+                "whyItMatters",
+                "whatToDo",
+                "facts",
+                "sources",
+                "disclaimer"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextDue": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "missionDay",
+          "checkin",
+          "bp",
+          "card",
+          "cards",
+          "nextDue"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/checkin/protocol": {
+      "id": "checkin.protocol",
+      "tier": "must",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "protocolId": {
+            "type": "string",
+            "const": "pvt-b-3min"
+          },
+          "durationMs": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "isiMinMs": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "isiMaxMs": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "feedbackMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "lapseMs": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "falseStartMs": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "noResponseTimeoutMs": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "protocolId",
+          "durationMs",
+          "isiMinMs",
+          "isiMaxMs",
+          "feedbackMs",
+          "lapseMs",
+          "falseStartMs",
+          "noResponseTimeoutMs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "POST /api/checkins": {
+      "id": "checkins.create",
+      "tier": "must",
+      "status": 201,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "protocolId": {
+            "type": "string",
+            "const": "pvt-b-3min"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "trials": {
+            "minItems": 1,
+            "maxItems": 400,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "i": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "isiMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 60000
+                },
+                "rtMs": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 60000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "early": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "i",
+                "isiMs",
+                "rtMs",
+                "early"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "sleepHours": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 16
+          }
+        },
+        "required": [
+          "protocolId",
+          "startedAt",
+          "trials"
+        ],
+        "additionalProperties": false
+      },
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subjectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "missionDay": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "effectiveDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "protocolId": {
+            "type": "string",
+            "const": "pvt-b-3min"
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "stimuli": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "validResponses": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "lapses": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "falseStarts": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "meanSpeed": {
+                "type": "number",
+                "minimum": 0
+              },
+              "medianRtMs": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "performanceScore": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "stimuli",
+              "validResponses",
+              "lapses",
+              "falseStarts",
+              "meanSpeed",
+              "medianRtMs",
+              "performanceScore"
+            ],
+            "additionalProperties": false
+          },
+          "sleepHours": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "qcFlags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "zone": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "z": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "zone": {
+                "type": "string",
+                "enum": [
+                  "not_scored",
+                  "building",
+                  "in_zone",
+                  "watch",
+                  "act"
+                ]
+              },
+              "baseline": {
+                "type": "object",
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "mean": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "sd": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "windowSessions": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "n",
+                  "mean",
+                  "sd",
+                  "ready",
+                  "windowSessions"
+                ],
+                "additionalProperties": false
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "in_zone",
+                      "watch",
+                      "act",
+                      "urgent"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "iconKey": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "hourglass",
+                      "check",
+                      "eye",
+                      "alert",
+                      "siren"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "label",
+                  "iconKey"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "code",
+              "value",
+              "unit",
+              "z",
+              "zone",
+              "baseline",
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "simulated",
+              "live"
+            ]
+          },
+          "card": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ruleId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "in_zone",
+                  "watch",
+                  "act",
+                  "urgent"
+                ]
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "in_zone",
+                      "watch",
+                      "act",
+                      "urgent"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "iconKey": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "hourglass",
+                      "check",
+                      "eye",
+                      "alert",
+                      "siren"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "label",
+                  "iconKey"
+                ],
+                "additionalProperties": false
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "whatChanged": {
+                "type": "string",
+                "minLength": 1
+              },
+              "whyItMatters": {
+                "type": "string",
+                "minLength": 1
+              },
+              "whatToDo": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "facts": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": [
+                    "number",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "sources": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "url"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "disclaimer": {
+                "type": "string",
+                "const": "Decision support, not a diagnosis."
+              },
+              "links": {
+                "type": "object",
+                "properties": {
+                  "emergencyProcedureId": {
+                    "type": "string"
+                  },
+                  "measurement": {
+                    "type": "string",
+                    "const": "bp"
+                  },
+                  "routineId": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "ruleId",
+              "severity",
+              "status",
+              "title",
+              "whatChanged",
+              "whyItMatters",
+              "whatToDo",
+              "facts",
+              "sources",
+              "disclaimer"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "missionDay",
+          "effectiveDateTime",
+          "protocolId",
+          "metrics",
+          "sleepHours",
+          "qcFlags",
+          "zone",
+          "source",
+          "card"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/trends": {
+      "id": "trends",
+      "tier": "must",
+      "status": 200,
+      "query": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "reaction-speed",
+              "bp-systolic",
+              "bp-diastolic",
+              "sleep-hours"
+            ]
+          },
+          "days": {
+            "default": 30,
+            "type": "integer",
+            "minimum": 7,
+            "maximum": 120
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subjectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "simulated",
+              "live",
+              "mixed",
+              "nasa-osd-569"
+            ]
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "missionDay": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "effectiveDateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "value": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "zone": {
+                  "type": "string",
+                  "enum": [
+                    "not_scored",
+                    "building",
+                    "in_zone",
+                    "watch",
+                    "act"
+                  ]
+                },
+                "baselineMean": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "baselineSd": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "missionDay",
+                "effectiveDateTime",
+                "value",
+                "z",
+                "zone",
+                "baselineMean",
+                "baselineSd"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "band": {
+            "type": "object",
+            "properties": {
+              "ready": {
+                "type": "boolean"
+              },
+              "mean": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "sd": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "watchAt": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "actAt": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "ready",
+              "mean",
+              "sd",
+              "watchAt",
+              "actAt"
+            ],
+            "additionalProperties": false
+          },
+          "referenceRange": {
+            "type": "object",
+            "properties": {
+              "low": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "low",
+              "high"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "unit",
+          "subjectId",
+          "source",
+          "points",
+          "band"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/measurements/bp/guide": {
+      "id": "bp.guide",
+      "tier": "must",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "steps": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "timerSeconds": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "adaptation": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "severeSymptoms": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "chest-pain",
+                    "shortness-of-breath",
+                    "back-pain",
+                    "numbness-or-weakness",
+                    "vision-change",
+                    "trouble-speaking"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "lowSymptoms": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "confusion",
+                    "dizziness-or-lightheadedness",
+                    "fainting",
+                    "cold-sweaty-skin",
+                    "rapid-breathing",
+                    "weak-rapid-pulse"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "disclaimer": {
+            "type": "string",
+            "const": "Decision support, not a diagnosis."
+          },
+          "sources": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "version",
+          "steps",
+          "severeSymptoms",
+          "lowSymptoms",
+          "disclaimer",
+          "sources"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "POST /api/measurements/bp": {
+      "id": "bp.create",
+      "tier": "must",
+      "status": 201,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "takenAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "readings": {
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "systolic": {
+                  "type": "integer",
+                  "minimum": 40,
+                  "maximum": 300
+                },
+                "diastolic": {
+                  "type": "integer",
+                  "minimum": 20,
+                  "maximum": 200
+                },
+                "pulse": {
+                  "type": "integer",
+                  "minimum": 20,
+                  "maximum": 250
+                }
+              },
+              "required": [
+                "systolic",
+                "diastolic"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "symptoms": {
+            "maxItems": 12,
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "chest-pain",
+                    "shortness-of-breath",
+                    "back-pain",
+                    "numbness-or-weakness",
+                    "vision-change",
+                    "trouble-speaking"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "confusion",
+                    "dizziness-or-lightheadedness",
+                    "fainting",
+                    "cold-sweaty-skin",
+                    "rapid-breathing",
+                    "weak-rapid-pulse"
+                  ]
+                }
+              ]
+            }
+          },
+          "retestOf": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "takenAt",
+          "readings",
+          "symptoms"
+        ],
+        "additionalProperties": false
+      },
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subjectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "missionDay": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "effectiveDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "readings": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "systolic": {
+                  "type": "integer",
+                  "minimum": 40,
+                  "maximum": 300
+                },
+                "diastolic": {
+                  "type": "integer",
+                  "minimum": 20,
+                  "maximum": 200
+                },
+                "pulse": {
+                  "type": "integer",
+                  "minimum": 20,
+                  "maximum": 250
+                }
+              },
+              "required": [
+                "systolic",
+                "diastolic"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "average": {
+            "type": "object",
+            "properties": {
+              "systolic": {
+                "type": "integer",
+                "minimum": 40,
+                "maximum": 300
+              },
+              "diastolic": {
+                "type": "integer",
+                "minimum": 20,
+                "maximum": 200
+              },
+              "pulse": {
+                "type": "integer",
+                "minimum": 20,
+                "maximum": 250
+              }
+            },
+            "required": [
+              "systolic",
+              "diastolic"
+            ],
+            "additionalProperties": false
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "elevated",
+              "stage1",
+              "stage2",
+              "severe"
+            ]
+          },
+          "symptoms": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "chest-pain",
+                    "shortness-of-breath",
+                    "back-pain",
+                    "numbness-or-weakness",
+                    "vision-change",
+                    "trouble-speaking"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "confusion",
+                    "dizziness-or-lightheadedness",
+                    "fainting",
+                    "cold-sweaty-skin",
+                    "rapid-breathing",
+                    "weak-rapid-pulse"
+                  ]
+                }
+              ]
+            }
+          },
+          "retestOf": {
+            "type": "string"
+          },
+          "zone": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "z": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "zone": {
+                "type": "string",
+                "enum": [
+                  "not_scored",
+                  "building",
+                  "in_zone",
+                  "watch",
+                  "act"
+                ]
+              },
+              "baseline": {
+                "type": "object",
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "mean": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "sd": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "windowSessions": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "n",
+                  "mean",
+                  "sd",
+                  "ready",
+                  "windowSessions"
+                ],
+                "additionalProperties": false
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "in_zone",
+                      "watch",
+                      "act",
+                      "urgent"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "iconKey": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "hourglass",
+                      "check",
+                      "eye",
+                      "alert",
+                      "siren"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "label",
+                  "iconKey"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "code",
+              "value",
+              "unit",
+              "z",
+              "zone",
+              "baseline",
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          "nextAction": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "retest",
+                  "alert_crew"
+                ]
+              },
+              "afterSeconds": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          "card": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ruleId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "in_zone",
+                  "watch",
+                  "act",
+                  "urgent"
+                ]
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "in_zone",
+                      "watch",
+                      "act",
+                      "urgent"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "iconKey": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "hourglass",
+                      "check",
+                      "eye",
+                      "alert",
+                      "siren"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "label",
+                  "iconKey"
+                ],
+                "additionalProperties": false
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "whatChanged": {
+                "type": "string",
+                "minLength": 1
+              },
+              "whyItMatters": {
+                "type": "string",
+                "minLength": 1
+              },
+              "whatToDo": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "facts": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": [
+                    "number",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "sources": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "url"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "disclaimer": {
+                "type": "string",
+                "const": "Decision support, not a diagnosis."
+              },
+              "links": {
+                "type": "object",
+                "properties": {
+                  "emergencyProcedureId": {
+                    "type": "string"
+                  },
+                  "measurement": {
+                    "type": "string",
+                    "const": "bp"
+                  },
+                  "routineId": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "ruleId",
+              "severity",
+              "status",
+              "title",
+              "whatChanged",
+              "whyItMatters",
+              "whatToDo",
+              "facts",
+              "sources",
+              "disclaimer"
+            ],
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "simulated",
+              "live"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "missionDay",
+          "effectiveDateTime",
+          "readings",
+          "average",
+          "category",
+          "symptoms",
+          "zone",
+          "nextAction",
+          "card",
+          "source"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/emergency/procedures": {
+      "id": "emergency.list",
+      "tier": "must",
+      "status": 200,
+      "query": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "for": {
+            "default": "self",
+            "type": "string",
+            "enum": [
+              "self",
+              "crewmate"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "procedures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "for": {
+                  "type": "string",
+                  "enum": [
+                    "self",
+                    "crewmate"
+                  ]
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whenToUse": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "steps": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "text": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "detail": {
+                        "type": "string"
+                      },
+                      "timerSeconds": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "caution": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "text"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "redFlags": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "escalation": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "action": {
+                      "type": "string",
+                      "const": "alert_crew"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "action"
+                  ],
+                  "additionalProperties": false
+                },
+                "disclaimer": {
+                  "type": "string",
+                  "const": "Decision support, not a diagnosis."
+                },
+                "sources": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "version",
+                "for",
+                "title",
+                "whenToUse",
+                "steps",
+                "redFlags",
+                "escalation",
+                "disclaimer",
+                "sources"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "version",
+          "procedures"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/emergency/procedures/:id": {
+      "id": "emergency.one",
+      "tier": "must",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "for": {
+            "type": "string",
+            "enum": [
+              "self",
+              "crewmate"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "whenToUse": {
+            "type": "string",
+            "minLength": 1
+          },
+          "steps": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "timerSeconds": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "caution": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "redFlags": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "escalation": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "action": {
+                "type": "string",
+                "const": "alert_crew"
+              }
+            },
+            "required": [
+              "text",
+              "action"
+            ],
+            "additionalProperties": false
+          },
+          "disclaimer": {
+            "type": "string",
+            "const": "Decision support, not a diagnosis."
+          },
+          "sources": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "for",
+          "title",
+          "whenToUse",
+          "steps",
+          "redFlags",
+          "escalation",
+          "disclaimer",
+          "sources"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "POST /api/coach/ask": {
+      "id": "coach.ask",
+      "tier": "reserved",
+      "status": 501,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_input",
+                  "not_found",
+                  "not_built",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "issues": {
+                "type": "array",
+                "items": {}
+              },
+              "feature": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/routines": {
+      "id": "routines",
+      "tier": "reserved",
+      "status": 501,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_input",
+                  "not_found",
+                  "not_built",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "issues": {
+                "type": "array",
+                "items": {}
+              },
+              "feature": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "POST /api/share/preview": {
+      "id": "share.preview",
+      "tier": "reserved",
+      "status": 501,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_input",
+                  "not_found",
+                  "not_built",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "issues": {
+                "type": "array",
+                "items": {}
+              },
+              "feature": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "POST /api/share": {
+      "id": "share.send",
+      "tier": "reserved",
+      "status": 501,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_input",
+                  "not_found",
+                  "not_built",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "issues": {
+                "type": "array",
+                "items": {}
+              },
+              "feature": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/reminders": {
+      "id": "reminders.get",
+      "tier": "reserved",
+      "status": 501,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_input",
+                  "not_found",
+                  "not_built",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "issues": {
+                "type": "array",
+                "items": {}
+              },
+              "feature": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "PUT /api/reminders": {
+      "id": "reminders.put",
+      "tier": "reserved",
+      "status": 501,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_input",
+                  "not_found",
+                  "not_built",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "issues": {
+                "type": "array",
+                "items": {}
+              },
+              "feature": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

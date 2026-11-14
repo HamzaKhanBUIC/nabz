@@ -1,0 +1,16 @@
+{
+  "error": {
+    "code": "invalid_input",
+    "message": "The request body does not match the contract.",
+    "issues": [
+      {
+        "path": [
+          "trials",
+          0,
+          "rtMs"
+        ],
+        "message": "Invalid input: expected number, received string"
+      }
+    ]
+  }
+}

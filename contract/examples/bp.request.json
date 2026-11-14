@@ -1,0 +1,14 @@
+{
+  "takenAt": "2026-11-15T08:20:00+00:00",
+  "readings": [
+    {
+      "systolic": 184,
+      "diastolic": 118
+    },
+    {
+      "systolic": 186,
+      "diastolic": 122
+    }
+  ],
+  "symptoms": []
+}

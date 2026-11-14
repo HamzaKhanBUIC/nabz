@@ -1,0 +1,42 @@
+{
+  "code": "reaction-speed",
+  "unit": "1/s",
+  "subjectId": "sara",
+  "source": "simulated",
+  "points": [
+    {
+      "missionDay": 118,
+      "effectiveDateTime": "2026-11-13T08:00:00+00:00",
+      "value": 4.21,
+      "z": 0.12,
+      "zone": "in_zone",
+      "baselineMean": 4.18,
+      "baselineSd": 0.25
+    },
+    {
+      "missionDay": 119,
+      "effectiveDateTime": "2026-11-14T08:00:00+00:00",
+      "value": 3.92,
+      "z": -1.04,
+      "zone": "watch",
+      "baselineMean": 4.18,
+      "baselineSd": 0.25
+    },
+    {
+      "missionDay": 120,
+      "effectiveDateTime": "2026-11-15T08:02:11+00:00",
+      "value": 3.71,
+      "z": -1.88,
+      "zone": "act",
+      "baselineMean": 4.18,
+      "baselineSd": 0.25
+    }
+  ],
+  "band": {
+    "ready": true,
+    "mean": 4.18,
+    "sd": 0.25,
+    "watchAt": 3.93,
+    "actAt": 3.81
+  }
+}

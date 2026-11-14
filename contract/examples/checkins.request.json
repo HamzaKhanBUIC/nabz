@@ -1,0 +1,31 @@
+{
+  "protocolId": "pvt-b-3min",
+  "startedAt": "2026-11-15T08:02:11+00:00",
+  "sleepHours": 5.2,
+  "trials": [
+    {
+      "i": 0,
+      "isiMs": 2140,
+      "rtMs": 268,
+      "early": false
+    },
+    {
+      "i": 1,
+      "isiMs": 1630,
+      "rtMs": null,
+      "early": true
+    },
+    {
+      "i": 2,
+      "isiMs": 3310,
+      "rtMs": 412,
+      "early": false
+    },
+    {
+      "i": 3,
+      "isiMs": 2875,
+      "rtMs": null,
+      "early": false
+    }
+  ]
+}

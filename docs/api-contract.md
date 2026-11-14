@@ -1,6 +1,9 @@
-# API contract (v0.1, draft until F01 passes)
+# API contract (v0.1)
 
 For the frontend. This page, the zod schemas in `src/schemas/` and the JSON files in `contract/examples/` say the same thing; tests keep them in step. If they ever disagree, the schemas win and this page gets fixed.
+
+- **Machine-readable shapes:** `contract/schemas.json` (JSON Schema for every endpoint).
+- **Status (Nov 14):** shapes are final for the Must endpoints. The server answers `/api/health` today; the other endpoints go live as they are built. Until then, use the example files as mock data.
 
 - **Base URL:** `http://localhost:8787`. JSON in, JSON out. CORS is open for `localhost` origins.
 - **No login.** One user (Sara, `subjectId: "sara"`).
@@ -54,7 +57,7 @@ Request:
               { "i": 2, "isiMs": 3310, "rtMs": 412, "early": false } ] }
 ```
 
-`sleepHours` is optional (0–16). Response `201`:
+`sleepHours` is optional (0–16). Any field not listed here is rejected with a 400, including scores computed in the browser. The example is shortened to 3 trials; a real session has about 60. Response `201`:
 
 ```json
 { "id": "chk-sara-120", "subjectId": "sara", "missionDay": 120,
@@ -117,7 +120,7 @@ Response `201`:
   "effectiveDateTime": "2026-11-15T08:20:00+00:00",
   "readings": [ { "systolic": 184, "diastolic": 118 }, { "systolic": 186, "diastolic": 122 } ],
   "average": { "systolic": 185, "diastolic": 120 }, "category": "severe", "symptoms": [],
-  "zone": { "code": "bp-systolic", "value": 185, "unit": "mmHg", "z": 6.2, "zone": "watch",
+  "zone": { "code": "bp-systolic", "value": 185, "unit": "mmHg", "z": 17.32, "zone": "watch",
             "baseline": { "n": 14, "mean": 114, "sd": 4.1, "ready": true, "windowSessions": 14 },
             "status": { "level": "watch", "label": "Different from your normal", "iconKey": "eye" } },
   "nextAction": { "type": "retest", "afterSeconds": 300 },
@@ -146,10 +149,10 @@ Five ids: `bleeding`, `burn`, `eye`, `allergic-reaction`, `near-fainting`. Fetch
 ### `GET /api/today`
 
 ```json
-{ "missionDay": 120, "checkin": null, "bp": null, "card": { "…": "…" }, "cards": [], "nextDue": null }
+{ "missionDay": 120, "checkin": null, "bp": null, "card": null, "cards": [], "nextDue": null }
 ```
 
-`checkin` and `bp` are today's entries, or `null` if not done yet. `card` is the most severe of today's cards.
+`checkin` and `bp` are today's entries, or `null` if not done yet. `card` is the most severe of today's cards, or `null` when nothing has been done today. `nextDue` stays `null` until the reminder feature is built.
 
 ### `GET /api/mission`
 

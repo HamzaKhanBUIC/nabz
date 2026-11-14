@@ -1,0 +1,80 @@
+{
+  "id": "bp-sara-120-1",
+  "subjectId": "sara",
+  "missionDay": 120,
+  "effectiveDateTime": "2026-11-15T08:20:00+00:00",
+  "readings": [
+    {
+      "systolic": 184,
+      "diastolic": 118
+    },
+    {
+      "systolic": 186,
+      "diastolic": 122
+    }
+  ],
+  "average": {
+    "systolic": 185,
+    "diastolic": 120
+  },
+  "category": "severe",
+  "symptoms": [],
+  "zone": {
+    "code": "bp-systolic",
+    "value": 185,
+    "unit": "mmHg",
+    "z": 17.32,
+    "zone": "watch",
+    "baseline": {
+      "n": 14,
+      "mean": 114,
+      "sd": 4.1,
+      "ready": true,
+      "windowSessions": 14
+    },
+    "status": {
+      "level": "watch",
+      "label": "Different from your normal",
+      "iconKey": "eye"
+    }
+  },
+  "nextAction": {
+    "type": "retest",
+    "afterSeconds": 300
+  },
+  "card": {
+    "id": "bp-severe-retest",
+    "ruleId": "BP-SEVERE-RETEST",
+    "severity": "act",
+    "status": {
+      "level": "act",
+      "label": "Check again",
+      "iconKey": "alert"
+    },
+    "title": "Very high reading: measure again",
+    "whatChanged": "Your reading averaged 185/120 mmHg. Above 180/120 is in the severe range.",
+    "whyItMatters": "One very high reading can be a measurement error. The guidance is to wait and measure again, unless you have symptoms.",
+    "whatToDo": [
+      "Rest quietly for about 5 minutes.",
+      "Take the measurement again.",
+      "If you get chest pain, shortness of breath, back pain, numbness or weakness, a change in vision or trouble speaking, alert a crewmate now."
+    ],
+    "facts": {
+      "systolic": 185,
+      "diastolic": 120,
+      "retestMinutes": 5
+    },
+    "sources": [
+      {
+        "id": "aha-acc-2025-bp",
+        "title": "2025 AHA/ACC Guideline for the Prevention, Detection, Evaluation, and Management of High Blood Pressure in Adults",
+        "url": "https://www.jacc.org/doi/10.1016/j.jacc.2025.05.007"
+      }
+    ],
+    "disclaimer": "Decision support, not a diagnosis.",
+    "links": {
+      "measurement": "bp"
+    }
+  },
+  "source": "live"
+}

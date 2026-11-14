@@ -1,0 +1,48 @@
+import type { z } from "zod";
+import { BpGuide, BpInput, BpMeasurement } from "./bp";
+import { CheckinInput, CheckinResponse, Protocol } from "./checkin";
+import { ErrorBody, HealthResponse } from "./common";
+import { Mission, Today } from "./mission";
+import { Procedure, ProcedureBundle, ProcedureQuery } from "./procedure";
+import { Trend, TrendQuery } from "./trend";
+
+export type EndpointSpec = {
+  id: string;
+  method: "GET" | "POST" | "PUT";
+  path: string;
+  /** must: part of the first build. reserved: answers 501 until its feature is designed and built. */
+  tier: "must" | "reserved";
+  /** Success status for "must"; 501 for "reserved". */
+  status: number;
+  query?: z.ZodType;
+  request?: z.ZodType;
+  response: z.ZodType;
+  /** File names in contract/examples/. */
+  examples: { request?: string; response: string };
+};
+
+const NOT_BUILT = { status: 501, response: ErrorBody, examples: { response: "error-not-built.response.json" } } as const;
+
+/** The whole API in one table. The server, the tests and docs/api-contract.md all follow it. */
+export const ENDPOINTS: EndpointSpec[] = [
+  { id: "health", method: "GET", path: "/api/health", tier: "must", status: 200, response: HealthResponse, examples: { response: "health.response.json" } },
+  { id: "mission", method: "GET", path: "/api/mission", tier: "must", status: 200, response: Mission, examples: { response: "mission.response.json" } },
+  { id: "today", method: "GET", path: "/api/today", tier: "must", status: 200, response: Today, examples: { response: "today.response.json" } },
+  { id: "checkin.protocol", method: "GET", path: "/api/checkin/protocol", tier: "must", status: 200, response: Protocol, examples: { response: "checkin-protocol.response.json" } },
+  { id: "checkins.create", method: "POST", path: "/api/checkins", tier: "must", status: 201, request: CheckinInput, response: CheckinResponse, examples: { request: "checkins.request.json", response: "checkins.response.json" } },
+  { id: "trends", method: "GET", path: "/api/trends", tier: "must", status: 200, query: TrendQuery, response: Trend, examples: { response: "trends.response.json" } },
+  { id: "bp.guide", method: "GET", path: "/api/measurements/bp/guide", tier: "must", status: 200, response: BpGuide, examples: { response: "bp-guide.response.json" } },
+  { id: "bp.create", method: "POST", path: "/api/measurements/bp", tier: "must", status: 201, request: BpInput, response: BpMeasurement, examples: { request: "bp.request.json", response: "bp.response.json" } },
+  { id: "emergency.list", method: "GET", path: "/api/emergency/procedures", tier: "must", status: 200, query: ProcedureQuery, response: ProcedureBundle, examples: { response: "emergency-procedures.response.json" } },
+  { id: "emergency.one", method: "GET", path: "/api/emergency/procedures/:id", tier: "must", status: 200, response: Procedure, examples: { response: "emergency-procedure.response.json" } },
+
+  { id: "coach.ask", method: "POST", path: "/api/coach/ask", tier: "reserved", ...NOT_BUILT },
+  { id: "routines", method: "GET", path: "/api/routines", tier: "reserved", ...NOT_BUILT },
+  { id: "share.preview", method: "POST", path: "/api/share/preview", tier: "reserved", ...NOT_BUILT },
+  { id: "share.send", method: "POST", path: "/api/share", tier: "reserved", ...NOT_BUILT },
+  { id: "reminders.get", method: "GET", path: "/api/reminders", tier: "reserved", ...NOT_BUILT },
+  { id: "reminders.put", method: "PUT", path: "/api/reminders", tier: "reserved", ...NOT_BUILT },
+];
+
+/** Error examples that belong to no single endpoint. */
+export const ERROR_EXAMPLES = ["error-invalid-input.response.json", "error-not-found.response.json", "error-not-built.response.json"];

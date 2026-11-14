@@ -1,0 +1,32 @@
+{
+  "name": "Mars Transit 1",
+  "profile": "mars-transit",
+  "launchDate": "2026-07-19",
+  "missionDay": 120,
+  "commsDelay": {
+    "oneWayMinMinutes": 3,
+    "oneWayMaxMinutes": 22
+  },
+  "crew": [
+    {
+      "id": "sara",
+      "name": "Sara",
+      "role": "Commander"
+    },
+    {
+      "id": "crew-2",
+      "name": "Crew 2",
+      "role": "Pilot"
+    },
+    {
+      "id": "crew-3",
+      "name": "Crew 3",
+      "role": "Medical officer"
+    },
+    {
+      "id": "crew-4",
+      "name": "Crew 4",
+      "role": "Engineer"
+    }
+  ]
+}
