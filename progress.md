@@ -90,3 +90,15 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Verified in live browser on `http://localhost:8787/dev/` (screenshot `final_step_30.png`): 0 console/network errors, Day-120 sample renders `[alert] Below your normal` + `RT-SHORT-SLEEP` card (`Decision support, not a diagnosis.`) + updated trend, plus guided BP and 5 emergency tabs.
 - Gate PASS (`tsc`, `eslint`, `vitest run`).
 - Next: F12 `README.md` quickstart and frontend handover documentation.
+
+## 2026-11-14 — F12 README quickstart and frontend handover documentation
+- Added root `README.md` starting with the one-command backend launch (`npm install && npm run dev`, plus `./init.ps1` / `./init.sh`, port `8787`, `/api/today`, `/dev/`), full frontend handover pointers (`docs/api-contract.md`, `contract/examples/*.json`, `contract/schemas.json`, `src/schemas/`, `docs/wireframe-review.md`, `tools/console/`), endpoint summary, reset instructions, and repository map.
+- Verified `npm run start` brings up `http://localhost:8787` and `GET /api/today` returns HTTP `200` (`{"missionDay":120,"checkin":null,"bp":null,"card":null,"cards":[],"nextDue":null}`).
+- Finished features: F00, F01, F02, F07, F03, F04, F05, F06, F08, F09, F10, F11, F12 (all P0 Must and P1 features complete)
+- Half-done: none
+- Remaining/Reserved P2 Should features: S01–S05 (slots in `src/slots/` and `501 not_built` stubs in place per `docs/blueprint/01-scope.md`, awaiting per-feature ADR/design pass)
+- Gate output (`python scripts/gate.py`):
+  `PASS npx tsc --noEmit`
+  `PASS npx eslint .`
+  `PASS npx vitest run`
+  `GATE: PASS`

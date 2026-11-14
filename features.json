@@ -135,8 +135,8 @@
       "verify": [
         "manual: on a clean clone, follow README only; server runs and /api/today answers"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Root README.md starts with one-command backend startup and includes complete frontend handover pointing to docs/api-contract.md, contract/examples/, contract/schemas.json, docs/wireframe-review.md, and /dev."
     },
     {
       "id": "F10",
