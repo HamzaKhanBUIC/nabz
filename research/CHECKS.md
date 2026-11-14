@@ -101,6 +101,26 @@ Status: **verified, one correction**
   - the ISS AED model (LIFEPAK 1000)
   - the "Warn, Gather, Work" toxic-air reference. The DOI cited in R4/R8, `10.82217/...`, looks malformed. The toxic-air steps must say "follow your spacecraft's emergency procedure".
 
+## R7: AI coach and voice (Should / Later)
+
+Status: **verified, one correction.** Nothing here goes into Must code; it feeds the Should design and the pitch.
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| Speechmatics real-time: $0.15–0.40/hr, so $500 buys ~1,250–3,333 h | **corrected** | [Speechmatics pricing](https://www.speechmatics.com/pricing). Those are the best-case rates: model-training opt-in (−33%) plus the top annual tier (−25%). **List rates** are Linden 1 $0.30 (promo, was $0.40), Melia 1 $0.40, Standard $0.45, Oak 1 (medical) $0.46, Enhanced $0.80 per hour. At list, $500 buys about **625 h (Enhanced) to ~1,667 h (Linden 1)**, ~1,087 h of Oak 1. Either way, far more than a hackathon needs. |
+| 1 credit = $1; Free plan has $100 credit and 2 concurrent real-time sessions | confirmed | same |
+| Speechmatics TTS: $0.011 per 1,000 chars after 1M free chars | confirmed | same |
+| On-prem / on-device Speechmatics is Enterprise only, not usable on self-serve credits | confirmed | [Speechmatics plans](https://docs.speechmatics.com/administration/plans): "These deployment options are available only on Enterprise." |
+| Browser `SpeechRecognition` is not offline-safe (Chrome sends audio to a server) | confirmed | [MDN SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition): audio "is sent to a web service for recognition processing, so it won't work offline." `processLocally` exists but support is limited. |
+| NASA CMO-DA ("Doc in a Box") OSCE: Llama 3.1 (8B/70B/405B), 3 scenarios, 3 evaluators; ankle 88%, ear 80%, flank 74%; better at diagnosis than treatment | confirmed | NTRS [20250002755](https://ntrs.nasa.gov/citations/20250002755), abstract + slides (PDF text searched). It is a conference talk (AsMA, June 2025) with 3 cases, so call it a preliminary result in the pitch. |
+| Qwen3-4B licence Apache 2.0 | confirmed | Hugging Face API, `Qwen/Qwen3-4B` card data |
+| RAG over verified documents: hallucinations 0% (GPT-4) / 6% (GPT-3.5) vs ~40% with no retrieval; RAG bots declined when the source had no answer | confirmed | Nishisako et al., JMIR Cancer 2025, PMID 40934488 (abstract via PubMed). **Trade-off R7 left out:** RAG bots answered only 36–81% of questions. Expect the coach to say "I don't have a verified source on that" often. |
+
+**Notes:**
+- R7 cites this study as PMC10365615. That PMC ID is a different paper (GPT on the Japanese licensing exam). Cite PMIDs from R7, not its PMC IDs.
+- Not checked: model file sizes and VRAM figures, Vosk / whisper.cpp / Kokoro / Piper sizes and licences, the voice-guided-CPR studies (#19), and Speechmatics latency and language counts. Re-check whichever one we actually pick before it goes into the design.
+- R7 says Mars is 3–22 min one way, which matches R5. The "40 minutes" in the problem statement is the round trip.
+
 ## Summary
 
 | R | Status | Corrections |
@@ -111,5 +131,5 @@ Status: **verified, one correction**
 | R4 emergencies | verified | eye flush **15 min**; tourniquet "2 in" is width, not placement |
 | R5 environments | verified (delays) | none |
 | R6 simulation | verified | PVT-B gap 1–4 s, not 0–4 s |
-| R7 AI coach + voice | queued | brief written, not run yet |
+| R7 AI coach + voice | verified | Speechmatics $0.15–0.40/hr is the best-case discounted rate; list is $0.30–0.80/hr (still 625+ h for $500) |
 | R8 crewmate emergency | verified | ER leg position wording; toxic-air steps defer to spacecraft procedure |

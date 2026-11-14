@@ -13,3 +13,4 @@ The Space Apps submission must describe how SI (AI) was used. Log every AI job h
 | Nov 14 | Antigravity app (run by Hamza) | Research R8: crewmate emergency | research/R8-crewmate-emergency.md | Claude: verified against Hinkelbein 2020 guideline + 3 PubMed abstracts, 1 correction |
 | Nov 14 | Claude Code (Opus 5.5) | R7 brief (AI coach + voice) | research/briefs/R7-ai-and-voice.md | Hamza |
 | Nov 14 | Claude Code (Opus 5.5) | Git setup, secret-scan hook (tested: blocked a fake token) | .gitignore, .githooks/ | Claude |
+| Nov 14 | Antigravity app (run by Hamza) | Research R7: AI coach + voice | research/R7-ai-and-voice.md | Claude: verified 8 key claims (Speechmatics pricing/plans, MDN, NASA NTRS slides, HF licence, PubMed), 1 correction |

@@ -1,6 +1,6 @@
 # HANDOFF: NOVA TRIO, Space Apps 2026 (Astronaut Health Monitoring)
 
-Last updated: Sat Nov 14, 2026, ~4:40 PM PKT.
+Last updated: Sat Nov 14, 2026, evening PKT.
 **Phase: research + basic setup.**
 - Git repo is set up, with a gitleaks secret-scan hook in `.githooks/`. Each clone turns it on with `git config core.hooksPath .githooks`.
 - Private GitHub repo: see the bottom of this file.
@@ -74,7 +74,7 @@ Must → Should → Later. Within Must: data → formulas → action cards → m
 
 1. Research R1–R6 running in Antigravity (Hamza's app, started Nov 14 afternoon). Hamza tells Claude when done.
    - **R1–R6 verified (Nov 14).** 4 corrections, recorded in research/CHECKS.md, which wins over the R files.
-   - R8 (crewmate emergency, Should) verified, 1 correction. R7 (AI coach + voice) brief written, not run yet.
+   - R7 (AI coach + voice) and R8 (crewmate emergency) verified, 1 correction each. All research R1–R8 is done.
 2. Claude verifies each result against its sources; Argon second opinion on key numbers.
 3. Decide: core NASA sources (R1), which emergencies (R4), environment switch yes/no (R5).
 4. Design: data model, formulas, action-card rules, API contract. Write DESIGN.md.
