@@ -72,3 +72,8 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Updated `src/api/app.ts` to serve all 10 Must endpoints (`/api/health`, `/api/mission`, `/api/today`, `/api/checkin/protocol`, `POST /api/checkins`, `/api/trends`, `/api/measurements/bp/guide`, `POST /api/measurements/bp`, `/api/emergency/procedures`, `/api/emergency/procedures/:id`), return `501 not_built` on all 6 reserved Should endpoints, and mount `/dev` in non-production mode.
 - Added `tests/contract/api.test.ts` (5/5 pass). Gate PASS (`tsc`, `eslint`, `vitest run` 69/69).
 - Next: F09 offline hero-flow golden test (`tests/golden/hero-flow.test.ts`).
+
+## 2026-11-14 — F09 offline hero flow golden test
+- Added `tests/golden/hero-flow.test.ts` (2/2 pass) verifying full offline replay of Sara's 120-day fixture (day 120 `act` + `RT-SHORT-SLEEP`, `short-sleep-week` `act` peak) and end-to-end HTTP flow (`GET /api/today` -> `POST /api/checkins` -> `GET /api/trends` -> `POST /api/measurements/bp` severe retest -> `GET /api/emergency/procedures`).
+- Gate PASS in ~10s (< 60s limit).
+- Next: F10 NASA Inspiration4 (`OSD-569`) blood-count trend (`src/store/nasa.ts`).

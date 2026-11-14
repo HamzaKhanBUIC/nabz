@@ -123,8 +123,8 @@
         "npx vitest run tests/golden/hero-flow.test.ts",
         "python scripts/gate.py finishes in under 60 seconds"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added tests/golden/hero-flow.test.ts verifying day-120 act + RT-SHORT-SLEEP, short-sleep-week peak, reaction trend drop, severe BP 5-min retest, and offline emergency bundle (2/2 pass); gate PASS under 60s."
     },
     {
       "id": "F12",
