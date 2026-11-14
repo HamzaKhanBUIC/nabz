@@ -48,3 +48,9 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Added `tests/unit/baseline.test.ts` (6/6 pass) verifying 4-vs-5 session calibration, the M2 hand-computed cases, exact z-score boundaries, exclusion of flagged/act entries, `sd === 0` stability, missing mission days, and `Trend` + `TrendBand` schema compliance.
 - Gate PASS (`npx tsc --noEmit`, `npx eslint .`, `npx vitest run`).
 - Next: F05 priority action-card engine (`src/core/cards.ts`).
+
+## 2026-11-14 — F05 priority rule table and action cards
+- Added `SEVERE_BP_SYMPTOM_IDS` and `LOW_BP_SYMPTOM_IDS` to `src/core/constants.ts`, plus `src/core/cards.ts` (`validateCardCatalog`, `selectReactionCard`, `selectBpCard`, `selectCard`, `pickMostSevereCard`) implementing all 7 reaction rules and all 10 blood-pressure rules in exact M3 priority order.
+- Added `tests/unit/cards.test.ts` (4/4 pass) verifying catalog source validation against `content/cards.json` and `content/sources.json`, all 17 rule boundaries and precedence rules, `{placeholder}` resolution, and strict error throwing on missing templates or facts.
+- Gate PASS (`npx tsc --noEmit`, `npx eslint .`, `npx vitest run`).
+- Next: F06 guided blood pressure measurement, classification, and next action (`src/core/bp.ts`, `src/core/index.ts`).

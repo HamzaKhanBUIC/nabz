@@ -74,8 +74,8 @@
       "verify": [
         "npx vitest run tests/unit/cards.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented pure src/core/cards.ts (all 7 reaction + 10 BP priority rules, template/source validation, placeholder rendering) and tests/unit/cards.test.ts (4/4 pass); gate PASS."
     },
     {
       "id": "F06",

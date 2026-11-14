@@ -22,3 +22,4 @@ The Space Apps submission must describe how SI (AI) was used. Log every AI job h
 | Nov 14 | Antigravity (Orchestrator Argon) | F07: verified emergency procedures, BP guide, card templates, sources, and content tests | content/, tests/unit/content.test.ts | Gate PASS (tsc, eslint, content.test.ts 4/4) |
 | Nov 14 | Antigravity (Orchestrator Argon) | F03: PVT-B protocol, trial scoring, and session QC rules | src/core/{constants,pvt,qc}.ts, tests/unit/pvt.test.ts | Gate PASS (tsc, eslint, pvt.test.ts 5/5) |
 | Nov 14 | Antigravity (Orchestrator Argon) | F04: personal baseline fold, zone classification, and trend builder | src/core/{zone,baseline}.ts, tests/unit/baseline.test.ts | Gate PASS (tsc, eslint, baseline.test.ts 6/6) |
+| Nov 14 | Antigravity (Orchestrator Argon) | F05: priority rule table and action card rendering engine | src/core/{constants,cards}.ts, tests/unit/cards.test.ts | Gate PASS (tsc, eslint, cards.test.ts 4/4) |

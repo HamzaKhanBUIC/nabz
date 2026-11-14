@@ -123,3 +123,23 @@ export const MARS_DELAY_MAX_MINUTES = 22;
 
 /** Mandatory card footer from docs/blueprint/03-data-model.md and src/schemas/common.ts. */
 export const CARD_DISCLAIMER = "Decision support, not a diagnosis." as const;
+
+/** research/CHECKS.md (AHA severe hypertension red-flag symptoms). */
+export const SEVERE_BP_SYMPTOM_IDS = [
+  "chest-pain",
+  "shortness-of-breath",
+  "back-pain",
+  "numbness-or-weakness",
+  "vision-change",
+  "trouble-speaking",
+] as const;
+
+/** research/CHECKS.md (NHLBI symptomatic hypotension symptoms). */
+export const LOW_BP_SYMPTOM_IDS = [
+  "confusion",
+  "dizziness-or-lightheadedness",
+  "fainting",
+  "cold-sweaty-skin",
+  "rapid-breathing",
+  "weak-rapid-pulse",
+] as const;
