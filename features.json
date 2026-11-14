@@ -147,8 +147,8 @@
       "verify": [
         "npx vitest run tests/golden/nasa-i4.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented src/store/nasa.ts parsing OSD-569 Inspiration4 CBC CSV and scoring via foldHistory + buildTrend; tests/golden/nasa-i4.test.ts 2/2 pass; gate PASS."
     },
     {
       "id": "F11",

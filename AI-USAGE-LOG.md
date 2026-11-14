@@ -26,3 +26,4 @@ The Space Apps submission must describe how SI (AI) was used. Log every AI job h
 | Nov 14 | Antigravity (Orchestrator Argon) | F06: guided blood pressure averaging, categorization, sustained high, and next actions | src/core/{bp,index}.ts, tests/unit/bp.test.ts | Gate PASS (tsc, eslint, bp.test.ts 6/6) |
 | Nov 14 | Antigravity (Orchestrator Argon) | F08: JSON store, Must API endpoints, and 501 reserved stubs | src/store/*, src/api/app.ts, tests/contract/api.test.ts | Gate PASS (tsc, eslint, api.test.ts 5/5) |
 | Nov 14 | Antigravity (Orchestrator Argon) | F09: offline hero-flow golden test (day 120 check-in, trend, severe BP, emergency) | tests/golden/hero-flow.test.ts | Gate PASS (tsc, eslint, hero-flow.test.ts 2/2, < 60s) |
+| Nov 14 | Antigravity (Orchestrator Argon) | F10: NASA OSD-569 Inspiration4 blood count trend engine integration | src/store/{nasa,index}.ts, tests/golden/nasa-i4.test.ts | Gate PASS (tsc, eslint, nasa-i4.test.ts 2/2) |

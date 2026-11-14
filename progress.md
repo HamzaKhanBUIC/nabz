@@ -77,3 +77,9 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Added `tests/golden/hero-flow.test.ts` (2/2 pass) verifying full offline replay of Sara's 120-day fixture (day 120 `act` + `RT-SHORT-SLEEP`, `short-sleep-week` `act` peak) and end-to-end HTTP flow (`GET /api/today` -> `POST /api/checkins` -> `GET /api/trends` -> `POST /api/measurements/bp` severe retest -> `GET /api/emergency/procedures`).
 - Gate PASS in ~10s (< 60s limit).
 - Next: F10 NASA Inspiration4 (`OSD-569`) blood-count trend (`src/store/nasa.ts`).
+
+## 2026-11-14 — F10 NASA Inspiration4 OSD-569 blood counts
+- Added `src/store/nasa.ts` (`parseOsd569Csv`, `loadNasaOsd569Samples`, `buildNasaBloodTrend`) parsing all 4 Inspiration4 subjects × 7 timepoints (`L-92` to `R+194`) and running them through `foldHistory` (`minSessions: 3`) + `buildTrend` (`source: "nasa-osd-569"` with lab `referenceRange`).
+- Added `tests/golden/nasa-i4.test.ts` (2/2 pass) verifying 4 subjects × 7 timepoints and confirming `C002` `hematocrit` `34.7` at `R+82` drops below its `35..45` reference range.
+- Gate PASS (`tsc`, `eslint`, `vitest run`).
+- Next: F11 `/dev` browser test console (`tools/console/`).
