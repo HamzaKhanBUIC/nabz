@@ -1,0 +1,24 @@
+# Secrets: only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+.venv/
+__pycache__/
+
+# Tool logs
+.playwright-mcp/
+
+# Team-private workshop files
+*.docx
+day-in-the-life*.png
+day-in-the-life*.svg
+playbook-cover.png
+
+# OS
+.DS_Store
+Thumbs.db
