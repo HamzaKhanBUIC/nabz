@@ -110,8 +110,8 @@
       "verify": [
         "npx vitest run tests/contract/api.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented file-backed store (src/store/*), all 10 Must + 6 501 Should endpoints in src/api/app.ts, and tests/contract/api.test.ts (5/5 pass); gate PASS."
     },
     {
       "id": "F09",

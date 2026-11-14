@@ -66,3 +66,9 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
   `PASS npx eslint .`
   `PASS npx vitest run`
   `GATE: PASS`
+
+## 2026-11-14 — F08 Must API routes and JSON store
+- Added `src/store/{clock,runtime,content,fixtures,index}.ts` implementing pinned/env clock, atomic temp+rename runtime storage with `*.corrupt` fallback, verified content loader, and core-scored fixture replay.
+- Updated `src/api/app.ts` to serve all 10 Must endpoints (`/api/health`, `/api/mission`, `/api/today`, `/api/checkin/protocol`, `POST /api/checkins`, `/api/trends`, `/api/measurements/bp/guide`, `POST /api/measurements/bp`, `/api/emergency/procedures`, `/api/emergency/procedures/:id`), return `501 not_built` on all 6 reserved Should endpoints, and mount `/dev` in non-production mode.
+- Added `tests/contract/api.test.ts` (5/5 pass). Gate PASS (`tsc`, `eslint`, `vitest run` 69/69).
+- Next: F09 offline hero-flow golden test (`tests/golden/hero-flow.test.ts`).
