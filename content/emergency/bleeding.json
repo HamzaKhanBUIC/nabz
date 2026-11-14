@@ -1,0 +1,40 @@
+{
+  "id": "bleeding",
+  "version": 1,
+  "for": "self",
+  "title": "Bleeding cut",
+  "whenToUse": "A bleeding cut or limb bleed that you can reach yourself.",
+  "steps": [
+    {
+      "id": "press",
+      "text": "Press firmly and steadily with clean cloth or gauze.",
+      "caution": "Do not lift the cloth early to check."
+    },
+    {
+      "id": "add-layer",
+      "text": "If blood soaks through, add another cloth on top and keep pressing."
+    },
+    {
+      "id": "tourniquet",
+      "text": "Apply tourniquet above the wound, not on a joint. Tighten until bleeding stops.",
+      "detail": "Use a commercial tourniquet if available when severe arm or leg bleeding does not stop with firm direct pressure."
+    },
+    {
+      "id": "minor-cut",
+      "text": "For a minor cut, rinse with clean water and cover with sterile dressing."
+    }
+  ],
+  "redFlags": [
+    "Blood is spurting or will not stop with firm pressure.",
+    "You feel dizzy, confused, or cold and sweaty.",
+    "The wound is deep or on your chest, neck or groin."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}

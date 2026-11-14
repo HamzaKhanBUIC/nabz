@@ -30,3 +30,9 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Wrote `data/fixtures/{mission,sara,mateo,elena,kenji}.json` (1813.0 KB total), `data/README.md` with the honesty table, and `tests/unit/simulate.test.ts` (4/4 pass).
 - Gate PASS (`tsc`, `eslint`, `vitest run`).
 - Next: F07 verified content (`content/`).
+
+## 2026-11-14 — F07 verified content
+- Wrote `content/sources.json` (9 verified sources from `research/CHECKS.md` and `R1..R4`), `content/emergency/{bleeding,burn,eye,allergic-reaction,near-fainting}.json`, `content/bp-guide.json`, and `content/cards.json` (all 17 rule card templates).
+- Copied verified CHECKS wording verbatim (eye flush 15 minutes, tourniquet wording, burn 5 to 20 minutes / no ice, severe BP retest about 5 minutes).
+- Added `tests/unit/content.test.ts` (4/4 pass). Gate PASS (`tsc`, `eslint`, `vitest run`).
+- Next: F03 reaction check-in scoring and quality checks (`src/core/`).

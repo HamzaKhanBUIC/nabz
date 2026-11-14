@@ -1,0 +1,35 @@
+{
+  "id": "near-fainting",
+  "version": 1,
+  "for": "self",
+  "title": "Dizzy or about to faint",
+  "whenToUse": "You feel lightheaded or dizzy while awake and have no chest pain or stroke signs.",
+  "steps": [
+    {
+      "id": "lie-down",
+      "text": "Stop what you are doing and lie down right away."
+    },
+    {
+      "id": "tense-muscles",
+      "text": "Cross your legs and tense your leg, belly and buttock muscles.",
+      "detail": "These physical counterpressure manoeuvres help raise blood pressure while you wait for symptoms to pass."
+    },
+    {
+      "id": "check-bp",
+      "text": "Once steady, check your blood pressure using the guided check."
+    }
+  ],
+  "redFlags": [
+    "Symptoms do not improve within 1 to 2 minutes.",
+    "You faint or lose consciousness.",
+    "You have chest pain, weakness or trouble speaking."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}

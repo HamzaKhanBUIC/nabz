@@ -98,8 +98,8 @@
       "verify": [
         "npx vitest run tests/unit/content.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Nov 14: content/sources.json (9 verified sources), 5 self emergency procedures, content/bp-guide.json, and content/cards.json (17 templates); tests/unit/content.test.ts 4/4 pass; gate PASS."
     },
     {
       "id": "F08",

@@ -1,0 +1,38 @@
+{
+  "id": "burn",
+  "version": 1,
+  "for": "self",
+  "title": "Burn",
+  "whenToUse": "A small burn from heat that you can treat yourself.",
+  "steps": [
+    {
+      "id": "move",
+      "text": "Move away from the heat. Remove rings or watches before swelling starts."
+    },
+    {
+      "id": "cool",
+      "text": "Cool the burn under clean, cool running water for 5 to 20 minutes.",
+      "timerSeconds": 1200,
+      "caution": "Do not use ice."
+    },
+    {
+      "id": "cover",
+      "text": "Cover loosely with a clean, dry, non-stick dressing.",
+      "caution": "Do not pop blisters."
+    }
+  ],
+  "redFlags": [
+    "The burn is larger than your palm.",
+    "The burn is on your face, hands or airway.",
+    "The skin looks white or charred.",
+    "It is a chemical or electrical burn."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}

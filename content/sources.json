@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "aha-first-aid-2024",
+      "title": "2024 American Heart Association and American Red Cross Guidelines for First Aid",
+      "url": "https://doi.org/10.1161/CIR.0000000000001281"
+    },
+    {
+      "id": "basner-2011-pvtb",
+      "title": "Validity and Sensitivity of a Brief Psychomotor Vigilance Test (PVT-B) to Total and Partial Sleep Deprivation (Basner et al., 2011)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/"
+    },
+    {
+      "id": "cognition-iss-pmc11614644",
+      "title": "Cognitive performance in ISS astronauts on 6-month low earth orbit missions",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11614644/"
+    },
+    {
+      "id": "jones-2022-iss-sleep",
+      "title": "Sleep deficiency in spaceflight is associated with degraded neurobehavioral functions and elevated stress in astronauts on six-month missions aboard the International Space Station (Jones et al., 2022)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197/"
+    },
+    {
+      "id": "aha-acc-2025-bp",
+      "title": "2025 AHA/ACC Guideline for the Prevention, Detection, Evaluation, and Management of High Blood Pressure in Adults",
+      "url": "https://www.jacc.org/doi/10.1016/j.jacc.2025.05.007"
+    },
+    {
+      "id": "cdc-bp-measure",
+      "title": "Measure Your Blood Pressure (CDC)",
+      "url": "https://www.cdc.gov/high-blood-pressure/measure/index.html"
+    },
+    {
+      "id": "nhlbi-low-bp",
+      "title": "Low Blood Pressure (NHLBI)",
+      "url": "https://www.nhlbi.nih.gov/health/low-blood-pressure"
+    },
+    {
+      "id": "norsk-2015",
+      "title": "Fluid shifts, vasodilatation and ambulatory blood pressure reduction during long duration spaceflight (Norsk et al., 2015)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4324706/"
+    },
+    {
+      "id": "ochmo-std-100-1a",
+      "title": "NASA Space Flight Human-System Standard (OCHMO-STD-100.1A)",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/04/ochmo-std-100.1a.pdf"
+    }
+  ]
+}

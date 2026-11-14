@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "checkin-retake",
+      "title": "Check-in could not be scored",
+      "whatChanged": "This session did not pass quality checks, so it was not added to your personal baseline.",
+      "whyItMatters": "A short or interrupted test cannot give a reliable response speed on the 3-minute PVT-B.",
+      "whatToDo": [
+        "Settle into a quiet spot with the same device and posture.",
+        "Run the 3-minute check-in again when ready."
+      ],
+      "sourceIds": [
+        "basner-2011-pvtb"
+      ]
+    },
+    {
+      "id": "baseline-building",
+      "title": "Learning your personal normal",
+      "whatChanged": "This check-in is saved, and your personal baseline is still building.",
+      "whyItMatters": "The 3-minute PVT-B shows little practice effect, so a handful of rested sessions set a steady personal normal.",
+      "whatToDo": [
+        "Keep taking your morning check-in on the same device.",
+        "Your personal normal band will appear after enough valid sessions."
+      ],
+      "sourceIds": [
+        "basner-2011-pvtb",
+        "cognition-iss-pmc11614644"
+      ]
+    },
+    {
+      "id": "reaction-slow-persistent",
+      "title": "Slower than your normal for {days} days in a row",
+      "whatChanged": "Your reaction speed is {zAbs} SD below your own normal, with {lapses} lapses, for {days} consecutive check-ins.",
+      "whyItMatters": "ISS astronauts whose PVT speed falls at or below 1.5 SD from their baseline show meaningful cognitive slowing.",
+      "whatToDo": [
+        "Put off precision or safety-critical tasks that can wait.",
+        "Tell a crewmate and ask them to double-check key steps.",
+        "Prioritise rest and check your blood pressure if you feel unwell."
+      ],
+      "sourceIds": [
+        "cognition-iss-pmc11614644",
+        "jones-2022-iss-sleep"
+      ],
+      "links": {
+        "measurement": "bp"
+      }
+    },
+    {
+      "id": "reaction-slow-short-sleep",
+      "title": "Slower than your normal after short sleep",
+      "whatChanged": "Your reaction speed is {zAbs} SD below your own normal. You slept {sleepHours} hours.",
+      "whyItMatters": "On the ISS, reaction speed on this test was slower after 6 hours of sleep or less.",
+      "whatToDo": [
+        "Put off precision tasks that can wait.",
+        "Ask a crewmate to double-check critical steps today.",
+        "Plan a full sleep period tonight.",
+        "Repeat the check-in tomorrow morning."
+      ],
+      "sourceIds": [
+        "jones-2022-iss-sleep",
+        "cognition-iss-pmc11614644"
+      ]
+    },
+    {
+      "id": "reaction-slow",
+      "title": "Slower than your personal normal",
+      "whatChanged": "Your reaction speed is {zAbs} SD below your own normal, with {lapses} lapses.",
+      "whyItMatters": "On the ISS Cognition battery, PVT speed at or below 1.5 SD from baseline marks low alertness.",
+      "whatToDo": [
+        "Put off precision tasks that can wait.",
+        "Ask a crewmate to double-check critical procedures today.",
+        "Repeat the check-in tomorrow morning."
+      ],
+      "sourceIds": [
+        "cognition-iss-pmc11614644",
+        "basner-2011-pvtb"
+      ]
+    },
+    {
+      "id": "reaction-watch",
+      "title": "Slightly below your personal normal",
+      "whatChanged": "Your reaction speed is {zAbs} SD below your own normal, with {lapses} lapses.",
+      "whyItMatters": "Tracking small dips on the 3-minute PVT-B gives an early heads-up before performance falls further.",
+      "whatToDo": [
+        "Pace demanding work and build in short breaks.",
+        "Aim for a full sleep period tonight.",
+        "Repeat the check-in tomorrow morning."
+      ],
+      "sourceIds": [
+        "basner-2011-pvtb",
+        "jones-2022-iss-sleep"
+      ]
+    },
+    {
+      "id": "all-normal",
+      "title": "Within your personal normal",
+      "whatChanged": "Your reaction speed is within your recent normal range, with {lapses} lapses.",
+      "whyItMatters": "Staying near your own PVT-B baseline reflects steady vigilant attention.",
+      "whatToDo": [
+        "Continue your normal schedule.",
+        "Repeat the check-in tomorrow morning."
+      ],
+      "sourceIds": [
+        "basner-2011-pvtb",
+        "cognition-iss-pmc11614644"
+      ]
+    },
+    {
+      "id": "bp-severe-symptoms",
+      "title": "Very high blood pressure with warning symptoms",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg with warning symptoms.",
+      "whyItMatters": "Blood pressure above 180/120 mmHg paired with acute symptoms requires immediate action without waiting.",
+      "whatToDo": [
+        "Stop activity and alert a crewmate now. Do not wait for Earth.",
+        "Do not wait to retest when symptoms are present.",
+        "Log the symptoms and readings for crew medical review."
+      ],
+      "sourceIds": [
+        "aha-acc-2025-bp"
+      ],
+      "links": {
+        "measurement": "bp"
+      }
+    },
+    {
+      "id": "bp-low-symptoms",
+      "title": "Low blood pressure with symptoms",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg with low-pressure symptoms.",
+      "whyItMatters": "Blood pressure below 90/60 mmHg with symptoms like dizziness or fainting can signal inadequate blood flow.",
+      "whatToDo": [
+        "Lie down right away and alert a crewmate.",
+        "Open the dizzy or near-fainting emergency steps if you are alert.",
+        "Do not wait for Earth if symptoms worsen."
+      ],
+      "sourceIds": [
+        "nhlbi-low-bp",
+        "aha-first-aid-2024"
+      ],
+      "links": {
+        "emergencyProcedureId": "near-fainting",
+        "measurement": "bp"
+      }
+    },
+    {
+      "id": "bp-severe-confirmed",
+      "title": "Confirmed very high blood pressure",
+      "whatChanged": "Your retest averaged {systolic}/{diastolic} mmHg, still above 180/120 mmHg.",
+      "whyItMatters": "A repeated reading above 180/120 mmHg confirms severe hypertension requiring prompt medical attention.",
+      "whatToDo": [
+        "Rest quietly and alert a crewmate now.",
+        "Do not wait for Earth if any new symptom appears.",
+        "Queue this reading for flight surgeon review."
+      ],
+      "sourceIds": [
+        "aha-acc-2025-bp"
+      ],
+      "links": {
+        "measurement": "bp"
+      }
+    },
+    {
+      "id": "bp-severe-retest",
+      "title": "Very high reading: measure again",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg. Above 180/120 is in the severe range.",
+      "whyItMatters": "One very high reading can be a measurement error. The guidance is to wait and measure again, unless you have symptoms.",
+      "whatToDo": [
+        "Rest quietly for about 5 minutes.",
+        "Take the measurement again.",
+        "If you get chest pain, shortness of breath, back pain, numbness or weakness, a change in vision or trouble speaking, alert a crewmate now."
+      ],
+      "sourceIds": [
+        "aha-acc-2025-bp"
+      ],
+      "links": {
+        "measurement": "bp"
+      }
+    },
+    {
+      "id": "bp-sustained-high",
+      "title": "Sustained high blood pressure across {days} days",
+      "whatChanged": "Your average reading of {systolic}/{diastolic} mmHg marks {days} separate days at or above 140/90 mmHg.",
+      "whyItMatters": "NASA spaceflight standards define hypertension as sustained blood pressure at or above 140/90 mmHg.",
+      "whatToDo": [
+        "Avoid heavy exertion until reviewed.",
+        "Share your recent log with a crewmate and queue for flight surgeon review.",
+        "Take another guided check tomorrow."
+      ],
+      "sourceIds": [
+        "ochmo-std-100-1a",
+        "aha-acc-2025-bp"
+      ]
+    },
+    {
+      "id": "bp-high",
+      "title": "High blood pressure (stage 2)",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, which is in the stage 2 range (140/90 mmHg or higher).",
+      "whyItMatters": "Readings at or above 140/90 mmHg are classified as stage 2 hypertension in AHA/ACC guidelines.",
+      "whatToDo": [
+        "Take a follow-up guided check on another day to watch for a pattern.",
+        "Note any unusual stress, salt intake, or poor sleep.",
+        "Watch for warning symptoms."
+      ],
+      "sourceIds": [
+        "aha-acc-2025-bp",
+        "ochmo-std-100-1a"
+      ]
+    },
+    {
+      "id": "bp-low",
+      "title": "Low blood pressure reading",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, below 90/60 mmHg without reported symptoms.",
+      "whyItMatters": "NHLBI defines low blood pressure as lower than 90/60 mmHg, which merits monitoring even without symptoms.",
+      "whatToDo": [
+        "Move slowly when changing posture and hydrate steadily.",
+        "Open the near-fainting guide if you start feeling dizzy.",
+        "Repeat the check if you notice any symptoms."
+      ],
+      "sourceIds": [
+        "nhlbi-low-bp"
+      ],
+      "links": {
+        "emergencyProcedureId": "near-fainting"
+      }
+    },
+    {
+      "id": "bp-off-normal",
+      "title": "Different from your in-flight normal",
+      "whatChanged": "Your systolic pressure of {systolic} mmHg is {zAbs} SD away from your own in-flight baseline.",
+      "whyItMatters": "On the ISS, 24-hour blood pressure typically sits about 8/9 mmHg lower than pre-flight, so shifts from your own in-flight normal stand out earlier.",
+      "whatToDo": [
+        "Check that the cuff fit and rest steps were followed.",
+        "Repeat a guided measurement over the next few days to see if the shift holds."
+      ],
+      "sourceIds": [
+        "norsk-2015"
+      ]
+    },
+    {
+      "id": "bp-above-ideal",
+      "title": "Slightly above normal blood pressure",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, in the elevated or stage 1 range.",
+      "whyItMatters": "AHA/ACC categories classify 120–129/<80 as elevated and 130–139 or 80–89 as stage 1.",
+      "whatToDo": [
+        "Continue routine guided blood pressure checks.",
+        "Keep a quiet 5-minute rest before measuring."
+      ],
+      "sourceIds": [
+        "aha-acc-2025-bp",
+        "cdc-bp-measure"
+      ]
+    },
+    {
+      "id": "bp-normal",
+      "title": "Blood pressure within normal range",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, within the normal range and your personal baseline.",
+      "whyItMatters": "Readings below 120/80 mmHg align with normal AHA/ACC blood pressure categories.",
+      "whatToDo": [
+        "Continue your regular check-in routine."
+      ],
+      "sourceIds": [
+        "aha-acc-2025-bp"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "allergic-reaction",
+  "version": 1,
+  "for": "self",
+  "title": "Allergic reaction",
+  "whenToUse": "A skin rash after exposure, or sudden breathing trouble or swelling.",
+  "steps": [
+    {
+      "id": "stop-trigger",
+      "text": "Move away from the trigger right away if you know what caused it."
+    },
+    {
+      "id": "check-airway",
+      "text": "Check for breathing trouble, throat tightness, lip swelling, or dizziness."
+    },
+    {
+      "id": "epinephrine",
+      "text": "If severe, inject your epinephrine auto-injector firmly into your outer thigh.",
+      "detail": "Hold against your outer thigh as directed on the device. About 7 to 18 percent of people need a second dose if symptoms continue."
+    },
+    {
+      "id": "alert-after-epi",
+      "text": "Alert a crewmate right away after using epinephrine."
+    }
+  ],
+  "redFlags": [
+    "You have trouble breathing or swallowing.",
+    "Your throat feels tight or your voice changes.",
+    "Your lips, tongue or face are swelling.",
+    "You feel dizzy or about to faint."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}

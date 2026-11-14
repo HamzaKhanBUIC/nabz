@@ -1,0 +1,42 @@
+{
+  "id": "eye",
+  "version": 1,
+  "for": "self",
+  "title": "Eye injury or chemical splash",
+  "whenToUse": "Dust or a chemical splash in your eye without embedded objects or vision loss.",
+  "steps": [
+    {
+      "id": "no-rub",
+      "text": "Do not rub or press on your eye."
+    },
+    {
+      "id": "position",
+      "text": "Hold the injured eye lower so water does not reach the other eye."
+    },
+    {
+      "id": "flush",
+      "text": "Flush gently with plenty of clean water for 15 minutes.",
+      "timerSeconds": 900,
+      "detail": "Continue flushing the full 15 minutes to wash away any chemical residue."
+    },
+    {
+      "id": "cover-if-stuck",
+      "text": "If an object is stuck in your eye, cover loosely with a rigid cup.",
+      "caution": "Never try to pull out an embedded object."
+    }
+  ],
+  "redFlags": [
+    "You have sudden blurred vision or vision loss.",
+    "An object is stuck in your eye.",
+    "The eye is bleeding.",
+    "Pain continues after flushing."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}
