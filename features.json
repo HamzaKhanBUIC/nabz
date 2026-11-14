@@ -13,8 +13,8 @@
         "npm run dev, then curl http://localhost:8787/api/health returns {\"ok\":true}",
         "manual: .github/workflows/ci.yml runs the gate, gitleaks and npm audit"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Nov 14: gate PASS (tsc, eslint, 4 tests); live GET /api/health returned {\"ok\":true}. CI workflow written but not yet run on GitHub (needs the first push). npm audit: 0 high, 7 moderate in dev lint tooling only; 0 in runtime deps."
     },
     {
       "id": "F01",
