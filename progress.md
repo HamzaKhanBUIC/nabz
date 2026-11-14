@@ -36,3 +36,9 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Copied verified CHECKS wording verbatim (eye flush 15 minutes, tourniquet wording, burn 5 to 20 minutes / no ice, severe BP retest about 5 minutes).
 - Added `tests/unit/content.test.ts` (4/4 pass). Gate PASS (`tsc`, `eslint`, `vitest run`).
 - Next: F03 reaction check-in scoring and quality checks (`src/core/`).
+
+## 2026-11-14 — F03 reaction check-in scoring and QC
+- Added `src/core/constants.ts` (all verified thresholds citing `research/CHECKS.md` or `design choice` in `docs/blueprint/03-data-model.md`), `src/core/pvt.ts` (`getProtocol`, `isFalseStartTrial`, `scorePvt`), and `src/core/qc.ts` (`computeSessionDurationMs`, `checkSession`).
+- Added `tests/unit/pvt.test.ts` (5/5 pass) verifying protocol defaults, the M1 hand-computed session (`meanSpeed = 3.2905`, `medianRtMs = 250`, `performanceScore = 55.56`), lapse (`354`/`355`) and false-start (`99`/`100`) boundaries, zero-division edge cases, and all 4 QC flag limits.
+- Gate PASS (`npx tsc --noEmit`, `npx eslint .`, `npx vitest run`).
+- Next: F04 normal zone, rolling personal baseline, and trend builder (`src/core/{zone,baseline}.ts`).

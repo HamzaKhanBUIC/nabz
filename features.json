@@ -50,8 +50,8 @@
       "verify": [
         "npx vitest run tests/unit/pvt.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented pure src/core/{constants,pvt,qc}.ts and tests/unit/pvt.test.ts (5/5 pass); gate PASS."
     },
     {
       "id": "F04",
