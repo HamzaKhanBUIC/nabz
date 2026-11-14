@@ -50,11 +50,11 @@ function sleepEventOverride(events: readonly SubjectEventSpec[], day: number, rn
       return round1(clamp(5.6 + rng.normal(0, 0.15), 5.3, 5.9));
     }
     if (ev.kind === "short-sleep-before-120") {
-      // Night before 119: ~5.6 h (watch); night before 120: ~5.2 h (act).
+      // Two bad nights in a row (scenario choice): about 4.2 h, then about 3.2 h.
       if (day === ev.startDay) {
-        return round1(clamp(5.6 + rng.normal(0, 0.05), 5.5, 5.8));
+        return round1(clamp(4.2 + rng.normal(0, 0.1), 4.0, 4.4));
       }
-      return round1(clamp(5.2 + rng.normal(0, 0.05), 5.0, 5.4));
+      return round1(clamp(3.2 + rng.normal(0, 0.1), 3.0, 3.4));
     }
   }
   return null;
@@ -81,11 +81,7 @@ function generateSleepSeries(subject: SubjectConfig, config: SimConfig): number[
 
   for (let day = 1; day <= config.days; day++) {
     ar = phi * ar + rng.normal(0, subject.sleepInnovationSd);
-    // Keep normal fluctuations realistic while keeping rested nights >= 6.05 h on hero lead-in days.
     let val = round1(clamp(subject.sleepMeanHours + ar, 4.5, 8.8));
-    if (subject.id === "sara" && day >= 109 && day <= 118 && val <= 6.0) {
-      val = 6.1;
-    }
     const override = sleepEventOverride(subject.events, day, rng);
     if (override !== null) {
       val = override;
@@ -121,8 +117,8 @@ function generateBpSeries(
   const out: Array<FixtureDay["bp"]> = [];
 
   for (let day = 1; day <= config.days; day++) {
-    arSbp = phi * arSbp + rng.normal(0, 1.5);
-    arDbp = phi * arDbp + rng.normal(0, 1.1);
+    arSbp = phi * arSbp + rng.normal(0, config.bpNoiseMmHg.dayToDaySystolic);
+    arDbp = phi * arDbp + rng.normal(0, config.bpNoiseMmHg.dayToDayDiastolic);
 
     // BP cadence: every 3rd day (1, 4, 7, ..., 118), leaving day 120 open for live check-in.
     if ((day - 1) % config.bpCadenceDays !== 0) {
@@ -139,8 +135,8 @@ function generateBpSeries(
     const baseHr = restingHr[day - 1] ?? subject.restingHrMean;
 
     const readings: BpReading[] = [0, 1].map(() => ({
-      systolic: Math.round(clamp(baseSbp + rng.normal(0, 1.5), 75, 220)),
-      diastolic: Math.round(clamp(baseDbp + rng.normal(0, 1.2), 45, 140)),
+      systolic: Math.round(clamp(baseSbp + rng.normal(0, config.bpNoiseMmHg.withinSessionSystolic), 75, 220)),
+      diastolic: Math.round(clamp(baseDbp + rng.normal(0, config.bpNoiseMmHg.withinSessionDiastolic), 45, 140)),
       pulse: Math.round(clamp(baseHr + rng.int(-2, 2), 35, 180)),
     }));
 
@@ -254,86 +250,45 @@ function generateCheckinSeries(
 ): Array<FixtureDay["checkin"]> {
   const rng = createRng(deriveSeed(config.seed, `${subject.id}:pvt`));
   const phi = config.ar1Phi.speed;
-  let ar = rng.normal(0, subject.speedInnovationSd * 0.7);
+  let ar = 0;
   let sleepDebt = 0;
   const out: Array<FixtureDay["checkin"]> = [];
-  const rollingWindow: number[] = [];
 
-  const windowStats = (): { mean: number; sd: number } | null => {
-    if (rollingWindow.length < 5) return null;
-    const m = rollingWindow.reduce((a, b) => a + b, 0) / rollingWindow.length;
-    const v = rollingWindow.reduce((a, b) => a + (b - m) ** 2, 0) / (rollingWindow.length - 1);
-    const sd = Math.sqrt(v);
-    return sd > 0 ? { mean: m, sd } : null;
-  };
-
+  // The generator knows nothing about the app's baseline, z-scores or zones.
+  // One rule runs on every day for every person: speed is the personal mean, plus
+  // day-to-day noise, minus a penalty for accumulated sleep debt. Events only change
+  // how long the person slept. Whatever the rules engine then flags (or misses) is real.
   for (let day = 1; day <= config.days; day++) {
     ar = phi * ar + rng.normal(0, subject.speedInnovationSd);
     const sleep = sleepHours[day - 1]!;
-    const events = activeEventsForDay(subject.events, day);
-    const hasSleepOrWorkloadEvent = events.some(
-      (e) => e.kind === "short-sleep-week" || e.kind === "high-workload" || e.kind === "short-sleep-before-120",
+    const deficit = Math.max(0, config.shortSleepThresholdHours - sleep);
+    sleepDebt = sleepDebt * config.cumulativeSleepDebtFactor + deficit;
+
+    const speed = clamp(
+      subject.speedMean + ar - config.sleepLossSpeedPenaltyPerHour * sleepDebt,
+      2.5,
+      5.2,
     );
 
-    const deficit = Math.max(0, 6.0 - sleep);
-    if (deficit > 0) {
-      sleepDebt = sleepDebt * config.cumulativeSleepDebtFactor + deficit;
-    } else {
-      sleepDebt = sleepDebt * 0.3;
-    }
-
-    const stats = windowStats();
-    let speed = subject.speedMean + ar;
-    if (hasSleepOrWorkloadEvent) {
-      const isBefore120 = events.some((e) => e.kind === "short-sleep-before-120");
-      if (isBefore120 && day === 119 && stats) {
-        // Watch tier: -1.25 SD so day 120 is not the 3rd consecutive act day
-        speed = stats.mean - 1.25 * stats.sd;
-      } else if (isBefore120 && day === 120) {
-        // Act tier: clearly slower on day 120 driven by short sleep <= 6 h
-        speed = subject.speedMean - config.sleepLossSpeedPenaltyPerHour * Math.max(1.0, sleepDebt) + rng.normal(0, 0.01);
-      } else {
-        speed = subject.speedMean + ar * 0.3 - config.sleepLossSpeedPenaltyPerHour * sleepDebt;
-      }
-    } else if (stats && (speed - stats.mean) / stats.sd <= -1.42) {
-      // Prevent random non-event noise from falsely flagging act and skewing the rolling baseline upward.
-      speed = stats.mean - 1.3 * stats.sd;
-    }
-
-    speed = clamp(speed, 3.1, 4.8);
-
-    // About 5% of days missed; never miss first 16 days, active events, or days 109-120.
-    const protectedDay = day <= 16 || day >= 109 || events.length > 0;
+    // About 5% of days are missed. The first 16 days (baseline), event days (ground truth)
+    // and the last day (the demo posts it) always have a check-in.
+    const events = activeEventsForDay(subject.events, day);
+    const protectedDay = day <= 16 || day === config.days || events.length > 0;
     if (!protectedDay && rng.next() < config.missedCheckinRate) {
       out.push(null);
       continue;
     }
 
-    const isSlow = speed < subject.speedMean - 0.18;
-    const isWatch = !isSlow && speed < subject.speedMean - 0.09;
-    const targetLapses = isSlow
-      ? rng.int(6, 11)
-      : isWatch
-        ? rng.int(3, 5)
-        : rng.next() < 0.15
-          ? 0
-          : rng.next() < 0.78
-            ? 1
-            : 2;
-    const targetFalseStarts = isSlow ? rng.int(1, 3) : rng.next() < 0.45 ? 1 : 0;
-
-    const trials = generatePvtTrials(speed, targetLapses, targetFalseStarts, rng);
-    const stim = trials.filter((t) => !t.early && (t.rtMs === null || t.rtMs >= 100));
-    const realizedSpeed = stim.reduce((a, t) => a + 1000 / (t.rtMs ?? 30_000), 0) / stim.length;
-    const isAct = stats !== null && (realizedSpeed - stats.mean) / stats.sd <= -1.5;
-    if (!isAct) {
-      rollingWindow.push(realizedSpeed);
-      if (rollingWindow.length > 14) rollingWindow.shift();
-    }
+    // Slower days carry more lapses and false starts, as a smooth function of the drop.
+    const drop = Math.max(0, subject.speedMean - speed);
+    const expectedLapses = config.restedLapsesPerSession + config.lapsesPerSpeedDrop * drop;
+    const targetLapses = Math.max(0, Math.round(expectedLapses + rng.normal(0, Math.sqrt(expectedLapses))));
+    const expectedFalseStarts = 0.5 + 2 * drop;
+    const targetFalseStarts = Math.max(0, Math.round(expectedFalseStarts + rng.normal(0, 0.6)));
 
     out.push({
       startedAt: isoAtDay(config.launchDate, day, "08:00:00"),
-      trials,
+      trials: generatePvtTrials(speed, targetLapses, targetFalseStarts, rng),
     });
   }
 

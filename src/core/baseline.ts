@@ -100,7 +100,9 @@ function computeBaselineStats(
 
 /**
  * Folds chronological entries from oldest to newest, scoring each entry against
- * the rolling window of up to `windowSessions` earlier valid non-`act` entries.
+ * the rolling window of up to `windowSessions` earlier valid entries. For
+ * two-sided series (blood pressure), off-normal `watch` outliers stay out of
+ * later windows so a severe reading does not shift the normal band.
  */
 export function foldHistory<T extends BaselineEntryInput>(
   entries: readonly T[],
@@ -138,7 +140,12 @@ export function foldHistory<T extends BaselineEntryInput>(
 
     results.push({ entry, baseline, z, zone, status });
 
-    if (!flagged && zone !== "act") {
+    // For a one-sided series (reaction speed), dropping `act` days censors only the
+    // lower tail and ratchets the rolling baseline upward. Keep all QC-valid days
+    // there; for a two-sided series (blood pressure), off-normal (`watch`) spikes
+    // stay out of later windows so a severe reading does not become the normal.
+    const offNormal = direction === "two_sided" && zone === "watch";
+    if (!flagged && !offNormal) {
       validValues.push(entry.value);
       if (validValues.length > windowSessions) {
         validValues.shift();

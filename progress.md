@@ -102,3 +102,20 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
   `PASS npx eslint .`
   `PASS npx vitest run`
   `GATE: PASS`
+
+## 2026-11-14 — Orchestrator review fixes & Generator 2.0.0
+- Completed Fable's orchestrator review fixes on `argon/work` after reviewing F08–F12:
+  - `src/store/index.ts`: Server mission clock (`getCurrentMissionDay()`) now sets `missionDay` on `POST /api/checkins` and `POST /api/measurements/bp` rather than client timestamps; `createCheckin` looks up the newly scored entry by object reference in `foldHistory`.
+  - `src/core/bp.ts`: `evaluateBp` looks up the newly scored BP entry by object reference in `foldHistory`.
+  - `src/core/baseline.ts`: Fixed two issues — two-sided (`bp-systolic`) `watch` outliers stay out of future rolling windows so a severe reading (`186/121`) cannot poison the personal normal band, while one-sided (`reaction-speed`) `lower_is_worse` valid entries stay in the rolling window so excluding lower-tail `act` days no longer ratchets the baseline upward (~25% -> ~7% ordinary-day `act` rate across crew fixtures). Updated `docs/features/M2-normal-zone.md` and `docs/blueprint/03-data-model.md`.
+  - `src/core/constants.ts` & `content/cards.json`: Tightened source citations (`PMC11614644`, `Jones 2022`, `30 s` no-response timeout marked design choice) and updated card template wording (`version: 2`, NHLBI shock/low-BP wording).
+  - `tools/simulate/{config,signals}.ts`, `data/README.md`, `data/fixtures/*.json`: Completed `generatorVersion: "2.0.0"` forward-only check-in generator (no baseline/zone knowledge in the simulator, no non-event sleep censoring on days 109–118, realistic day-to-day BP spread `4.0/3.0` mmHg + `2.5/2.0` within-session, `restedLapsesPerSession: 1.0`).
+  - Added `tests/contract/api-regression.test.ts` (6/6 pass) and updated `tests/unit/{baseline,simulate}.test.ts`.
+- Verified `npm run simulate -- --check` (byte-identical) and live HTTP endpoints (`POST /api/checkins` off-day timestamp -> `missionDay: 120` `act` `RT-SHORT-SLEEP`; severe BP `186/121` -> `retest` `300s` with unchanged BP baseline on follow-up `116/74`).
+- Finished features: F00, F01, F02, F07, F03, F04, F05, F06, F08, F09, F10, F11, F12
+- Half-done: none
+- Gate output (`python scripts/gate.py`):
+  `PASS npx tsc --noEmit`
+  `PASS npx eslint .`
+  `PASS npx vitest run`
+  `GATE: PASS`

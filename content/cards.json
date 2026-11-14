@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "templates": [
     {
       "id": "checkin-retake",
@@ -18,7 +18,7 @@
       "id": "baseline-building",
       "title": "Learning your personal normal",
       "whatChanged": "This check-in is saved, and your personal baseline is still building.",
-      "whyItMatters": "The 3-minute PVT-B shows little practice effect, so a handful of rested sessions set a steady personal normal.",
+      "whyItMatters": "Your normal is worked out from your own recent check-ins, so a few valid sessions are needed before today can be compared with it.",
       "whatToDo": [
         "Keep taking your morning check-in on the same device.",
         "Your personal normal band will appear after enough valid sessions."
@@ -32,7 +32,7 @@
       "id": "reaction-slow-persistent",
       "title": "Slower than your normal for {days} days in a row",
       "whatChanged": "Your reaction speed is {zAbs} SD below your own normal, with {lapses} lapses, for {days} consecutive check-ins.",
-      "whyItMatters": "ISS astronauts whose PVT speed falls at or below 1.5 SD from their baseline show meaningful cognitive slowing.",
+      "whyItMatters": "In NASA's study of ISS astronauts, a reaction-speed score at or below 1.5 SD under the person's own baseline was counted as a low score.",
       "whatToDo": [
         "Put off precision or safety-critical tasks that can wait.",
         "Tell a crewmate and ask them to double-check key steps.",
@@ -66,7 +66,7 @@
       "id": "reaction-slow",
       "title": "Slower than your personal normal",
       "whatChanged": "Your reaction speed is {zAbs} SD below your own normal, with {lapses} lapses.",
-      "whyItMatters": "On the ISS Cognition battery, PVT speed at or below 1.5 SD from baseline marks low alertness.",
+      "whyItMatters": "In NASA's study of ISS astronauts, a reaction-speed score at or below 1.5 SD under the person's own baseline was counted as a low score.",
       "whatToDo": [
         "Put off precision tasks that can wait.",
         "Ask a crewmate to double-check critical procedures today.",
@@ -81,22 +81,22 @@
       "id": "reaction-watch",
       "title": "Slightly below your personal normal",
       "whatChanged": "Your reaction speed is {zAbs} SD below your own normal, with {lapses} lapses.",
-      "whyItMatters": "Tracking small dips on the 3-minute PVT-B gives an early heads-up before performance falls further.",
+      "whyItMatters": "This is an early heads-up. It is not yet at the 1.5 SD level that NASA's ISS study counted as a low score.",
       "whatToDo": [
         "Pace demanding work and build in short breaks.",
         "Aim for a full sleep period tonight.",
         "Repeat the check-in tomorrow morning."
       ],
       "sourceIds": [
-        "basner-2011-pvtb",
-        "jones-2022-iss-sleep"
+        "cognition-iss-pmc11614644",
+        "basner-2011-pvtb"
       ]
     },
     {
       "id": "all-normal",
       "title": "Within your personal normal",
       "whatChanged": "Your reaction speed is within your recent normal range, with {lapses} lapses.",
-      "whyItMatters": "Staying near your own PVT-B baseline reflects steady vigilant attention.",
+      "whyItMatters": "The 3-minute test measures vigilant attention. Today's speed is close to your own baseline.",
       "whatToDo": [
         "Continue your normal schedule.",
         "Repeat the check-in tomorrow morning."
@@ -127,7 +127,7 @@
       "id": "bp-low-symptoms",
       "title": "Low blood pressure with symptoms",
       "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg with low-pressure symptoms.",
-      "whyItMatters": "Blood pressure below 90/60 mmHg with symptoms like dizziness or fainting can signal inadequate blood flow.",
+      "whyItMatters": "NHLBI lists dizziness, fainting and confusion as symptoms of low blood pressure, and cold sweaty skin, rapid breathing and a weak rapid pulse as signs of shock.",
       "whatToDo": [
         "Lie down right away and alert a crewmate.",
         "Open the dizzy or near-fainting emergency steps if you are alert.",
@@ -150,7 +150,7 @@
       "whatToDo": [
         "Rest quietly and alert a crewmate now.",
         "Do not wait for Earth if any new symptom appears.",
-        "Queue this reading for flight surgeon review."
+        "Report this reading to Earth at the next contact."
       ],
       "sourceIds": [
         "aha-acc-2025-bp"
@@ -182,8 +182,7 @@
       "whatChanged": "Your average reading of {systolic}/{diastolic} mmHg marks {days} separate days at or above 140/90 mmHg.",
       "whyItMatters": "NASA spaceflight standards define hypertension as sustained blood pressure at or above 140/90 mmHg.",
       "whatToDo": [
-        "Avoid heavy exertion until reviewed.",
-        "Share your recent log with a crewmate and queue for flight surgeon review.",
+        "Tell a crewmate and raise it at your next medical conference with Earth.",
         "Take another guided check tomorrow."
       ],
       "sourceIds": [
@@ -197,9 +196,8 @@
       "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, which is in the stage 2 range (140/90 mmHg or higher).",
       "whyItMatters": "Readings at or above 140/90 mmHg are classified as stage 2 hypertension in AHA/ACC guidelines.",
       "whatToDo": [
-        "Take a follow-up guided check on another day to watch for a pattern.",
-        "Note any unusual stress, salt intake, or poor sleep.",
-        "Watch for warning symptoms."
+        "Take another guided check on a different day to see if it repeats.",
+        "If you get chest pain, shortness of breath, back pain, numbness or weakness, a change in vision or trouble speaking, alert a crewmate now."
       ],
       "sourceIds": [
         "aha-acc-2025-bp",
@@ -210,14 +208,14 @@
       "id": "bp-low",
       "title": "Low blood pressure reading",
       "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, below 90/60 mmHg without reported symptoms.",
-      "whyItMatters": "NHLBI defines low blood pressure as lower than 90/60 mmHg, which merits monitoring even without symptoms.",
+      "whyItMatters": "NHLBI defines low blood pressure as lower than 90/60 mmHg. On the ISS, blood pressure runs about 8/9 mmHg lower than before flight.",
       "whatToDo": [
-        "Move slowly when changing posture and hydrate steadily.",
-        "Open the near-fainting guide if you start feeling dizzy.",
+        "Open the near-fainting steps if you start to feel dizzy.",
         "Repeat the check if you notice any symptoms."
       ],
       "sourceIds": [
-        "nhlbi-low-bp"
+        "nhlbi-low-bp",
+        "norsk-2015"
       ],
       "links": {
         "emergencyProcedureId": "near-fainting"
@@ -253,7 +251,7 @@
     {
       "id": "bp-normal",
       "title": "Blood pressure within normal range",
-      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, within the normal range and your personal baseline.",
+      "whatChanged": "Your reading averaged {systolic}/{diastolic} mmHg, within the normal range.",
       "whyItMatters": "Readings below 120/80 mmHg align with normal AHA/ACC blood pressure categories.",
       "whatToDo": [
         "Continue your regular check-in routine."

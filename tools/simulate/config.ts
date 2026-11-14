@@ -32,10 +32,21 @@ export type SimConfig = {
   generatorVersion: string;
   launchDate: string;
   days: number;
-  /** Named sleep-loss effect parameter (1/s speed reduction per hour below 6.0 h sleep). */
+  /** Sleep at or below this many hours counts as short (CHECKS R2 addendum, Jones 2022). */
+  shortSleepThresholdHours: number;
+  /**
+   * Speed lost (1/s) per hour of accumulated sleep debt. Assumption, anchored to one
+   * published number: 5 nights of 4 h in bed lowers 10-min PVT speed by 0.545 /s
+   * (Basner & Dinges 2011, R2 #15). With the carry-over below, 5 such nights build a
+   * debt of about 5.05 h, so 0.545 / 5.05 = 0.108.
+   */
   sleepLossSpeedPenaltyPerHour: number;
-  /** Cumulative multiplier for consecutive short-sleep nights (< 6.0 h). */
+  /** Share of yesterday's sleep debt carried into today (assumption). */
   cumulativeSleepDebtFactor: number;
+  /** Lapses in a rested session (R2 #11: median 1 on the 3-min test). */
+  restedLapsesPerSession: number;
+  /** Extra lapses per 1/s of lost speed (assumption). */
+  lapsesPerSpeedDrop: number;
   /** Probability of missing a non-protected daily reaction check-in (~5%). */
   missedCheckinRate: number;
   /** AR(1) persistence coefficient across daily signals. */
@@ -53,17 +64,32 @@ export type SimConfig = {
     settleAfterDay: number;
   };
   bpCadenceDays: number;
+  /**
+   * Blood pressure spread in mmHg (assumption; no published within-person value).
+   * dayToDay: AR(1) innovation SD. withinSession: SD between the two readings.
+   * Together they give a day-to-day systolic SD of about 5 mmHg (CV about 4%),
+   * well under the 11% CV that R6 #4 (Juhanoja 2017) links to raised risk.
+   */
+  bpNoiseMmHg: {
+    dayToDaySystolic: number;
+    dayToDayDiastolic: number;
+    withinSessionSystolic: number;
+    withinSessionDiastolic: number;
+  };
   mission: MissionFile;
   subjects: SubjectConfig[];
 };
 
 export const SIM_CONFIG: SimConfig = {
   seed: 20261115,
-  generatorVersion: "1.0.0",
+  generatorVersion: "2.0.0",
   launchDate: "2026-07-19",
   days: 120,
-  sleepLossSpeedPenaltyPerHour: 0.48,
+  shortSleepThresholdHours: 6.0,
+  sleepLossSpeedPenaltyPerHour: 0.108,
   cumulativeSleepDebtFactor: 0.65,
+  restedLapsesPerSession: 1.0,
+  lapsesPerSpeedDrop: 14,
   missedCheckinRate: 0.05,
   ar1Phi: {
     sleep: 0.45,
@@ -78,6 +104,12 @@ export const SIM_CONFIG: SimConfig = {
     settleAfterDay: 30,
   },
   bpCadenceDays: 3,
+  bpNoiseMmHg: {
+    dayToDaySystolic: 4.0,
+    dayToDayDiastolic: 3.0,
+    withinSessionSystolic: 2.5,
+    withinSessionDiastolic: 2.0,
+  },
   mission: {
     name: "Mars Transit 1",
     profile: "mars-transit",
@@ -139,7 +171,7 @@ export const SIM_CONFIG: SimConfig = {
           kind: "short-sleep-before-120",
           startDay: 119,
           endDay: 120,
-          description: "Short sleep under 6 h before days 119 and 120, putting day 119 in watch and day 120 in act.",
+          description: "Two nights of very short sleep (about 4 h, then about 3 h) before days 119 and 120.",
           basis: "Jones 2022 (CHECKS R2 addendum)",
         },
       ],

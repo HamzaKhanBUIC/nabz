@@ -8,7 +8,7 @@ import type {
   NextAction,
   SevereSymptom,
 } from "../schemas";
-import { foldHistory } from "./baseline";
+import { foldHistory, type BaselineEntryInput } from "./baseline";
 import { selectBpCard, type CardCatalog } from "./cards";
 import {
   BP_ELEVATED_SYS_MIN,
@@ -186,6 +186,11 @@ export function evaluateBp(
   const consecutiveHighDays = countConsecutiveHighBpDays(currentEntry, history);
   const sustainedHigh = consecutiveHighDays >= BP_SUSTAINED_DAYS;
 
+  const newBpEntry: BaselineEntryInput = {
+    missionDay,
+    effectiveDateTime: input.takenAt,
+    value: average.systolic,
+  };
   const folded = foldHistory(
     [
       ...history.map((h) => ({
@@ -193,15 +198,12 @@ export function evaluateBp(
         effectiveDateTime: h.effectiveDateTime,
         value: h.average.systolic,
       })),
-      {
-        missionDay,
-        effectiveDateTime: input.takenAt,
-        value: average.systolic,
-      },
+      newBpEntry,
     ],
     { direction: "two_sided" },
   );
-  const lastScored = folded[folded.length - 1]!;
+  // The fold sorts by day and timestamp, so find the current entry by reference.
+  const lastScored = folded.find((item) => item.entry === newBpEntry)!;
 
   const zone = buildZoneResult({
     code: "bp-systolic",

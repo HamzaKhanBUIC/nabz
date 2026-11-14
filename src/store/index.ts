@@ -176,9 +176,11 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
     },
 
     createCheckin(input: CheckinInput): CheckinResponse {
-      const missionDay = missionDayFromIso(missionFile.launchDate, input.startedAt);
+      // The server's mission clock decides the day. `startedAt` comes from the browser
+      // and is kept only as the timestamp; a wrong browser clock must not move the entry.
+      const missionDay = getCurrentMissionDay();
       const runtime = loadRuntime();
-      const sim = getHistoricalCheckins(getCurrentMissionDay());
+      const sim = getHistoricalCheckins(missionDay);
       const existing = [...sim, ...runtime.checkins].sort(
         (a, b) =>
           a.missionDay - b.missionDay || a.effectiveDateTime.localeCompare(b.effectiveDateTime),
@@ -194,6 +196,12 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
           ? `chk-${subjectId}-${missionDay}`
           : `chk-${subjectId}-${missionDay}-${sameDayRuntime + 1}`;
 
+      const newEntry: BaselineEntryInput = {
+        missionDay,
+        effectiveDateTime: input.startedAt,
+        value: metrics.meanSpeed,
+        qcFlags,
+      };
       const entries: BaselineEntryInput[] = [
         ...existing.map((c) => ({
           missionDay: c.missionDay,
@@ -201,16 +209,12 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
           value: c.metrics.meanSpeed,
           qcFlags: c.qcFlags,
         })),
-        {
-          missionDay,
-          effectiveDateTime: input.startedAt,
-          value: metrics.meanSpeed,
-          qcFlags,
-        },
+        newEntry,
       ];
 
+      // The fold sorts by day and timestamp, so the new entry is not always last.
       const folded = foldHistory(entries, { direction: "lower_is_worse" });
-      const last = folded[folded.length - 1]!;
+      const last = folded.find((item) => item.entry === newEntry)!;
 
       let consecutiveActDays = 0;
       if (last.zone === "act") {
@@ -362,7 +366,8 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
     },
 
     createBpMeasurement(input: BpInput): BpMeasurement {
-      const missionDay = missionDayFromIso(missionFile.launchDate, input.takenAt);
+      // As with check-ins: the server's mission clock decides the day, not `takenAt`.
+      const missionDay = getCurrentMissionDay();
       const runtime = loadRuntime();
       const existing = getAllBp();
       const history: BpHistoryEntry[] = existing.map((b) => ({

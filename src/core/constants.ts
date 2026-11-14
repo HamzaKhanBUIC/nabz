@@ -25,7 +25,7 @@ export const PVT_LAPSE_MS = 355;
 /** research/CHECKS.md (Basner et al. 2011 PVT-B): false start < 100 ms. */
 export const PVT_FALSE_START_MS = 100;
 
-/** research/CHECKS.md (PVT-B / 03-data-model.md): 30 s no-response timeout. */
+/** design choice (docs/blueprint/03-data-model.md): 30 s no-response timeout. Used by the 10-min PVT; not re-checked for PVT-B. */
 export const PVT_NO_RESPONSE_TIMEOUT_MS = 30_000;
 
 /** design choice (docs/blueprint/03-data-model.md, M1): minimum valid stimuli per session. */
@@ -52,7 +52,7 @@ export const BASELINE_MIN_SESSIONS = 5;
 /** design choice (docs/blueprint/03-data-model.md, M2): watch z-score cutoff for lower_is_worse. */
 export const Z_WATCH = -1.0;
 
-/** research/CHECKS.md (personal baseline reaction drop): action cutoff z <= -1.5. */
+/** research/CHECKS.md R2 addendum (Cognition on ISS, PMC11614644): a score at or below -1.5 SD from the person's own baseline counts as low. */
 export const Z_ACT = -1.5;
 
 /** design choice (docs/blueprint/03-data-model.md, M4): two-sided |z| >= 1.5 gives BP watch. */
@@ -61,7 +61,7 @@ export const BP_Z_WATCH = 1.5;
 /** design choice (docs/blueprint/03-data-model.md, M3): consecutive act days for persistence. */
 export const PERSISTENT_ACT_DAYS = 3;
 
-/** research/CHECKS.md (Barger et al. 2014 / short sleep threshold): <= 6 hours. */
+/** research/CHECKS.md R2 addendum (Jones et al. 2022, PMC8919197): PVT-B speed is slower after sleep of <= 6 hours. */
 export const SHORT_SLEEP_HOURS = 6;
 
 /** research/CHECKS.md (AHA/ACC BP classification): severe systolic > 180 mmHg. */

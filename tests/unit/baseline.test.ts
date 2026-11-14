@@ -83,7 +83,7 @@ describe("F04 personal baseline, zone classification, and trend builder (M2)", (
     expect(foldHistory([...seed, entry(6, 3.505)])[5]!.zone).toBe("in_zone");
   });
 
-  it("excludes flagged entries and act entries from subsequent baseline windows", () => {
+  it("excludes flagged entries, keeps valid one-sided entries, and excludes two-sided watch outliers", () => {
     const seed = [
       entry(1, 3.8),
       entry(2, 3.8),
@@ -94,8 +94,8 @@ describe("F04 personal baseline, zone classification, and trend builder (M2)", (
     const entries: BaselineEntryInput[] = [
       ...seed,
       entry(6, 3.5, ["duration_out_of_range"]), // flagged: not_scored, excluded from window
-      entry(7, 3.5), // act (z = -2.5): scored as act, excluded from window
-      entry(8, 4.0), // sees same baseline (n = 5, mean = 4.0, sd = 0.2)
+      entry(7, 3.5), // act (z = -2.5): valid session stays in one-sided window
+      entry(8, 4.0), // sees n = 6, mean = 23.5 / 6 = 3.9167 (no upward ratchet)
     ];
 
     const scored = foldHistory(entries);
@@ -106,10 +106,26 @@ describe("F04 personal baseline, zone classification, and trend builder (M2)", (
     expect(scored[6]!.zone).toBe("act");
     expect(scored[6]!.z).toBe(-2.5);
 
-    expect(scored[7]!.baseline.n).toBe(5);
-    expect(scored[7]!.baseline.mean).toBe(4.0);
-    expect(scored[7]!.baseline.sd).toBe(0.2);
+    expect(scored[7]!.baseline.n).toBe(6);
+    expect(scored[7]!.baseline.mean).toBeCloseTo(3.9167, 4);
     expect(scored[7]!.zone).toBe("in_zone");
+
+    // Two-sided (blood pressure): off-normal watch outliers stay out of later windows.
+    const bpEntries = [
+      entry(1, 116),
+      entry(2, 118),
+      entry(3, 120),
+      entry(4, 120),
+      entry(5, 121),
+      entry(6, 186), // spike: |z| = 33.5 -> watch, excluded from window
+      entry(7, 119), // sees unchanged window: n = 5, mean = 119, sd = 2
+    ];
+    const bpScored = foldHistory(bpEntries, { direction: "two_sided" });
+    expect(bpScored[5]!.zone).toBe("watch");
+    expect(bpScored[6]!.baseline.n).toBe(5);
+    expect(bpScored[6]!.baseline.mean).toBe(119);
+    expect(bpScored[6]!.baseline.sd).toBe(2);
+    expect(bpScored[6]!.zone).toBe("in_zone");
   });
 
   it("stays in building when all baseline values are equal (sd === 0)", () => {

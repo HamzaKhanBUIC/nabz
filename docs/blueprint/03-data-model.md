@@ -94,7 +94,7 @@ Design choices (no published value; each is one named constant so it can change 
 | `Z_WATCH` | −1.0 | R2 proposal: an early "heads-up" tier before −1.5 |
 | `BASELINE_WINDOW_SESSIONS` | 14 | R2 proposal: rolling two-week window |
 | `BASELINE_MIN_SESSIONS` | 5 | R2 proposal: 5–7 rested sessions; PVT has no practice effect |
-| Baseline excludes `act` days and flagged sessions | — | Stops a bad week becoming the new normal |
+| Baseline excludes flagged sessions (and two-sided `watch` spikes) | — | Stops flagged checks or severe BP spikes skewing later bands without ratcheting one-sided reaction baselines upward |
 | `PERSISTENT_DAYS` | 3 | Three `act` check-ins in a row raise the persistent card |
 | `BP_SUSTAINED_READINGS` | 3 | Last 3 measurements on different days all ≥ 140/90 (R3: assess over 3–7 days) |
 | `BP_Z_FLAG` | ±1.5 | Mirrors the reaction threshold for "different from your normal" |
