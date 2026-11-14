@@ -1,0 +1,41 @@
+{
+  "name": "Mars Transit 1",
+  "profile": "mars-transit",
+  "launchDate": "2026-07-19",
+  "commsDelay": {
+    "oneWayMinMinutes": 3,
+    "oneWayMaxMinutes": 22
+  },
+  "crew": [
+    {
+      "id": "sara",
+      "name": "Sara",
+      "role": "Commander"
+    },
+    {
+      "id": "mateo",
+      "name": "Mateo",
+      "role": "Pilot"
+    },
+    {
+      "id": "elena",
+      "name": "Elena",
+      "role": "Medical officer"
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji",
+      "role": "Engineer"
+    }
+  ],
+  "otherProfiles": [
+    {
+      "profile": "station",
+      "oneWayDelaySeconds": 1
+    },
+    {
+      "profile": "moon",
+      "oneWayDelaySeconds": 1.3
+    }
+  ]
+}

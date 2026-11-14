@@ -38,8 +38,8 @@
         "npx vitest run tests/unit/simulate.test.ts",
         "npm run simulate -- --check (regenerates and reports no difference from data/fixtures)"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Nov 14: seeded simulator (seed 20261115) writes 5 fixture files (1813.0 KB total, < 3 MB) for Sara + 3 crew across 120 days; npm run simulate -- --check PASS; tests/unit/simulate.test.ts 4/4 pass; gate PASS."
     },
     {
       "id": "F03",

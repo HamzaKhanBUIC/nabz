@@ -23,3 +23,10 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - `GET /api/today` returns `card: null` when nothing was done today (changed from the first draft).
 - Gate PASS, 35 tests. `src/schemas/` is now frozen for lanes A and B.
 - Next: lanes A (F02 data) and B (F07 content) on Antigravity; F03-F06 rules engine (Claude).
+
+## 2026-11-14 — F02 seeded data simulator
+- Added `"simulate": "tsx tools/simulate/index.ts"` in `package.json`.
+- Built `tools/simulate/{rng,config,signals,index}.ts`: deterministic mulberry32 + Box-Muller PRNG (`deriveSeed` via FNV-1a), 120-day signals for Sara and 3 crew (`mateo`, `elena`, `kenji`) anchored to `research/CHECKS.md`, injected events (`short-sleep-week`, `illness`, `high-workload`, `short-sleep-before-120`), and `--check` byte-identical comparison.
+- Wrote `data/fixtures/{mission,sara,mateo,elena,kenji}.json` (1813.0 KB total), `data/README.md` with the honesty table, and `tests/unit/simulate.test.ts` (4/4 pass).
+- Gate PASS (`tsc`, `eslint`, `vitest run`).
+- Next: F07 verified content (`content/`).
