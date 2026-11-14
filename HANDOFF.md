@@ -74,7 +74,7 @@ Must → Should → Later. Within Must: data → formulas → action cards → m
 
 1. Research R1–R6 running in Antigravity (Hamza's app, started Nov 14 afternoon). Hamza tells Claude when done.
    - **R1–R6 verified (Nov 14).** 4 corrections, recorded in research/CHECKS.md, which wins over the R files.
-   - R8 (crewmate emergency, Should) has a brief written; not run yet.
+   - R8 (crewmate emergency, Should) verified, 1 correction. R7 (AI coach + voice) brief written, not run yet.
 2. Claude verifies each result against its sources; Argon second opinion on key numbers.
 3. Decide: core NASA sources (R1), which emergencies (R4), environment switch yes/no (R5).
 4. Design: data model, formulas, action-card rules, API contract. Write DESIGN.md.

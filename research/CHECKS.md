@@ -77,6 +77,30 @@ Cross-checked by an Antigravity read-only worker. It was asked to use Gemini 4 A
 - R5's escalation and EIMO material is context for the action-card wording, not numbers in code.
 - R6's calibration dataset list (PhysioNet, OpenNeuro) gets checked if we actually use one.
 
+## R8: crewmate emergency (Should)
+
+Status: **verified, one correction**
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| Space CPR order: start with Evetts-Russomano (ER), switch to reverse bear hug if ER doesn't work; handstand once the patient is strapped to the medical restraint (CMRS) | confirmed (Recs 2–3) | Hinkelbein et al. 2020, DGLRM/ESAM spaceflight CPR guideline, [PMC7607644](https://pmc.ncbi.nlm.nih.gov/articles/PMC7607644/) |
+| Defibrillate only when the patient is restrained on an electrically isolated surface | confirmed (Rec 10) | same |
+| Start CPR even without a defibrillator | confirmed (Rec 14) | same |
+| Airway devices only with ≥ 2 rescuers and the patient restrained; second-generation supraglottic airway if nobody can intubate | confirmed (Recs 6–8) | same |
+| Rehnberg 2014: ER 37.4 mm at 105.6/min; handstand 49.3 mm at 91.9/min; reverse bear hug 23.9 mm at 101.3/min | confirmed | PubMed abstract, PMID 25022155 |
+| Jay 2003 (on the CMRS): handstand 4.01 cm, side straddle 1.98 cm, waist straddle 3.07 cm | confirmed | PubMed abstract, PMID 14620476 |
+| Evetts 2005 (parabolic flight): ER 44.0 mm at 68.3/min | confirmed | PubMed abstract, PMID 15892553 |
+| Adult CPR: 100–120/min, ≥ 5 cm (ERC: not more than 6 cm), full recoil. 30:2 if trained and willing, otherwise compressions only. | consistent with 2025 summaries; primary AHA 2025 text not opened (blocked) | AHA 2025 BLS (doi 10.1161/CIR.0000000000001369) via [Resus Council UK 2025](https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-basic-life-support-guidelines) and training summaries |
+| Seizure: don't restrain, nothing in the mouth; escalate if > 5 min or not back to normal in 5–10 min | confirmed | 2024 AHA/Red Cross first-aid guideline (full text) |
+| Low blood sugar: oral glucose only if awake and able to swallow | confirmed | same |
+| ER screen step "hook and cross ankles behind their shoulders" | **corrected** | Guideline: one leg over the patient's shoulder, the other around the torso, ankles locked in the centre of their back. Screen text: "Wrap your legs around their chest. Lock your ankles behind their back." |
+
+**Design notes:**
+- No microgravity method reliably reaches the 50–60 mm Earth target (guideline evidence: handstand 47.4 mm best). The app should coach "push hard and fast" with a 100–120/min metronome and not promise full depth.
+- Not checked; only used as context, not screen text:
+  - the ISS AED model (LIFEPAK 1000)
+  - the "Warn, Gather, Work" toxic-air reference. The DOI cited in R4/R8, `10.82217/...`, looks malformed. The toxic-air steps must say "follow your spacecraft's emergency procedure".
+
 ## Summary
 
 | R | Status | Corrections |
@@ -87,4 +111,5 @@ Cross-checked by an Antigravity read-only worker. It was asked to use Gemini 4 A
 | R4 emergencies | verified | eye flush **15 min**; tourniquet "2 in" is width, not placement |
 | R5 environments | verified (delays) | none |
 | R6 simulation | verified | PVT-B gap 1–4 s, not 0–4 s |
-| R8 crewmate emergency | queued | brief written, not run yet |
+| R7 AI coach + voice | queued | brief written, not run yet |
+| R8 crewmate emergency | verified | ER leg position wording; toxic-air steps defer to spacecraft procedure |

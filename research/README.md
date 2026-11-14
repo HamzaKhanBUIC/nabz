@@ -12,8 +12,8 @@ Hamza runs the research in the Antigravity app: one agent per brief, all opened 
 | R4 | First-person emergencies Sara can handle alone, offline | Emergency mode | [brief](briefs/R4-emergencies.md) | `R4-emergencies.md` | verified |
 | R5 | Station / Moon / Mars: delays, escalation, differences | Review point #3 (decide after) | [brief](briefs/R5-environments.md) | `R5-environments.md` | verified |
 | R6 | Simulation design: signals, drift by day 120, events, calibration data | Sample crew data for all Must | [brief](briefs/R6-simulation.md) | `R6-simulation.md` | verified |
-| R7 | Offline-capable AI models; Speechmatics voice | Should / Later | not written | | later |
-| R8 | Crewmate collapses in front of Sara: check response and breathing, CPR in microgravity, recovery position, which steps one person can do | Should: emergency "For a crewmate" | [brief](briefs/R8-crewmate-emergency.md) | `R8-crewmate-emergency.md` | queued |
+| R7 | AI coach (offline models, grounding, NASA AI assistants) and voice (Speechmatics, offline speech) | Should / Later | [brief](briefs/R7-ai-and-voice.md) | `R7-ai-and-voice.md` | queued |
+| R8 | Crewmate collapses in front of Sara: check response and breathing, CPR in microgravity, recovery position, which steps one person can do | Should: emergency "For a crewmate" | [brief](briefs/R8-crewmate-emergency.md) | `R8-crewmate-emergency.md` | verified |
 
 **Checks and corrections:** [CHECKS.md](CHECKS.md). Where an R file and CHECKS.md disagree, CHECKS.md wins.
 
