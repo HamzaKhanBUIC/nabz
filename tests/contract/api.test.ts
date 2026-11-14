@@ -51,14 +51,13 @@ describe("F08 API contract and JSON store", () => {
 
     const todayRes = await request(app).get("/api/today");
     expect(todayRes.status).toBe(200);
-    expect(Today.parse(todayRes.body)).toEqual({
-      missionDay: 120,
-      checkin: null,
-      bp: null,
-      card: null,
-      cards: [],
-      nextDue: null,
-    });
+    const today = Today.parse(todayRes.body);
+    expect(today.missionDay).toBe(120);
+    expect(today.checkin).toBeNull();
+    expect(today.bp).toBeNull();
+    expect(today.card).toBeNull();
+    expect(today.cards).toEqual([]);
+    expect(today.nextDue).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
 
     const protocolRes = await request(app).get("/api/checkin/protocol");
     expect(protocolRes.status).toBe(200);
@@ -81,7 +80,12 @@ describe("F08 API contract and JSON store", () => {
 
     const crewmateRes = await request(app).get("/api/emergency/procedures?for=crewmate");
     expect(crewmateRes.status).toBe(200);
-    expect(ProcedureBundle.parse(crewmateRes.body).procedures).toEqual([]);
+    expect(ProcedureBundle.parse(crewmateRes.body).procedures.map((p) => p.id)).toEqual([
+      "crewmate-collapse",
+      "crewmate-cpr",
+      "crewmate-seizure",
+      "crewmate-low-blood-sugar",
+    ]);
 
     const oneProcRes = await request(app).get("/api/emergency/procedures/eye");
     expect(oneProcRes.status).toBe(200);
@@ -205,26 +209,29 @@ describe("F08 API contract and JSON store", () => {
     expect(ErrorBody.parse(missingProc.body).error.code).toBe("not_found");
   });
 
-  it("answers 501 not_built on all 6 reserved Should endpoints", async () => {
+  it("serves all 6 live Should endpoints and rejects invalid payloads with 400", async () => {
     const runtimeDir = makeTempRuntimeDir();
-    const app = createApp({ runtimeDir });
+    const app = createApp({ runtimeDir, pinnedNow: "2026-11-15T08:00:00+00:00" });
 
-    const reserved: Array<{ method: "get" | "post" | "put"; path: string; feature: string }> = [
-      { method: "post", path: "/api/coach/ask", feature: "coach" },
-      { method: "get", path: "/api/routines", feature: "routines" },
-      { method: "post", path: "/api/share/preview", feature: "share" },
-      { method: "post", path: "/api/share", feature: "share" },
-      { method: "get", path: "/api/reminders", feature: "reminders" },
-      { method: "put", path: "/api/reminders", feature: "reminders" },
-    ];
+    expect((await request(app).get("/api/routines")).status).toBe(200);
+    expect((await request(app).get("/api/reminders")).status).toBe(200);
+    expect((await request(app).post("/api/share/preview").send({})).status).toBe(200);
+    expect((await request(app).post("/api/coach/ask").send({ question: "What should I do today?" })).status).toBe(200);
 
-    for (const item of reserved) {
-      const res = await request(app)[item.method](item.path).send({});
-      expect(res.status).toBe(501);
-      const body = ErrorBody.parse(res.body);
-      expect(body.error.code).toBe("not_built");
-      expect(body.error.feature).toBe(item.feature);
-    }
+    const badShare = await request(app).post("/api/share").send({ confirm: false });
+    expect(badShare.status).toBe(400);
+    expect(ErrorBody.parse(badShare.body).error.code).toBe("invalid_input");
+
+    const goodShare = await request(app).post("/api/share").send({ confirm: true, days: 2 });
+    expect(goodShare.status).toBe(201);
+
+    const badReminder = await request(app).put("/api/reminders").send({ enabled: true });
+    expect(badReminder.status).toBe(400);
+    expect(ErrorBody.parse(badReminder.body).error.code).toBe("invalid_input");
+
+    const badCoach = await request(app).post("/api/coach/ask").send({ question: "a" });
+    expect(badCoach.status).toBe(400);
+    expect(ErrorBody.parse(badCoach.body).error.code).toBe("invalid_input");
   });
 
   it("serves the offline /dev test console outside production", async () => {

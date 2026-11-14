@@ -117,14 +117,66 @@
 
       <section class="panel" id="sec-emergency">
         <div class="panel-head">
-          <h2>5. Offline Emergency Procedures (Self)</h2>
+          <h2>5. Offline Emergency Procedures</h2>
+          <div class="controls-row">
+            <button type="button" id="btn-em-self" class="primary">Me (self)</button>
+            <button type="button" id="btn-em-crewmate">A crewmate</button>
+          </div>
         </div>
         <div id="emergency-tabs" class="controls-row"></div>
         <div id="emergency-detail"></div>
       </section>
 
+      <section class="panel" id="sec-coach">
+        <div class="panel-head">
+          <h2>6. Coach (Offline-First)</h2>
+        </div>
+        <div id="coach-suggested" class="controls-row"></div>
+        <div class="controls-row">
+          <input id="coach-question" type="text" placeholder="Ask about today's card..." style="flex:1; min-width:220px;" />
+          <button type="button" id="btn-coach-ask" class="primary">Ask Coach</button>
+        </div>
+        <div id="coach-reply"></div>
+      </section>
+
+      <section class="panel" id="sec-share">
+        <div class="panel-head">
+          <h2>7. Send to Earth</h2>
+        </div>
+        <div class="symptoms-grid">
+          <label class="symptom-item"><input type="checkbox" id="share-reaction" checked /> Reaction check-ins</label>
+          <label class="symptom-item"><input type="checkbox" id="share-sleep" checked /> Sleep hours</label>
+          <label class="symptom-item"><input type="checkbox" id="share-bp" checked /> Blood pressure</label>
+          <label class="symptom-item"><input type="checkbox" id="share-cards" checked /> Action cards</label>
+        </div>
+        <div class="controls-row">
+          <label class="inline-label">Days: <input id="share-days" type="number" min="1" max="30" value="3" /></label>
+          <input id="share-note" type="text" placeholder="Optional note to Flight Surgeon" style="flex:1; min-width:200px;" />
+        </div>
+        <div class="controls-row">
+          <button type="button" id="btn-share-preview">Preview Packet</button>
+          <button type="button" id="btn-share-send" class="primary">Send Summary (confirm)</button>
+        </div>
+        <div id="share-result"></div>
+      </section>
+
+      <section class="panel" id="sec-routines-reminders">
+        <div class="panel-head">
+          <h2>8. Routines &amp; Reminders</h2>
+        </div>
+        <div id="reminders-panel" class="card-box"></div>
+        <div class="controls-row" style="margin-top:10px;">
+          <label class="symptom-item"><input type="checkbox" id="rem-enabled" checked /> Reminders enabled</label>
+          <label class="inline-label">Check-in UTC: <input id="rem-checkin-utc" type="text" value="08:00" style="width:90px;" /></label>
+          <label class="inline-label">BP interval (d): <input id="rem-bp-days" type="number" min="1" max="30" value="3" /></label>
+          <label class="inline-label">BP UTC: <input id="rem-bp-utc" type="text" value="08:30" style="width:90px;" /></label>
+          <button type="button" id="btn-save-reminders">Save Reminders</button>
+        </div>
+        <div id="routines-list"></div>
+      </section>
+
       <section class="panel wide" id="sec-reset">
-        <h2>6. Reset Instructions</h2>
+        <h2>9. Reset Instructions</h2>
         <p>
           This dev page does not wipe files automatically. To reset to seeded day-119 history
           with an empty day 120, stop the server, delete <code>data/runtime/</code>, and restart

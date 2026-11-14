@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "schedule": {
+    "enabled": true,
+    "checkinTimeUtc": "08:00",
+    "bpIntervalDays": 3,
+    "bpTimeUtc": "08:30"
+  },
+  "nextDue": "2026-11-15T08:00:00+00:00",
+  "items": [
+    {
+      "kind": "checkin",
+      "label": "Daily reaction check-in (3 min)",
+      "dueAt": "2026-11-15T08:00:00+00:00",
+      "overdue": false,
+      "reason": "Daily 3-minute PVT-B check-in due for mission day 120."
+    },
+    {
+      "kind": "bp",
+      "label": "Guided blood pressure check (every 3 d)",
+      "dueAt": "2026-11-16T08:30:00+00:00",
+      "overdue": false,
+      "reason": "Last checked on mission day 118. Next check on mission day 121."
+    }
+  ]
+}

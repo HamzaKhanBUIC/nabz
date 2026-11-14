@@ -1,0 +1,33 @@
+{
+  "id": "hands-microbreak",
+  "version": 1,
+  "category": "hands",
+  "title": "Hands and vigilance microbreak",
+  "summary": "Two-minute physical and visual reset after borderline reaction drift or long fine-motor work.",
+  "durationSeconds": 120,
+  "steps": [
+    {
+      "id": "pause-controls",
+      "text": "Pause precision control work and rest your forearms loosely."
+    },
+    {
+      "id": "finger-spread",
+      "text": "Slowly spread and relax your fingers ten times without gripping."
+    },
+    {
+      "id": "wrist-circles",
+      "text": "Rotate both wrists gently in slow circles for 20 seconds.",
+      "timerSeconds": 20
+    },
+    {
+      "id": "focus-reset",
+      "text": "Rest your eyes on a distant cabin point and breathe slowly for 60 seconds.",
+      "timerSeconds": 60
+    }
+  ],
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "cognition-iss-pmc11614644",
+    "basner-2011-pvtb"
+  ]
+}

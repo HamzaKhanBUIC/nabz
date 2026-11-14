@@ -143,3 +143,51 @@ export const LOW_BP_SYMPTOM_IDS = [
   "rapid-breathing",
   "weak-rapid-pulse",
 ] as const;
+
+/** research/CHECKS.md R8 (DGLRM/ESAM & AHA 2025): 100-120 compressions/min; midpoint for metronome. */
+export const CPR_METRONOME_BPM = 110;
+
+/** design choice (docs/blueprint/03-data-model.md, S05): daily morning PVT check-in reminder hour/minute UTC. */
+export const DEFAULT_CHECKIN_REMINDER_UTC = "08:00" as const;
+
+/** design choice (docs/blueprint/03-data-model.md, S05): periodic blood pressure reminder hour/minute UTC. */
+export const DEFAULT_BP_REMINDER_UTC = "08:30" as const;
+
+/** design choice (docs/blueprint/03-data-model.md, S05): periodic blood pressure interval in mission days. */
+export const DEFAULT_BP_INTERVAL_DAYS = 3;
+
+/** Fixed abstention reply for out-of-scope coach queries (docs/features/S-should-slots.md). */
+export const COACH_NO_SOURCE_REPLY =
+  "I only answer from verified mission medical cards and don't have a verified source on that." as const;
+
+/** Fixed urgent banner label when red-flag symptoms appear in a coach query (docs/features/S-should-slots.md). */
+export const COACH_URGENT_BANNER_LABEL =
+  "Alert a crewmate or medical officer now — do not wait for Earth." as const;
+
+/** Deterministic red-flag symptom terms scanned before any coach phrasing (research/CHECKS.md R3/R4/R8). */
+export const COACH_RED_FLAG_TERMS = [
+  "chest pain",
+  "can't breathe",
+  "cannot breathe",
+  "trouble breathing",
+  "shortness of breath",
+  "faint",
+  "fainting",
+  "passed out",
+  "collapsed",
+  "unconscious",
+  "unresponsive",
+  "seizure",
+  "convulsion",
+  "numbness",
+  "weakness",
+  "vision change",
+  "vision loss",
+  "trouble speaking",
+  "slurred speech",
+  "back pain",
+  "spurting blood",
+  "severe bleeding",
+  "anaphylaxis",
+  "swelling throat",
+] as const;

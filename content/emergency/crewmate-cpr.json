@@ -1,0 +1,46 @@
+{
+  "id": "crewmate-cpr",
+  "version": 1,
+  "for": "crewmate",
+  "title": "Crewmate CPR in microgravity",
+  "whenToUse": "Unresponsive crewmate who is not breathing normally or is only gasping.",
+  "steps": [
+    {
+      "id": "start-cpr",
+      "text": "Start chest compressions right away, even without a defibrillator."
+    },
+    {
+      "id": "er-position",
+      "text": "Wrap your legs around their chest. Lock your ankles behind their back.",
+      "detail": "Start immediately with the Evetts-Russomano method; if it does not work, switch to the reverse bear hug."
+    },
+    {
+      "id": "compressions",
+      "text": "Push hard and fast in the centre of the chest at 100 to 120 per minute with full recoil.",
+      "timerSeconds": 120,
+      "metronomeBpm": 110,
+      "detail": "Microgravity methods do not reliably reach full Earth compression depth; push hard and fast continuously (or 30:2 if trained and willing). Switch to Handstand CPR once strapped to the CMRS restraint.",
+      "caution": "Do not wait for Earth or delay compressions."
+    },
+    {
+      "id": "defib-isolated",
+      "text": "Defibrillate only when they are restrained on an electrically isolated surface.",
+      "detail": "Apply AED pads per diagrams once strapped to the CMRS. Use airway devices only with at least two rescuers and the patient restrained (second-generation supraglottic airway if nobody can intubate).",
+      "caution": "Clear everyone before AED rhythm analysis or shock, then resume CPR immediately."
+    }
+  ],
+  "redFlags": [
+    "No return of normal breathing or movement.",
+    "Multiple AED shocks delivered or repeated arrest.",
+    "Suspected toxic air, electrocution or severe trauma."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "dglrm-esam-2020-cpr",
+    "aha-bls-2025"
+  ]
+}

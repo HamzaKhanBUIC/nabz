@@ -1,0 +1,48 @@
+{
+  "id": "crewmate-collapse",
+  "version": 1,
+  "for": "crewmate",
+  "title": "Collapsed or unresponsive crewmate",
+  "whenToUse": "A crewmate collapses or is unresponsive in front of you.",
+  "steps": [
+    {
+      "id": "scene-check",
+      "text": "Check for alarms, smoke or chemical fumes. Follow your spacecraft's emergency procedure.",
+      "caution": "Put on emergency breathing protection first if cabin air may be unsafe."
+    },
+    {
+      "id": "responsiveness",
+      "text": "Tap their shoulders firmly and shout loudly to check if they respond."
+    },
+    {
+      "id": "alert-help",
+      "text": "Alert the crew and medical officer right away and fetch the AED."
+    },
+    {
+      "id": "breathing",
+      "text": "Open the airway and check for normal breathing for up to 10 seconds.",
+      "timerSeconds": 10,
+      "detail": "Tilt head and lift chin (use jaw thrust if trauma is suspected). Slow gasps are not normal breathing — start CPR immediately."
+    },
+    {
+      "id": "restrain-breathing",
+      "text": "If breathing normally, tether or strap them safely and keep the airway open.",
+      "caution": "Give nothing by mouth while drowsy or unresponsive; stay with them and recheck breathing every minute."
+    }
+  ],
+  "redFlags": [
+    "They are not breathing normally or only gasping.",
+    "They do not wake up within 1 to 2 minutes or have a head injury.",
+    "Cabin air, CO2 or toxic-fume alarms are active."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-bls-2025",
+    "aha-first-aid-2024",
+    "dglrm-esam-2020-cpr"
+  ]
+}

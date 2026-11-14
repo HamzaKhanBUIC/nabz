@@ -167,60 +167,70 @@
       "priority": "P2",
       "description": "Emergency mode asks who it is for and serves crewmate procedures (collapse, microgravity CPR) when Sara picks 'For a crewmate'.",
       "design": "docs/features/S-should-slots.md",
-      "owner": "unassigned",
+      "owner": "Orchestrator Argon",
       "verify": [
-        "design pass first: docs/adr/ entry and verify steps added before any code"
+        "docs/adr/0002-should-features.md written before implementation",
+        "npx vitest run tests/unit/should.test.ts -t S01",
+        "GET /api/emergency/procedures?for=crewmate returns 4 crewmate procedures with R8 Hinkelbein 2020 reverse bear-hug wording and metronomeBpm: 110"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ADR 0002 + 4 crewmate procedures in content/emergency/crewmate-*.json (collapse, microgravity CPR with metronomeBpm 110, seizure, low blood sugar) using exact CHECKS R8 wording; filtered via GET /api/emergency/procedures?for=crewmate; verified in should.test.ts."
     },
     {
       "id": "S02",
       "priority": "P2",
       "description": "The AI coach answers a follow-up question about a card using only that card, its facts and verified content, and gives the fixed no-source reply otherwise.",
       "design": "docs/features/S-should-slots.md",
-      "owner": "unassigned",
+      "owner": "Orchestrator Argon",
       "verify": [
-        "design pass first: docs/adr/ entry and verify steps added before any code"
+        "docs/adr/0002-should-features.md written before implementation",
+        "npx vitest run tests/unit/should.test.ts -t S02",
+        "POST /api/coach/ask returns grounded deterministic explanation with verified citations or fixed no-source reply when out of scope, plus urgent banner on red-flag terms and offline fallback for OllamaCoachProvider"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ADR 0002 + pure deterministic coach engine in src/core/coach.ts + content/coach-knowledge.json (11 verified snippets) + DeterministicCoachProvider default and opt-in OllamaCoachProvider (qwen3:4b) with automatic offline fallback in src/slots/coach/index.ts; verified in should.test.ts."
     },
     {
       "id": "S03",
       "priority": "P2",
       "description": "Health routines for hands, tension and blood pressure are served and linked from action cards.",
       "design": "docs/features/S-should-slots.md",
-      "owner": "unassigned",
+      "owner": "Orchestrator Argon",
       "verify": [
-        "design pass first: docs/adr/ entry and verify steps added before any code"
+        "docs/adr/0002-should-features.md written before implementation",
+        "npx vitest run tests/unit/should.test.ts -t S03",
+        "GET /api/routines returns hands-microbreak, tension-winddown, and bp-quiet-rest; action cards link routineId and startup content loader verifies every link"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ADR 0002 + 3 verified routines in content/routines/*.json linked from content/cards.json (links.routineId) with startup link validation in src/store/content.ts; served by GET /api/routines; verified in should.test.ts."
     },
     {
       "id": "S04",
       "priority": "P2",
       "description": "Send to Earth: Sara previews exactly which entries would be shared and confirms before a package is queued.",
       "design": "docs/features/S-should-slots.md",
-      "owner": "unassigned",
+      "owner": "Orchestrator Argon",
       "verify": [
-        "design pass first: docs/adr/ entry and verify steps added before any code"
+        "docs/adr/0002-should-features.md written before implementation",
+        "npx vitest run tests/unit/should.test.ts -t S04",
+        "POST /api/share/preview builds exact flight-surgeon package with mission delay and nothing queued; POST /api/share requires confirm: true and persists to runtime outbox"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ADR 0002 + pure share preview builder in src/core/share.ts + runtime outbox persistence in src/store/; POST /api/share/preview (200) and POST /api/share (201 with confirm: true required); verified in should.test.ts."
     },
     {
       "id": "S05",
       "priority": "P2",
       "description": "A check-up reminder tells Sara when the next check-in or measurement is due.",
       "design": "docs/features/S-should-slots.md",
-      "owner": "unassigned",
+      "owner": "Orchestrator Argon",
       "verify": [
-        "design pass first: docs/adr/ entry and verify steps added before any code"
+        "docs/adr/0002-should-features.md written before implementation",
+        "npx vitest run tests/unit/should.test.ts -t S05",
+        "GET /api/today populates nextDue (overdue/due_now/upcoming) and GET/PUT /api/reminders reads and updates reminder schedule"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ADR 0002 + pure reminder state machine in src/core/reminders.ts; wired into Today.nextDue and GET/PUT /api/reminders with runtime persistence; verified in should.test.ts."
     }
   ]
 }

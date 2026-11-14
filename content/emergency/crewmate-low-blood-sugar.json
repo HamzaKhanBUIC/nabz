@@ -1,0 +1,41 @@
+{
+  "id": "crewmate-low-blood-sugar",
+  "version": 1,
+  "for": "crewmate",
+  "title": "Suspected low blood sugar",
+  "whenToUse": "A crewmate is shaky, confused, sweaty or sluggish and may have low blood sugar.",
+  "steps": [
+    {
+      "id": "check-swallow",
+      "text": "Check if the crewmate is awake and able to swallow safely.",
+      "caution": "If unresponsive or unable to swallow safely, give nothing by mouth."
+    },
+    {
+      "id": "oral-glucose",
+      "text": "Give oral glucose only if they are awake and able to swallow.",
+      "detail": "Use measured glucose tablets or gel from the crew medical kit if available."
+    },
+    {
+      "id": "unresponsive-escalate",
+      "text": "If they cannot swallow safely, alert the medical officer immediately for care."
+    },
+    {
+      "id": "recheck",
+      "text": "Wait 15 minutes, then recheck alertness and symptoms.",
+      "timerSeconds": 900
+    }
+  ],
+  "redFlags": [
+    "The crewmate becomes drowsy, confused or unresponsive.",
+    "They cannot swallow safely.",
+    "Symptoms do not improve 15 minutes after oral glucose."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}

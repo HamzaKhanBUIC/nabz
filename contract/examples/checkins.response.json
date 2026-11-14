@@ -70,6 +70,9 @@
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11614644/"
       }
     ],
-    "disclaimer": "Decision support, not a diagnosis."
+    "disclaimer": "Decision support, not a diagnosis.",
+    "links": {
+      "routineId": "tension-winddown"
+    }
   }
 }

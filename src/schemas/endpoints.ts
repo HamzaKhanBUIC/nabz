@@ -1,18 +1,26 @@
 import type { z } from "zod";
 import { BpGuide, BpInput, BpMeasurement } from "./bp";
 import { CheckinInput, CheckinResponse, Protocol } from "./checkin";
+import { CoachAskInput, CoachAskResponse } from "./coach";
 import { ErrorBody, HealthResponse } from "./common";
 import { Mission, Today } from "./mission";
 import { Procedure, ProcedureBundle, ProcedureQuery } from "./procedure";
+import { ReminderSchedule, RemindersResponse } from "./reminders";
+import { RoutineBundle } from "./routine";
+import {
+  SharePackagePreview,
+  SharePreviewInput,
+  ShareQueuedPackage,
+  ShareSendInput,
+} from "./share";
 import { Trend, TrendQuery } from "./trend";
 
 export type EndpointSpec = {
   id: string;
   method: "GET" | "POST" | "PUT";
   path: string;
-  /** must: part of the first build. reserved: answers 501 until its feature is designed and built. */
-  tier: "must" | "reserved";
-  /** Success status for "must"; 501 for "reserved". */
+  /** must: P0 build. should: P2 build. reserved: answers 501 until built. */
+  tier: "must" | "should" | "reserved";
   status: number;
   query?: z.ZodType;
   request?: z.ZodType;
@@ -20,8 +28,6 @@ export type EndpointSpec = {
   /** File names in contract/examples/. */
   examples: { request?: string; response: string };
 };
-
-const NOT_BUILT = { status: 501, response: ErrorBody, examples: { response: "error-not-built.response.json" } } as const;
 
 /** The whole API in one table. The server, the tests and docs/api-contract.md all follow it. */
 export const ENDPOINTS: EndpointSpec[] = [
@@ -36,13 +42,14 @@ export const ENDPOINTS: EndpointSpec[] = [
   { id: "emergency.list", method: "GET", path: "/api/emergency/procedures", tier: "must", status: 200, query: ProcedureQuery, response: ProcedureBundle, examples: { response: "emergency-procedures.response.json" } },
   { id: "emergency.one", method: "GET", path: "/api/emergency/procedures/:id", tier: "must", status: 200, response: Procedure, examples: { response: "emergency-procedure.response.json" } },
 
-  { id: "coach.ask", method: "POST", path: "/api/coach/ask", tier: "reserved", ...NOT_BUILT },
-  { id: "routines", method: "GET", path: "/api/routines", tier: "reserved", ...NOT_BUILT },
-  { id: "share.preview", method: "POST", path: "/api/share/preview", tier: "reserved", ...NOT_BUILT },
-  { id: "share.send", method: "POST", path: "/api/share", tier: "reserved", ...NOT_BUILT },
-  { id: "reminders.get", method: "GET", path: "/api/reminders", tier: "reserved", ...NOT_BUILT },
-  { id: "reminders.put", method: "PUT", path: "/api/reminders", tier: "reserved", ...NOT_BUILT },
+  { id: "coach.ask", method: "POST", path: "/api/coach/ask", tier: "should", status: 200, request: CoachAskInput, response: CoachAskResponse, examples: { request: "coach-ask.request.json", response: "coach-ask.response.json" } },
+  { id: "routines", method: "GET", path: "/api/routines", tier: "should", status: 200, response: RoutineBundle, examples: { response: "routines.response.json" } },
+  { id: "share.preview", method: "POST", path: "/api/share/preview", tier: "should", status: 200, request: SharePreviewInput, response: SharePackagePreview, examples: { request: "share-preview.request.json", response: "share-preview.response.json" } },
+  { id: "share.send", method: "POST", path: "/api/share", tier: "should", status: 201, request: ShareSendInput, response: ShareQueuedPackage, examples: { request: "share.request.json", response: "share.response.json" } },
+  { id: "reminders.get", method: "GET", path: "/api/reminders", tier: "should", status: 200, response: RemindersResponse, examples: { response: "reminders.response.json" } },
+  { id: "reminders.put", method: "PUT", path: "/api/reminders", tier: "should", status: 200, request: ReminderSchedule, response: RemindersResponse, examples: { request: "reminders-put.request.json", response: "reminders.response.json" } },
 ];
 
 /** Error examples that belong to no single endpoint. */
 export const ERROR_EXAMPLES = ["error-invalid-input.response.json", "error-not-found.response.json", "error-not-built.response.json"];
+export type { z, ErrorBody };

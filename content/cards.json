@@ -60,7 +60,10 @@
       "sourceIds": [
         "jones-2022-iss-sleep",
         "cognition-iss-pmc11614644"
-      ]
+      ],
+      "links": {
+        "routineId": "tension-winddown"
+      }
     },
     {
       "id": "reaction-slow",
@@ -90,7 +93,10 @@
       "sourceIds": [
         "cognition-iss-pmc11614644",
         "basner-2011-pvtb"
-      ]
+      ],
+      "links": {
+        "routineId": "hands-microbreak"
+      }
     },
     {
       "id": "all-normal",
@@ -232,7 +238,11 @@
       ],
       "sourceIds": [
         "norsk-2015"
-      ]
+      ],
+      "links": {
+        "routineId": "bp-quiet-rest",
+        "measurement": "bp"
+      }
     },
     {
       "id": "bp-above-ideal",
@@ -246,7 +256,11 @@
       "sourceIds": [
         "aha-acc-2025-bp",
         "cdc-bp-measure"
-      ]
+      ],
+      "links": {
+        "routineId": "bp-quiet-rest",
+        "measurement": "bp"
+      }
     },
     {
       "id": "bp-normal",

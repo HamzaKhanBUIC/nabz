@@ -5,3 +5,6 @@ export * from "./zone";
 export * from "./baseline";
 export * from "./cards";
 export * from "./bp";
+export * from "./reminders";
+export * from "./share";
+export * from "./coach";

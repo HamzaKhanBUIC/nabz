@@ -1,0 +1,36 @@
+{
+  "id": "out-sara-120-1",
+  "status": "queued",
+  "queuedAt": "2026-11-15T08:00:00+00:00",
+  "confirmedByUser": true,
+  "package": {
+    "generatedAt": "2026-11-15T08:00:00+00:00",
+    "missionDay": 120,
+    "subjectId": "sara",
+    "commsDelay": {
+      "oneWayMinMinutes": 3,
+      "oneWayMaxMinutes": 22,
+      "nominalMinutes": 13,
+      "delayNotice": "Earth one-way light-time delay is 3 to 22 minutes. Urgent symptoms must alert a crewmate or medical officer immediately rather than waiting for Earth."
+    },
+    "selection": {
+      "includeReaction": true,
+      "includeSleep": true,
+      "includeBp": true,
+      "includeCards": true,
+      "days": 3
+    },
+    "entries": [
+      {
+        "id": "chk-sara-120",
+        "kind": "reaction",
+        "missionDay": 120,
+        "effectiveDateTime": "2026-11-15T08:02:11+00:00",
+        "summary": "Day 120: PVT-B 3.71 1/s, 9 lapses (Below your normal, z=-1.88)"
+      }
+    ],
+    "cards": [],
+    "summaryText": "CREWPULSE FLIGHT SURGEON SUMMARY\nCrewmember: sara | Mission Day: 120 | Generated: 2026-11-15T08:00:00+00:00\nTransmission window: 3-22 min one-way (~44 min max round-trip)\n\nSelected entries (1):\n- Day 120: PVT-B 3.71 1/s, 9 lapses (Below your normal, z=-1.88)\n\nDecision support, not a diagnosis.",
+    "disclaimer": "Decision support, not a diagnosis."
+  }
+}

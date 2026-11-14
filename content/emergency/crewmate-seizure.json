@@ -1,0 +1,44 @@
+{
+  "id": "crewmate-seizure",
+  "version": 1,
+  "for": "crewmate",
+  "title": "Crewmate having a seizure",
+  "whenToUse": "A crewmate has sudden shaking, stiffness or loss of awareness.",
+  "steps": [
+    {
+      "id": "time-alert",
+      "text": "Alert the crew and medical officer and start a timer now.",
+      "timerSeconds": 300,
+      "detail": "Track duration so you know immediately if convulsions exceed 5 minutes."
+    },
+    {
+      "id": "protect-hardware",
+      "text": "Move hard floating gear away and cushion their head from module walls."
+    },
+    {
+      "id": "no-restraint",
+      "text": "Do not restrain their movements and do not put anything in their mouth.",
+      "caution": "Never force food, liquids, pills or objects between their teeth."
+    },
+    {
+      "id": "post-breathing",
+      "text": "Once shaking stops, tether gently and check normal breathing for up to 10 seconds.",
+      "timerSeconds": 10,
+      "detail": "Keep airway clear until fully awake; switch to CPR if they are not breathing normally."
+    }
+  ],
+  "redFlags": [
+    "The seizure lasts more than 5 minutes.",
+    "They are not back to normal in 5 to 10 minutes after shaking stops.",
+    "This is their first seizure or another seizure starts without recovery.",
+    "They have trouble breathing, vomiting or a head injury."
+  ],
+  "escalation": {
+    "text": "Red flag or getting worse? Alert a crewmate now. Do not wait for Earth.",
+    "action": "alert_crew"
+  },
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "aha-first-aid-2024"
+  ]
+}

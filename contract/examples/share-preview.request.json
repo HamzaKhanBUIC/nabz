@@ -1,0 +1,8 @@
+{
+  "includeReaction": true,
+  "includeSleep": true,
+  "includeBp": true,
+  "includeCards": true,
+  "days": 3,
+  "note": "Sharing short sleep recovery log with Flight Surgeon."
+}

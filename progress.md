@@ -119,3 +119,21 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
   `PASS npx eslint .`
   `PASS npx vitest run`
   `GATE: PASS`
+
+
+## 2026-11-14 — S01–S05 Should features & deterministic offline-first AI coach
+- Completed the design pass (`docs/adr/0002-should-features.md`, `docs/features/S-should-slots.md`, `docs/blueprint/03-data-model.md`) and implemented all 5 `Should (P2)` features with zero runtime network dependencies:
+  - **S01 Crewmate Emergency (`?for=crewmate`):** Added `metronomeBpm` support in `src/schemas/procedure.ts`, 3 verified R8 sources in `content/sources.json`, and 4 crewmate procedures (`crewmate-collapse`, `crewmate-cpr` with `metronomeBpm: 110`, `crewmate-seizure`, `crewmate-low-blood-sugar`) copied verbatim from `research/CHECKS.md` R8; filtered via `GET /api/emergency/procedures?for=crewmate`.
+  - **S02 Deterministic Offline-First AI Coach (`POST /api/coach/ask`):** Added pure rules engine in `src/core/coach.ts` + 11 verified snippets in `content/coach-knowledge.json`, `DeterministicCoachProvider` default + opt-in `OllamaCoachProvider` (`qwen3:4b`) with automatic offline fallback in `src/slots/coach/index.ts`. Handles card-grounded intents (`why`, `serious`, `worse`, `earth`, `routine`, `action`), fixed `COACH_NO_SOURCE_REPLY` abstention for uncovered topics, and `COACH_URGENT_BANNER_LABEL` on red-flag terms even if combined with uncovered terms.
+  - **S03 Health Routines (`GET /api/routines`):** Added `src/schemas/routine.ts`, 3 routines in `content/routines/` (`hands-microbreak`, `tension-winddown`, `bp-quiet-rest`), card linkage in `content/cards.json`, and startup link validation in `src/store/content.ts`.
+  - **S04 Send to Earth (`POST /api/share/preview`, `POST /api/share`):** Added pure preview builder in `src/core/share.ts`, `confirm: true` gate, and atomic runtime outbox persistence in `src/store/`.
+  - **S05 Check-up Reminders (`GET/PUT /api/reminders` + `Today.nextDue`):** Added pure reminder state machine in `src/core/reminders.ts` and wired `nextDue` into `GET /api/today`.
+- Exported updated `contract/schemas.json` (`npm run contract:export`), added 9 contract example files (`24` total in `contract/examples/`), updated `docs/api-contract.md` and `README.md`, and added live Should panels + crewmate CPR metronome in `tools/console/`.
+- Added `tests/unit/should.test.ts` and updated `tests/contract/api.test.ts` (`13/13` test files, `93/93` tests passing).
+- Finished features: F00, F01, F02, F07, F03, F04, F05, F06, F08, F09, F10, F11, F12, S01, S02, S03, S04, S05 (all Must, P1, and Should features complete)
+- Half-done: none
+- Gate output (`python scripts/gate.py`):
+  `PASS npx tsc --noEmit`
+  `PASS npx eslint .`
+  `PASS npx vitest run`
+  `GATE: PASS`

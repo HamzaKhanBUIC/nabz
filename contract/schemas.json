@@ -2735,6 +2735,11 @@
                       },
                       "caution": {
                         "type": "string"
+                      },
+                      "metronomeBpm": {
+                        "type": "integer",
+                        "minimum": 60,
+                        "maximum": 200
                       }
                     },
                     "required": [
@@ -2881,6 +2886,11 @@
                 },
                 "caution": {
                   "type": "string"
+                },
+                "metronomeBpm": {
+                  "type": "integer",
+                  "minimum": 60,
+                  "maximum": 200
                 }
               },
               "required": [
@@ -2965,270 +2975,1224 @@
     },
     "POST /api/coach/ask": {
       "id": "coach.ask",
-      "tier": "reserved",
-      "status": 501,
+      "tier": "should",
+      "status": 200,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 400
+          },
+          "cardId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "additionalProperties": false
+      },
       "response": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "error": {
+          "cardId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ruleId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "answer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "grounded": {
+            "type": "boolean"
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "banner": {
             "type": "object",
             "properties": {
-              "code": {
+              "level": {
                 "type": "string",
                 "enum": [
-                  "invalid_input",
-                  "not_found",
-                  "not_built",
-                  "internal"
+                  "info",
+                  "in_zone",
+                  "watch",
+                  "act",
+                  "urgent"
                 ]
               },
-              "message": {
+              "label": {
                 "type": "string",
                 "minLength": 1
               },
-              "issues": {
-                "type": "array",
-                "items": {}
-              },
-              "feature": {
-                "type": "string"
+              "iconKey": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "hourglass",
+                  "check",
+                  "eye",
+                  "alert",
+                  "siren"
+                ]
               }
             },
             "required": [
-              "code",
-              "message"
+              "level",
+              "label",
+              "iconKey"
             ],
             "additionalProperties": false
+          },
+          "suggestedQuestions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "disclaimer": {
+            "type": "string",
+            "const": "Decision support, not a diagnosis."
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "deterministic",
+              "ollama"
+            ]
           }
         },
         "required": [
-          "error"
+          "cardId",
+          "ruleId",
+          "answer",
+          "grounded",
+          "citations",
+          "suggestedQuestions",
+          "disclaimer",
+          "provider"
         ],
         "additionalProperties": false
       }
     },
     "GET /api/routines": {
       "id": "routines",
-      "tier": "reserved",
-      "status": 501,
+      "tier": "should",
+      "status": 200,
       "response": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string",
-                "enum": [
-                  "invalid_input",
-                  "not_found",
-                  "not_built",
-                  "internal"
-                ]
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "routines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "category": {
+                  "type": "string",
+                  "enum": [
+                    "hands",
+                    "tension",
+                    "blood-pressure"
+                  ]
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "durationSeconds": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "steps": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "text": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "detail": {
+                        "type": "string"
+                      },
+                      "timerSeconds": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "caution": {
+                        "type": "string"
+                      },
+                      "metronomeBpm": {
+                        "type": "integer",
+                        "minimum": 60,
+                        "maximum": 200
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "text"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "disclaimer": {
+                  "type": "string",
+                  "const": "Decision support, not a diagnosis."
+                },
+                "sources": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
               },
-              "message": {
-                "type": "string",
-                "minLength": 1
-              },
-              "issues": {
-                "type": "array",
-                "items": {}
-              },
-              "feature": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "code",
-              "message"
-            ],
-            "additionalProperties": false
+              "required": [
+                "id",
+                "version",
+                "category",
+                "title",
+                "summary",
+                "durationSeconds",
+                "steps",
+                "disclaimer",
+                "sources"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
-          "error"
+          "version",
+          "routines"
         ],
         "additionalProperties": false
       }
     },
     "POST /api/share/preview": {
       "id": "share.preview",
-      "tier": "reserved",
-      "status": 501,
+      "tier": "should",
+      "status": 200,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "includeReaction": {
+            "type": "boolean"
+          },
+          "includeSleep": {
+            "type": "boolean"
+          },
+          "includeBp": {
+            "type": "boolean"
+          },
+          "includeCards": {
+            "type": "boolean"
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          },
+          "entryIds": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "additionalProperties": false
+      },
       "response": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "error": {
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "missionDay": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "subjectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "commsDelay": {
             "type": "object",
             "properties": {
-              "code": {
-                "type": "string",
-                "enum": [
-                  "invalid_input",
-                  "not_found",
-                  "not_built",
-                  "internal"
-                ]
+              "oneWayMinMinutes": {
+                "type": "number",
+                "exclusiveMinimum": 0
               },
-              "message": {
+              "oneWayMaxMinutes": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "nominalMinutes": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "delayNotice": {
                 "type": "string",
                 "minLength": 1
-              },
-              "issues": {
-                "type": "array",
-                "items": {}
-              },
-              "feature": {
-                "type": "string"
               }
             },
             "required": [
-              "code",
-              "message"
+              "oneWayMinMinutes",
+              "oneWayMaxMinutes",
+              "nominalMinutes",
+              "delayNotice"
             ],
             "additionalProperties": false
+          },
+          "selection": {
+            "type": "object",
+            "properties": {
+              "includeReaction": {
+                "type": "boolean"
+              },
+              "includeSleep": {
+                "type": "boolean"
+              },
+              "includeBp": {
+                "type": "boolean"
+              },
+              "includeCards": {
+                "type": "boolean"
+              },
+              "days": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30
+              }
+            },
+            "required": [
+              "includeReaction",
+              "includeSleep",
+              "includeBp",
+              "includeCards",
+              "days"
+            ],
+            "additionalProperties": false
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "reaction",
+                    "sleep",
+                    "bp",
+                    "card"
+                  ]
+                },
+                "missionDay": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "effectiveDateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "missionDay",
+                "effectiveDateTime",
+                "summary"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "cards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ruleId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "in_zone",
+                    "watch",
+                    "act",
+                    "urgent"
+                  ]
+                },
+                "status": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "in_zone",
+                        "watch",
+                        "act",
+                        "urgent"
+                      ]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "iconKey": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "hourglass",
+                        "check",
+                        "eye",
+                        "alert",
+                        "siren"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "level",
+                    "label",
+                    "iconKey"
+                  ],
+                  "additionalProperties": false
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whatChanged": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whyItMatters": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "whatToDo": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "facts": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": [
+                      "number",
+                      "string",
+                      "boolean"
+                    ]
+                  }
+                },
+                "sources": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "disclaimer": {
+                  "type": "string",
+                  "const": "Decision support, not a diagnosis."
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "emergencyProcedureId": {
+                      "type": "string"
+                    },
+                    "measurement": {
+                      "type": "string",
+                      "const": "bp"
+                    },
+                    "routineId": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "id",
+                "ruleId",
+                "severity",
+                "status",
+                "title",
+                "whatChanged",
+                "whyItMatters",
+                "whatToDo",
+                "facts",
+                "sources",
+                "disclaimer"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "summaryText": {
+            "type": "string",
+            "minLength": 1
+          },
+          "disclaimer": {
+            "type": "string",
+            "const": "Decision support, not a diagnosis."
           }
         },
         "required": [
-          "error"
+          "generatedAt",
+          "missionDay",
+          "subjectId",
+          "commsDelay",
+          "selection",
+          "entries",
+          "cards",
+          "summaryText",
+          "disclaimer"
         ],
         "additionalProperties": false
       }
     },
     "POST /api/share": {
       "id": "share.send",
-      "tier": "reserved",
-      "status": 501,
+      "tier": "should",
+      "status": 201,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "includeReaction": {
+            "type": "boolean"
+          },
+          "includeSleep": {
+            "type": "boolean"
+          },
+          "includeBp": {
+            "type": "boolean"
+          },
+          "includeCards": {
+            "type": "boolean"
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          },
+          "entryIds": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "confirm": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "confirm"
+        ],
+        "additionalProperties": false
+      },
       "response": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "error": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "const": "queued"
+          },
+          "queuedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "confirmedByUser": {
+            "type": "boolean",
+            "const": true
+          },
+          "package": {
             "type": "object",
             "properties": {
-              "code": {
+              "generatedAt": {
                 "type": "string",
-                "enum": [
-                  "invalid_input",
-                  "not_found",
-                  "not_built",
-                  "internal"
-                ]
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
               },
-              "message": {
+              "missionDay": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "subjectId": {
                 "type": "string",
                 "minLength": 1
               },
-              "issues": {
-                "type": "array",
-                "items": {}
+              "commsDelay": {
+                "type": "object",
+                "properties": {
+                  "oneWayMinMinutes": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "oneWayMaxMinutes": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "nominalMinutes": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "delayNotice": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "oneWayMinMinutes",
+                  "oneWayMaxMinutes",
+                  "nominalMinutes",
+                  "delayNotice"
+                ],
+                "additionalProperties": false
               },
-              "feature": {
-                "type": "string"
+              "selection": {
+                "type": "object",
+                "properties": {
+                  "includeReaction": {
+                    "type": "boolean"
+                  },
+                  "includeSleep": {
+                    "type": "boolean"
+                  },
+                  "includeBp": {
+                    "type": "boolean"
+                  },
+                  "includeCards": {
+                    "type": "boolean"
+                  },
+                  "days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30
+                  }
+                },
+                "required": [
+                  "includeReaction",
+                  "includeSleep",
+                  "includeBp",
+                  "includeCards",
+                  "days"
+                ],
+                "additionalProperties": false
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "reaction",
+                        "sleep",
+                        "bp",
+                        "card"
+                      ]
+                    },
+                    "missionDay": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "effectiveDateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                    },
+                    "summary": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "missionDay",
+                    "effectiveDateTime",
+                    "summary"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "cards": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "ruleId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "in_zone",
+                        "watch",
+                        "act",
+                        "urgent"
+                      ]
+                    },
+                    "status": {
+                      "type": "object",
+                      "properties": {
+                        "level": {
+                          "type": "string",
+                          "enum": [
+                            "info",
+                            "in_zone",
+                            "watch",
+                            "act",
+                            "urgent"
+                          ]
+                        },
+                        "label": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "iconKey": {
+                          "type": "string",
+                          "enum": [
+                            "info",
+                            "hourglass",
+                            "check",
+                            "eye",
+                            "alert",
+                            "siren"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "level",
+                        "label",
+                        "iconKey"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "whatChanged": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "whyItMatters": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "whatToDo": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "facts": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": [
+                          "number",
+                          "string",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "sources": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "url"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "disclaimer": {
+                      "type": "string",
+                      "const": "Decision support, not a diagnosis."
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "emergencyProcedureId": {
+                          "type": "string"
+                        },
+                        "measurement": {
+                          "type": "string",
+                          "const": "bp"
+                        },
+                        "routineId": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "ruleId",
+                    "severity",
+                    "status",
+                    "title",
+                    "whatChanged",
+                    "whyItMatters",
+                    "whatToDo",
+                    "facts",
+                    "sources",
+                    "disclaimer"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "summaryText": {
+                "type": "string",
+                "minLength": 1
+              },
+              "disclaimer": {
+                "type": "string",
+                "const": "Decision support, not a diagnosis."
               }
             },
             "required": [
-              "code",
-              "message"
+              "generatedAt",
+              "missionDay",
+              "subjectId",
+              "commsDelay",
+              "selection",
+              "entries",
+              "cards",
+              "summaryText",
+              "disclaimer"
             ],
             "additionalProperties": false
           }
         },
         "required": [
-          "error"
+          "id",
+          "status",
+          "queuedAt",
+          "confirmedByUser",
+          "package"
         ],
         "additionalProperties": false
       }
     },
     "GET /api/reminders": {
       "id": "reminders.get",
-      "tier": "reserved",
-      "status": 501,
+      "tier": "should",
+      "status": 200,
       "response": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "error": {
+          "version": {
+            "type": "number",
+            "const": 1
+          },
+          "schedule": {
             "type": "object",
             "properties": {
-              "code": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "checkinTimeUtc": {
                 "type": "string",
-                "enum": [
-                  "invalid_input",
-                  "not_found",
-                  "not_built",
-                  "internal"
-                ]
+                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
               },
-              "message": {
+              "bpIntervalDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30
+              },
+              "bpTimeUtc": {
                 "type": "string",
-                "minLength": 1
-              },
-              "issues": {
-                "type": "array",
-                "items": {}
-              },
-              "feature": {
-                "type": "string"
+                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
               }
             },
             "required": [
-              "code",
-              "message"
+              "enabled",
+              "checkinTimeUtc",
+              "bpIntervalDays",
+              "bpTimeUtc"
             ],
             "additionalProperties": false
+          },
+          "nextDue": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "checkin",
+                    "bp"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "dueAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "overdue": {
+                  "type": "boolean"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "label",
+                "dueAt",
+                "overdue",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
-          "error"
+          "version",
+          "schedule",
+          "nextDue",
+          "items"
         ],
         "additionalProperties": false
       }
     },
     "PUT /api/reminders": {
       "id": "reminders.put",
-      "tier": "reserved",
-      "status": 501,
+      "tier": "should",
+      "status": 200,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "checkinTimeUtc": {
+            "type": "string",
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "bpIntervalDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          },
+          "bpTimeUtc": {
+            "type": "string",
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+          }
+        },
+        "required": [
+          "enabled",
+          "checkinTimeUtc",
+          "bpIntervalDays",
+          "bpTimeUtc"
+        ],
+        "additionalProperties": false
+      },
       "response": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "error": {
+          "version": {
+            "type": "number",
+            "const": 1
+          },
+          "schedule": {
             "type": "object",
             "properties": {
-              "code": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "checkinTimeUtc": {
                 "type": "string",
-                "enum": [
-                  "invalid_input",
-                  "not_found",
-                  "not_built",
-                  "internal"
-                ]
+                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
               },
-              "message": {
+              "bpIntervalDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30
+              },
+              "bpTimeUtc": {
                 "type": "string",
-                "minLength": 1
-              },
-              "issues": {
-                "type": "array",
-                "items": {}
-              },
-              "feature": {
-                "type": "string"
+                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
               }
             },
             "required": [
-              "code",
-              "message"
+              "enabled",
+              "checkinTimeUtc",
+              "bpIntervalDays",
+              "bpTimeUtc"
             ],
             "additionalProperties": false
+          },
+          "nextDue": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "checkin",
+                    "bp"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "dueAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "overdue": {
+                  "type": "boolean"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "label",
+                "dueAt",
+                "overdue",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
-          "error"
+          "version",
+          "schedule",
+          "nextDue",
+          "items"
         ],
         "additionalProperties": false
       }

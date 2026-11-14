@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "checkinTimeUtc": "08:00",
+  "bpIntervalDays": 3,
+  "bpTimeUtc": "08:30"
+}

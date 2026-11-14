@@ -1,0 +1,32 @@
+{
+  "id": "tension-winddown",
+  "version": 1,
+  "category": "tension",
+  "title": "Pre-sleep wind-down routine",
+  "summary": "Five-minute pre-sleep decompression after short sleep or slower reaction scores.",
+  "durationSeconds": 300,
+  "steps": [
+    {
+      "id": "dim-screens",
+      "text": "Dim cabin displays and stow non-essential checklists before sleep."
+    },
+    {
+      "id": "anchor-relax",
+      "text": "Fasten your sleep restraint gently so every muscle can relax."
+    },
+    {
+      "id": "paced-breathing",
+      "text": "Breathe steadily: 4 seconds in, 6 seconds out for 3 minutes.",
+      "timerSeconds": 180
+    },
+    {
+      "id": "full-sleep-window",
+      "text": "Protect a full 8.5-hour scheduled sleep period tonight."
+    }
+  ],
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "nasa-std-3001",
+    "jones-2022-iss-sleep"
+  ]
+}

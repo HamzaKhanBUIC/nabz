@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "routines": [
+    {
+      "id": "hands-microbreak",
+      "version": 1,
+      "category": "hands",
+      "title": "Hands and vigilance microbreak",
+      "summary": "Two-minute physical and visual reset after borderline reaction drift or long fine-motor work.",
+      "durationSeconds": 120,
+      "steps": [
+        {
+          "id": "pause-controls",
+          "text": "Pause precision control work and rest your forearms loosely."
+        },
+        {
+          "id": "wrist-circles",
+          "text": "Rotate both wrists gently in slow circles for 20 seconds.",
+          "timerSeconds": 20
+        }
+      ],
+      "disclaimer": "Decision support, not a diagnosis.",
+      "sources": [
+        {
+          "id": "cognition-iss-pmc11614644",
+          "title": "Cognitive performance in ISS astronauts on 6-month low earth orbit missions",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11614644/"
+        }
+      ]
+    }
+  ]
+}

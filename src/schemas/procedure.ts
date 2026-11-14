@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Disclaimer, SourceRef } from "./common";
 
-/** Who the procedure is for. Must ships "self" only; "crewmate" is reserved for a later feature. */
+/** Who the procedure is for. */
 export const ProcedureFor = z.enum(["self", "crewmate"]);
 export type ProcedureFor = z.infer<typeof ProcedureFor>;
 
@@ -12,6 +12,7 @@ export const ProcedureStep = z.strictObject({
   detail: z.string().optional(),
   timerSeconds: z.number().int().positive().optional(),
   caution: z.string().optional(),
+  metronomeBpm: z.number().int().min(60).max(200).optional(),
 });
 export type ProcedureStep = z.infer<typeof ProcedureStep>;
 

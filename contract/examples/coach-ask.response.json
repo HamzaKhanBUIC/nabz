@@ -1,0 +1,26 @@
+{
+  "cardId": "reaction-slow-short-sleep",
+  "ruleId": "RT-SHORT-SLEEP",
+  "answer": "Your reaction speed is 1.9 SD below your own normal. You slept 5.2 hours. Card facts (RT-SHORT-SLEEP): 1.9 SD from your personal normal, 5.2 hours of sleep, 9 lapses. On the ISS, 3-minute PVT-B reaction speed was significantly slower after 6 hours of sleep or less (Jones et al., 2022).",
+  "grounded": true,
+  "citations": [
+    {
+      "id": "jones-2022-iss-sleep",
+      "title": "Sleep deficiency in spaceflight is associated with degraded neurobehavioral functions and elevated stress in astronauts on six-month missions aboard the International Space Station (Jones et al., 2022)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197/"
+    },
+    {
+      "id": "cognition-iss-pmc11614644",
+      "title": "Cognitive performance in ISS astronauts on 6-month low earth orbit missions",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11614644/"
+    }
+  ],
+  "suggestedQuestions": [
+    "Why is my reaction slower?",
+    "Is this serious?",
+    "What if it gets worse?",
+    "Should I tell Earth?"
+  ],
+  "disclaimer": "Decision support, not a diagnosis.",
+  "provider": "deterministic"
+}

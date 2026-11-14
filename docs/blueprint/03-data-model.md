@@ -45,11 +45,26 @@ type BpMeasurement = { id: string; subjectId: string; missionDay: number; effect
                        source: "simulated" | "live" };
 
 // Emergency
-type Step = { id: string; text: string; detail?: string; timerSeconds?: number; caution?: string };
+type Step = { id: string; text: string; detail?: string; timerSeconds?: number; caution?: string; metronomeBpm?: number };
 type Procedure = { id: string; version: number; for: "self" | "crewmate"; title: string;
                    whenToUse: string; steps: Step[]; redFlags: string[];
                    escalation: { text: string; action: "alert_crew" };
                    disclaimer: string; sources: SourceRef[] };
+
+// Routines (S03), Coach (S02), Share to Earth (S04), Reminders (S05)
+type Routine = { id: string; version: number; category: "hands" | "tension" | "blood-pressure";
+                 title: string; summary: string; durationSeconds: number;
+                 steps: Step[]; disclaimer: string; sources: SourceRef[] };
+type CoachAskResponse = { cardId: string | null; ruleId: string | null; answer: string; grounded: boolean;
+                          citations: SourceRef[]; banner?: Status; suggestedQuestions: string[];
+                          disclaimer: "Decision support, not a diagnosis."; provider: "deterministic" | "ollama" };
+type SharePackagePreview = { generatedAt: string; missionDay: number; subjectId: string;
+                             commsDelay: { oneWayMinMinutes: number; oneWayMaxMinutes: number; nominalMinutes: number; delayNotice: string };
+                             selection: { includeReaction: boolean; includeSleep: boolean; includeBp: boolean; includeCards: boolean; days: number };
+                             entries: Array<{ id: string; kind: "reaction" | "sleep" | "bp" | "card"; missionDay: number; effectiveDateTime: string; summary: string }>;
+                             cards: Card[]; summaryText: string; disclaimer: "Decision support, not a diagnosis." };
+type RemindersResponse = { version: 1; schedule: { enabled: boolean; checkinTimeUtc: string; bpIntervalDays: number; bpTimeUtc: string };
+                           nextDue: string | null; items: Array<{ kind: "checkin" | "bp"; label: string; dueAt: string; overdue: boolean; reason: string }> };
 
 // Trend
 type TrendPoint = { missionDay: number; effectiveDateTime: string; value: number; z: number | null;
@@ -100,6 +115,9 @@ Design choices (no published value; each is one named constant so it can change 
 | `BP_Z_FLAG` | ±1.5 | Mirrors the reaction threshold for "different from your normal" |
 | `NO_RESPONSE_TIMEOUT_MS` | 30 000 | Used by the 10-min PVT (R2 #6); not re-checked for PVT-B |
 | QC limits | ≥ 20 stimuli; total time within 150–210 s; median RT ≥ 120 ms | Reject broken or scripted sessions |
+| `CPR_METRONOME_BPM` | 110 | Midpoint of verified 100–120/min chest compression target (CHECKS R8) |
+| `DEFAULT_CHECKIN_REMINDER_UTC` | "08:00" | Daily morning check-in reminder default (design choice, S05) |
+| `DEFAULT_BP_REMINDER_UTC` / `DEFAULT_BP_INTERVAL_DAYS` | "08:30" / 3 | Periodic BP check default (design choice, S05; R3 notes periodic checks) |
 
 ## Storage
 

@@ -1,12 +1,19 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
-import { BpMeasurement, CheckinResponse } from "../schemas";
+import {
+  BpMeasurement,
+  CheckinResponse,
+  ReminderSchedule,
+  ShareQueuedPackage,
+} from "../schemas";
 
 const RuntimeFileSchema = z.strictObject({
   version: z.literal(1),
   checkins: z.array(CheckinResponse),
   bp: z.array(BpMeasurement),
+  reminders: ReminderSchedule.optional(),
+  outbox: z.array(ShareQueuedPackage).optional(),
 });
 
 export type RuntimeData = z.infer<typeof RuntimeFileSchema>;

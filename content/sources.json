@@ -45,6 +45,21 @@
       "id": "ochmo-std-100-1a",
       "title": "NASA Space Flight Human-System Standard (OCHMO-STD-100.1A)",
       "url": "https://www.nasa.gov/wp-content/uploads/2023/04/ochmo-std-100.1a.pdf"
+    },
+    {
+      "id": "dglrm-esam-2020-cpr",
+      "title": "Cardiopulmonary resuscitation (CPR) during spaceflight — DGLRM/ESAM guideline (Hinkelbein et al., 2020)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7607644/"
+    },
+    {
+      "id": "aha-bls-2025",
+      "title": "2025 AHA / Resuscitation Council UK Adult Basic Life Support Guidelines",
+      "url": "https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-basic-life-support-guidelines"
+    },
+    {
+      "id": "nasa-std-3001",
+      "title": "NASA Space Flight Human-System Standard Volume 1: Crew Health (NASA-STD-3001)",
+      "url": "https://www.nasa.gov/humans-in-space/human-spaceflight-standards-nasa-std-3001/"
     }
   ]
 }

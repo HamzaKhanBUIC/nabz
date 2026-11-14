@@ -67,7 +67,10 @@
     const bpText = today.bp
       ? `BP: ${today.bp.average.systolic}/${today.bp.average.diastolic} mmHg (${today.bp.category}) ${renderStatusBadge(today.bp.zone.status)}`
       : "BP: not done today";
-    todayStatus.innerHTML = `<p>${chkText}</p><p>${bpText}</p>`;
+    const dueText = today.nextDue
+      ? `Next reminder due: <code>${escapeHtml(today.nextDue)}</code>`
+      : "Reminders: paused";
+    todayStatus.innerHTML = `<p>${chkText}</p><p>${bpText}</p><p>${dueText}</p>`;
 
     document.getElementById("today-card").innerHTML = renderCardHtml(today.card);
   }
@@ -478,24 +481,30 @@
     void loadMissionAndToday();
   }
 
-  // 5. Emergency Procedures
+  // 5. Emergency Procedures (Self + Crewmate)
   let procedures = [];
+  let emergencyFor = "self";
+  let metroTimer = null;
 
   function renderProcedure(proc) {
+    clearInterval(metroTimer);
     const stepsHtml = proc.steps
       .map((s) => {
         const caution = s.caution ? ` <em>(${escapeHtml(s.caution)})</em>` : "";
         const timerBtn = s.timerSeconds
           ? ` <button type="button" class="em-step-timer" data-sec="${s.timerSeconds}">Start ${s.timerSeconds}s timer</button>`
           : "";
-        return `<li>${escapeHtml(s.text)}${caution}${timerBtn}</li>`;
+        const metroBtn = s.metronomeBpm
+          ? ` <button type="button" class="em-step-metro" data-bpm="${s.metronomeBpm}">Metronome ${s.metronomeBpm} BPM</button> <span class="metro-beat"></span>`
+          : "";
+        return `<li>${escapeHtml(s.text)}${caution}${timerBtn}${metroBtn}</li>`;
       })
       .join("");
     const redFlagsHtml = proc.redFlags.map((f) => `<li>${escapeHtml(f)}</li>`).join("");
     const detail = document.getElementById("emergency-detail");
     detail.innerHTML = `
       <div class="card-box">
-        <h3>${escapeHtml(proc.title)}</h3>
+        <h3>${escapeHtml(proc.title)} <span class="pill">${escapeHtml(proc.for)}</span></h3>
         <p>${escapeHtml(proc.whenToUse)}</p>
         <ol class="steps-list">${stepsHtml}</ol>
         <p><strong>Red flags:</strong></p>
@@ -507,10 +516,26 @@
     detail.querySelectorAll(".em-step-timer").forEach((btn) => {
       btn.addEventListener("click", () => startTimerBadge(btn, Number(btn.dataset.sec)));
     });
+    detail.querySelectorAll(".em-step-metro").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        clearInterval(metroTimer);
+        const bpm = Number(btn.dataset.bpm);
+        const beatEl = btn.nextElementSibling;
+        let beat = 0;
+        const intervalMs = Math.round(60000 / bpm);
+        metroTimer = setInterval(() => {
+          beat += 1;
+          if (beatEl) beatEl.textContent = beat % 2 === 0 ? "● Push" : "○ Recoil";
+        }, intervalMs);
+      });
+    });
   }
 
-  async function loadEmergencyProcedures() {
-    const bundle = await apiJson("/api/emergency/procedures?for=self");
+  async function loadEmergencyProcedures(forWho = emergencyFor) {
+    emergencyFor = forWho;
+    document.getElementById("btn-em-self").classList.toggle("primary", forWho === "self");
+    document.getElementById("btn-em-crewmate").classList.toggle("primary", forWho === "crewmate");
+    const bundle = await apiJson(`/api/emergency/procedures?for=${encodeURIComponent(forWho)}`);
     procedures = bundle.procedures;
     const tabsEl = document.getElementById("emergency-tabs");
     tabsEl.innerHTML = procedures
@@ -525,6 +550,142 @@
     if (procedures[0]) {
       renderProcedure(procedures[0]);
     }
+  }
+
+  // 6. Coach (Offline-First)
+  async function askCoach(questionText) {
+    const q = (questionText ?? document.getElementById("coach-question").value).trim();
+    if (!q) return;
+    document.getElementById("coach-question").value = q;
+    const reply = await apiJson("/api/coach/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q }),
+    });
+    renderSuggestedQuestions(reply.suggestedQuestions);
+    const bannerHtml = reply.banner ? `<p>${renderStatusBadge(reply.banner)}</p>` : "";
+    const citesHtml = reply.citations
+      .map((c) => `<li><a href="${escapeHtml(c.url)}" target="_blank" rel="noreferrer">${escapeHtml(c.title)}</a></li>`)
+      .join("");
+    document.getElementById("coach-reply").innerHTML = `
+      <div class="card-box">
+        ${bannerHtml}
+        <p><span class="pill">${reply.grounded ? "Grounded" : "Out of scope"}</span> <span class="pill">${escapeHtml(reply.provider)}</span></p>
+        <p>${escapeHtml(reply.answer)}</p>
+        ${citesHtml ? `<ul>${citesHtml}</ul>` : ""}
+        <p class="disclaimer">${escapeHtml(reply.disclaimer)}</p>
+      </div>
+    `;
+  }
+
+  function renderSuggestedQuestions(list) {
+    const questions = list || [
+      "Why is my reaction slower?",
+      "Is this serious?",
+      "What if it gets worse?",
+      "Should I tell Earth?",
+    ];
+    const container = document.getElementById("coach-suggested");
+    container.innerHTML = questions
+      .map((q) => `<button type="button" class="coach-sug" data-q="${escapeHtml(q)}">${escapeHtml(q)}</button>`)
+      .join("");
+    container.querySelectorAll(".coach-sug").forEach((btn) => {
+      btn.addEventListener("click", () => void askCoach(btn.dataset.q));
+    });
+  }
+
+  // 7. Send to Earth
+  function readShareInput() {
+    const note = document.getElementById("share-note").value.trim();
+    return {
+      includeReaction: document.getElementById("share-reaction").checked,
+      includeSleep: document.getElementById("share-sleep").checked,
+      includeBp: document.getElementById("share-bp").checked,
+      includeCards: document.getElementById("share-cards").checked,
+      days: Number(document.getElementById("share-days").value || "3"),
+      ...(note ? { note } : {}),
+    };
+  }
+
+  async function previewShare() {
+    const pkg = await apiJson("/api/share/preview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(readShareInput()),
+    });
+    document.getElementById("share-result").innerHTML = `
+      <div class="card-box">
+        <p class="meta-line">${escapeHtml(pkg.commsDelay.delayNotice)}</p>
+        <pre>${escapeHtml(pkg.summaryText)}</pre>
+      </div>
+    `;
+  }
+
+  async function sendShare() {
+    const queued = await apiJson("/api/share", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...readShareInput(), confirm: true }),
+    });
+    document.getElementById("share-result").innerHTML = `
+      <div class="card-box">
+        <p><span class="status-badge" data-level="in_zone">[check] Queued: ${escapeHtml(queued.id)}</span></p>
+        <pre>${escapeHtml(queued.package.summaryText)}</pre>
+      </div>
+    `;
+  }
+
+  // 8. Routines & Reminders
+  async function loadRoutines() {
+    const bundle = await apiJson("/api/routines");
+    const el = document.getElementById("routines-list");
+    el.innerHTML = bundle.routines
+      .map(
+        (r) => `
+          <div class="card-box">
+            <strong>${escapeHtml(r.title)}</strong> <span class="pill">${escapeHtml(r.category)} · ${Math.round(r.durationSeconds / 60)} min</span>
+            <p>${escapeHtml(r.summary)}</p>
+            <ol class="steps-list">${r.steps.map((s) => `<li>${escapeHtml(s.text)}</li>`).join("")}</ol>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function renderReminders(data) {
+    document.getElementById("rem-enabled").checked = data.schedule.enabled;
+    document.getElementById("rem-checkin-utc").value = data.schedule.checkinTimeUtc;
+    document.getElementById("rem-bp-days").value = String(data.schedule.bpIntervalDays);
+    document.getElementById("rem-bp-utc").value = data.schedule.bpTimeUtc;
+    document.getElementById("reminders-panel").innerHTML = `
+      <p><strong>Next due:</strong> <code>${escapeHtml(data.nextDue ?? "paused")}</code></p>
+      <ul>${data.items
+        .map(
+          (i) =>
+            `<li><strong>${escapeHtml(i.label)}:</strong> ${escapeHtml(i.dueAt)} (${i.overdue ? "overdue" : "scheduled"}) — ${escapeHtml(i.reason)}</li>`,
+        )
+        .join("")}</ul>
+    `;
+  }
+
+  async function loadReminders() {
+    const data = await apiJson("/api/reminders");
+    renderReminders(data);
+  }
+
+  async function saveReminders() {
+    const data = await apiJson("/api/reminders", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        enabled: document.getElementById("rem-enabled").checked,
+        checkinTimeUtc: document.getElementById("rem-checkin-utc").value.trim(),
+        bpIntervalDays: Number(document.getElementById("rem-bp-days").value || "3"),
+        bpTimeUtc: document.getElementById("rem-bp-utc").value.trim(),
+      }),
+    });
+    renderReminders(data);
+    void loadMissionAndToday();
   }
 
   // Wire up events cleanly
@@ -544,6 +705,12 @@
   document.getElementById("btn-send-sample").addEventListener("click", () => void sendSampleDay120());
   document.getElementById("btn-load-trend").addEventListener("click", () => void loadTrend());
   document.getElementById("btn-submit-bp").addEventListener("click", () => void submitBp());
+  document.getElementById("btn-em-self").addEventListener("click", () => void loadEmergencyProcedures("self"));
+  document.getElementById("btn-em-crewmate").addEventListener("click", () => void loadEmergencyProcedures("crewmate"));
+  document.getElementById("btn-coach-ask").addEventListener("click", () => void askCoach());
+  document.getElementById("btn-share-preview").addEventListener("click", () => void previewShare());
+  document.getElementById("btn-share-send").addEventListener("click", () => void sendShare());
+  document.getElementById("btn-save-reminders").addEventListener("click", () => void saveReminders());
 
   document.getElementById("pvt-target").addEventListener("pointerdown", (e) => {
     handlePvtInput(e.timeStamp);
@@ -555,5 +722,13 @@
     }
   });
 
-  void Promise.all([loadMissionAndToday(), loadTrend(), loadBpGuide(), loadEmergencyProcedures()]);
+  renderSuggestedQuestions();
+  void Promise.all([
+    loadMissionAndToday(),
+    loadTrend(),
+    loadBpGuide(),
+    loadEmergencyProcedures("self"),
+    loadRoutines(),
+    loadReminders(),
+  ]);
 })();

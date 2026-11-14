@@ -32,7 +32,7 @@ Everything the frontend needs lives in these files:
 | What you need | Where it is | Notes |
 |---|---|---|
 | **API contract** (single source of truth) | [`docs/api-contract.md`](docs/api-contract.md) | Request/response shapes, units, status semantics, and rules |
-| **Example JSON payloads** (all 15 files) | [`contract/examples/`](contract/examples/) | Validated request/response mocks (e.g. `today.response.json`, `checkins.request.json`, `checkins.response.json`, `bp-guide.response.json`, `bp.response.json`, `trends.response.json`, `emergency-procedures.response.json`, `error-invalid-input.response.json`, `error-not-built.response.json`) |
+| **Example JSON payloads** (all 24 files) | [`contract/examples/`](contract/examples/) | Validated request/response mocks for all Must and Should endpoints (e.g. `today.response.json`, `checkins.request.json`, `checkins.response.json`, `bp-guide.response.json`, `bp.response.json`, `trends.response.json`, `emergency-procedures.response.json`, `coach-ask.request.json`, `coach-ask.response.json`, `routines.response.json`, `share-preview.response.json`, `reminders.response.json`) |
 | **JSON Schemas** (generated from Zod 4) | [`contract/schemas.json`](contract/schemas.json) | Generated via `npm run contract:export` from [`src/schemas/`](src/schemas/) |
 | **Wireframe vs API contract notes** | [`docs/wireframe-review.md`](docs/wireframe-review.md) | Exact screens/fields to hide, update, or add from the wireframe review |
 | **Working reference test UI** | [`tools/console/`](tools/console/) (`http://localhost:8787/dev/`) | Plain HTML/JS reference for PVT-B `requestAnimationFrame` + `event.timeStamp` timing, trends, guided BP, and offline emergency tabs |
@@ -42,7 +42,7 @@ Everything the frontend needs lives in these files:
 1. **Send raw inputs only; never send scores.** Request schemas use strict objects and reject unexpected fields (such as mood or client-calculated scores) with HTTP `400 invalid_input`.
 2. **Never rely on color alone for status.** Every status object includes `{ level, label, iconKey }` (`normal | watch | act | not_scored`). Always render `label` and an icon alongside color.
 3. **Preserve safety disclaimers and sources.** Action cards and emergency procedures include `disclaimer: "Decision support, not a diagnosis."` and `sources` (`{ id, title, url }`).
-4. **Reserved `Should` endpoints return `501 not_built`.** Hide or disable Should features (`Coach`, `Send to Earth`, `Routines`, `Reminders`, and `for=crewmate` emergency filter) until those features are built.
+4. **All Must + Should (`S01`–`S05`) endpoints are live offline.** `Coach`, `Send to Earth`, `Routines`, `Reminders`, and `?for=crewmate` emergency procedures all run deterministically with zero network calls. Setting `COACH_PROVIDER=ollama` enables the optional local `qwen3:4b` phraser, with automatic fallback to the deterministic offline engine if Ollama is unavailable.
 
 ---
 
@@ -63,9 +63,16 @@ Everything the frontend needs lives in these files:
 | `GET /api/emergency/procedures` | All offline first-person (`for=self`) emergency procedures (optional `?for=`) | `contract/examples/emergency-procedures.response.json` |
 | `GET /api/emergency/procedures/:id` | Single offline emergency procedure by ID (`bleeding`, `burn`, `eye`, `allergic-reaction`, `near-fainting`) | `contract/examples/emergency-procedure.response.json` |
 
-### Reserved Should endpoints (currently HTTP `501 not_built`)
+### Should endpoints (live, P2)
 
-`POST /api/coach/ask`, `GET /api/routines`, `POST /api/share/preview`, `POST /api/share`, `GET /api/reminders`, `PUT /api/reminders` — example response in [`contract/examples/error-not-built.response.json`](contract/examples/error-not-built.response.json).
+| Method & Path | Purpose | Example JSON |
+|---|---|---|
+| `GET /api/emergency/procedures?for=crewmate` | Offline crewmate emergency procedures (collapse, microgravity CPR `metronomeBpm: 110`, seizure, low blood sugar) | `contract/examples/emergency-procedures.response.json` |
+| `POST /api/coach/ask` | Deterministic offline-first Coach (`DeterministicCoachProvider` default; opt-in `COACH_PROVIDER=ollama` falls back offline); fixed no-source reply + urgent red-flag banner | `contract/examples/coach-ask.request.json`, `coach-ask.response.json` |
+| `GET /api/routines` | Verified short routines (`hands-microbreak`, `tension-winddown`, `bp-quiet-rest`) linked from action cards | `contract/examples/routines.response.json` |
+| `POST /api/share/preview` | Preview exact flight-surgeon message & Earth delay without queuing anything | `contract/examples/share-preview.request.json`, `share-preview.response.json` |
+| `POST /api/share` | Queue flight-surgeon package to local runtime outbox (requires `confirm: true`) | `contract/examples/share.request.json`, `share.response.json` |
+| `GET /api/reminders` / `PUT /api/reminders` | Read & update check-in / BP reminder schedule (also reflected in `GET /api/today` `nextDue`) | `contract/examples/reminders.response.json`, `reminders-put.request.json` |
 
 ---
 
@@ -90,8 +97,8 @@ To reset check-ins and BP measurements posted during testing back to a clean Day
 - `src/schemas/` — Zod 4 schemas defining the contract.
 - `src/store/` — Clock, atomic runtime JSON persistence, content loader, seeded fixture loader, and real NASA Inspiration4 `OSD-569` blood-count trend loader.
 - `src/api/` & `src/server.ts` — Express 5 routes, Zod request validation, and `/dev` console mount.
-- `src/slots/` — Reserved interfaces for `Should` features (`coach`, etc.).
-- `content/` — Verified cards, BP guide, sources, and 5 offline emergency procedures sourced from `research/CHECKS.md`.
+- `src/slots/` — Should-feature adapters (`coach` deterministic + optional Ollama phraser with automatic offline fallback, `routines`, `share`, `reminders`).
+- `content/` — Verified cards, BP guide, coach knowledge snippets (`coach-knowledge.json`), sources, 3 routines (`content/routines/`), and 9 offline emergency procedures (5 `for=self` + 4 `for=crewmate`) sourced from `research/CHECKS.md`.
 - `data/fixtures/` & `tools/simulate/` — Seeded 120-day synthetic mission data (`sara`, `alex`, `mei`, `tomas`) + honesty table (`data/README.md`).
 - `data/nasa/` — Real NASA OSDR `OSD-569` Inspiration4 CBC dataset (`LSDS-7_Complete_Blood_Count_CBC_TRANSFORMED.csv`).
 - `tools/console/` — Offline `/dev` HTML/CSS/JS test console.

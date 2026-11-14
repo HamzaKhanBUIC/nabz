@@ -144,15 +144,15 @@ Categories: `low`, `normal`, `elevated`, `stage1`, `stage2`, `severe`.
       "sources": [ { "id": "aha-first-aid-2024", "title": "…", "url": "…" } ] } ] }
 ```
 
-Five ids: `bleeding`, `burn`, `eye`, `allergic-reaction`, `near-fainting`. Fetch once at start-up and keep a copy; re-fetch when `version` changes. Emergency mode must open without a round trip.
+Five self ids: `bleeding`, `burn`, `eye`, `allergic-reaction`, `near-fainting`. Four crewmate ids (`?for=crewmate`): `crewmate-collapse`, `crewmate-cpr`, `crewmate-seizure`, `crewmate-low-blood-sugar`. Fetch once at start-up and keep a copy; re-fetch when `version` changes. Emergency mode must open without a round trip.
 
 ### `GET /api/today`
 
 ```json
-{ "missionDay": 120, "checkin": null, "bp": null, "card": null, "cards": [], "nextDue": null }
+{ "missionDay": 120, "checkin": null, "bp": null, "card": null, "cards": [], "nextDue": "2026-11-15T08:00:00+00:00" }
 ```
 
-`checkin` and `bp` are today's entries, or `null` if not done yet. `card` is the most severe of today's cards, or `null` when nothing has been done today. `nextDue` stays `null` until the reminder feature is built.
+`checkin` and `bp` are today's entries, or `null` if not done yet. `card` is the most severe of today's cards, or `null` when nothing has been done today. `nextDue` shows the earliest upcoming or overdue check-in/BP reminder timestamp (`null` if reminders are disabled).
 
 ### `GET /api/mission`
 
@@ -162,18 +162,49 @@ Five ids: `bleeding`, `burn`, `eye`, `allergic-reaction`, `near-fainting`. Fetch
   "crew": [ { "id": "sara", "name": "Sara", "role": "Commander" } ] }
 ```
 
-## Reserved endpoints (not built; they answer 501)
+## Should endpoints (`built`)
 
-Leave room for these in the screens. Shapes will be added here when each is designed.
+All six Should endpoints plus crewmate emergency procedures (`GET /api/emergency/procedures?for=crewmate`) are now live on `argon/work`.
 
-| Method and path | Feature |
+| Method and path | Purpose |
 |---|---|
-| `GET /api/emergency/procedures?for=crewmate` | Emergency for a crewmate (returns an empty list, not 501) |
-| `POST /api/coach/ask` | AI coach: a follow-up question about a card |
-| `GET /api/routines` | Health routines |
-| `POST /api/share/preview`, `POST /api/share` | Send to Earth |
-| `GET /api/reminders`, `PUT /api/reminders` | Check-up reminder |
+| `GET /api/emergency/procedures?for=crewmate` | 4 microgravity crewmate procedures (`crewmate-collapse`, `crewmate-cpr`, `crewmate-seizure`, `crewmate-low-blood-sugar`), with optional `metronomeBpm` (`110`) |
+| `POST /api/coach/ask` | Deterministic offline-first explanation of today's card with red-flag urgent banner and fixed no-source abstention |
+| `GET /api/routines` | 3 offline recovery routines (`hands-microbreak`, `tension-winddown`, `bp-quiet-rest`) linked from `card.links.routineId` |
+| `POST /api/share/preview` | Preview exact entries, cards, plain-text flight-surgeon summary, and Mars 3–22 min delay before sending |
+| `POST /api/share` | Requires `confirm: true`; queues the confirmed package into `data/runtime/<subjectId>.json` outbox (`201`) |
+| `GET /api/reminders` | Active reminder schedule (`checkin` + `bp`), due items, overdue flags, and earliest `nextDue` |
+| `PUT /api/reminders` | Save `{ enabled, checkinTimeUtc, bpIntervalDays, bpTimeUtc }` and return updated schedule |
+
+### `POST /api/coach/ask`
+
+Request: `{ "question": "Why is my reaction slower?", "cardId": "optional-card-or-rule-id" }` (`cardId` defaults to today's primary card). Response `200`:
+
+```json
+{ "cardId": "reaction-slow-short-sleep", "ruleId": "RT-SHORT-SLEEP", "answer": "…",
+  "grounded": true, "citations": [ { "id": "jones-2022-iss-sleep", "title": "…", "url": "…" } ],
+  "banner": { "level": "urgent", "label": "Alert a crewmate or medical officer now — do not wait for Earth.", "iconKey": "alert" },
+  "suggestedQuestions": [ "Why is my reaction slower?", "Is this serious?", "What if it gets worse?", "Should I tell Earth?" ],
+  "disclaimer": "Decision support, not a diagnosis.", "provider": "deterministic" }
+```
+
+`banner` is omitted unless red-flag symptoms (`chest pain`, `can't breathe`, `fainting`, etc.) appear or `card.severity === "urgent"`. Uncovered questions return `grounded: false`, `citations: []`, and `"I only answer from verified mission medical cards and don't have a verified source on that."`.
+
+### `GET /api/routines`
+
+Response `200`: `{ "version": 1, "routines": [ { "id": "hands-microbreak", "category": "hands", "title": "…", "summary": "…", "durationSeconds": 120, "steps": […], "disclaimer": "Decision support, not a diagnosis.", "sources": […] } ] }`.
+
+### `POST /api/share/preview` and `POST /api/share`
+
+Preview request (`POST /api/share/preview`): `{ "includeReaction": true, "includeSleep": true, "includeBp": true, "includeCards": true, "days": 3, "entryIds": ["optional"], "note": "optional" }`.
+Send request (`POST /api/share`): same body plus `"confirm": true` (returns `201` `{ "id": "out-sara-120-1", "status": "queued", "queuedAt": "…", "confirmedByUser": true, "package": { … } }`).
+
+### `GET /api/reminders` and `PUT /api/reminders`
+
+Schedule body for `PUT /api/reminders`: `{ "enabled": true, "checkinTimeUtc": "08:00", "bpIntervalDays": 3, "bpTimeUtc": "08:30" }`.
+Response `200`: `{ "version": 1, "schedule": { … }, "nextDue": "2026-11-15T08:00:00+00:00", "items": [ { "kind": "checkin", "label": "…", "dueAt": "…", "overdue": false, "reason": "…" } ] }`.
 
 ## Changes
 
-Ask before building against anything not on this page. Every change is listed here with a date.
+- **2026-11-14 (P2 Should pass):** Implemented `S01`–`S05` endpoints, added `metronomeBpm` to `ProcedureStep`, populated `Today.nextDue`, and updated `contract/schemas.json`.
+- Ask before building against anything not on this page. Every change is listed here with a date.

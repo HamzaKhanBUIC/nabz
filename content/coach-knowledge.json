@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "snippets": [
+    {
+      "id": "rt-sleep-6h",
+      "ruleIds": ["RT-SHORT-SLEEP", "RT-SLOW", "RT-PERSISTENT"],
+      "intents": ["why", "sleep", "action"],
+      "keywords": ["sleep", "slept", "short sleep", "tired", "fatigue", "slow", "slower", "reaction", "why"],
+      "sourceId": "jones-2022-iss-sleep",
+      "text": "On the ISS, 3-minute PVT-B reaction speed was significantly slower after 6 hours of sleep or less (Jones et al., 2022)."
+    },
+    {
+      "id": "rt-act-15sd",
+      "ruleIds": ["RT-SHORT-SLEEP", "RT-SLOW", "RT-PERSISTENT", "RT-WATCH"],
+      "intents": ["why", "seriousness", "numbers", "baseline", "worsening"],
+      "keywords": ["serious", "1.5", "sd", "z-score", "z", "score", "threshold", "baseline", "normal", "zone", "below", "slower"],
+      "sourceId": "cognition-iss-pmc11614644",
+      "text": "In NASA's ISS Cognition study, a reaction-speed score at or below 1.5 SD under a crewmember's own baseline was counted as a low score."
+    },
+    {
+      "id": "rt-pvtb-metrics",
+      "ruleIds": ["RT-SHORT-SLEEP", "RT-SLOW", "RT-PERSISTENT", "RT-WATCH", "RT-OK", "RT-BUILDING", "RT-RETAKE"],
+      "intents": ["numbers", "baseline", "action"],
+      "keywords": ["pvt", "lapse", "lapses", "false start", "speed", "meanSpeed", "355", "ms", "reaction", "retest", "quality"],
+      "sourceId": "basner-2011-pvtb",
+      "text": "On the 3-minute PVT-B (1 to 4 second target gap), a reaction time of 355 ms or slower is a lapse, under 100 ms is a false start, and mean 1/RT speed is most sensitive to sleep loss."
+    },
+    {
+      "id": "nasa-sleep-opportunity",
+      "ruleIds": ["RT-SHORT-SLEEP", "RT-WATCH", "RT-SLOW", "RT-PERSISTENT", "RT-OK"],
+      "intents": ["routine", "sleep", "action", "earth"],
+      "keywords": ["sleep", "routine", "wind", "tonight", "schedule", "mars", "earth", "delay", "flight surgeon"],
+      "sourceId": "nasa-std-3001",
+      "text": "NASA-STD-3001 provides an 8.5-hour sleep opportunity per 24 hours. On Mars transit, messages to Earth take 3 to 22 minutes each way, so urgent signs never wait for Earth."
+    },
+    {
+      "id": "bp-aha-categories",
+      "ruleIds": [
+        "BP-OK",
+        "BP-ABOVE-IDEAL",
+        "BP-OFF-NORMAL",
+        "BP-LOW",
+        "BP-STAGE2",
+        "BP-SUSTAINED-HIGH",
+        "BP-SEVERE-RETEST",
+        "BP-SEVERE-CONFIRMED",
+        "BP-SEVERE-SYMPTOMS"
+      ],
+      "intents": ["why", "seriousness", "numbers", "bp", "worsening"],
+      "keywords": ["blood pressure", "bp", "systolic", "diastolic", "stage", "elevated", "severe", "180", "120", "140", "90", "serious", "high"],
+      "sourceId": "aha-acc-2025-bp",
+      "text": "2025 AHA/ACC categories classify blood pressure as normal (<120/<80), elevated (120-129/<80), stage 1 (130-139 or 80-89), stage 2 (>=140 or >=90), and severe hypertension (>180/120 mmHg)."
+    },
+    {
+      "id": "bp-severe-retest-rule",
+      "ruleIds": ["BP-SEVERE-RETEST", "BP-SEVERE-CONFIRMED", "BP-SEVERE-SYMPTOMS"],
+      "intents": ["seriousness", "worsening", "action", "bp", "safety"],
+      "keywords": ["retest", "5 minutes", "five minutes", "180", "120", "severe", "wait", "symptoms", "worse"],
+      "sourceId": "aha-acc-2025-bp",
+      "text": "For a blood pressure reading above 180/120 mmHg without warning symptoms, AHA guidance is to wait about 5 minutes and retest. If warning symptoms appear, act immediately without waiting."
+    },
+    {
+      "id": "bp-sustained-ochmo",
+      "ruleIds": ["BP-STAGE2", "BP-SUSTAINED-HIGH", "BP-ABOVE-IDEAL"],
+      "intents": ["worsening", "earth", "bp", "seriousness"],
+      "keywords": ["sustained", "days", "140", "90", "earth", "flight surgeon", "repeat", "worse"],
+      "sourceId": "ochmo-std-100-1a",
+      "text": "NASA spaceflight standard OCHMO-STD-100.1A defines hypertension as sustained blood pressure at or above 140/90 mmHg across separate days."
+    },
+    {
+      "id": "bp-norsk-inflight",
+      "ruleIds": ["BP-OFF-NORMAL", "BP-LOW", "BP-OK"],
+      "intents": ["why", "baseline", "numbers", "bp"],
+      "keywords": ["normal", "baseline", "flight", "iss", "shift", "lower", "different", "why"],
+      "sourceId": "norsk-2015",
+      "text": "In flight on the ISS (Norsk et al., 2015), 24-hour blood pressure averaged about 8/9 mmHg lower than before flight, so shifts from your own in-flight baseline stand out earlier."
+    },
+    {
+      "id": "bp-low-nhlbi",
+      "ruleIds": ["BP-LOW", "BP-LOW-SYMPTOMS"],
+      "intents": ["seriousness", "worsening", "bp", "safety"],
+      "keywords": ["low", "90/60", "dizzy", "lightheaded", "faint", "fainting", "shock", "pressure"],
+      "sourceId": "nhlbi-low-bp",
+      "text": "NHLBI defines low blood pressure as lower than 90/60 mmHg. Dizziness, lightheadedness, fainting and confusion are warning symptoms; cold sweaty skin, rapid breathing and a weak rapid pulse are signs of shock."
+    },
+    {
+      "id": "bp-cdc-steps",
+      "ruleIds": ["BP-OK", "BP-ABOVE-IDEAL", "BP-OFF-NORMAL", "BP-STAGE2", "BP-SEVERE-RETEST"],
+      "intents": ["routine", "action", "bp"],
+      "keywords": ["cuff", "measure", "rest", "routine", "steps", "how", "recheck", "retest"],
+      "sourceId": "cdc-bp-measure",
+      "text": "CDC steps require 30 minutes without food, caffeine or exercise, an empty bladder, at least 5 minutes quiet supported rest with legs uncrossed, bare upper arm at heart level, and staying silent."
+    },
+    {
+      "id": "safety-red-flags",
+      "ruleIds": ["*"],
+      "intents": ["safety", "worsening", "seriousness"],
+      "keywords": [
+        "chest pain",
+        "can't breathe",
+        "shortness of breath",
+        "faint",
+        "fainting",
+        "collapsed",
+        "unconscious",
+        "seizure",
+        "emergency",
+        "bleeding",
+        "burn",
+        "eye"
+      ],
+      "sourceId": "aha-first-aid-2024",
+      "text": "Warning symptoms such as chest pain, trouble breathing, fainting, severe bleeding or collapse require alerting a crewmate immediately and opening the offline Emergency guide — never wait for Earth."
+    }
+  ]
+}

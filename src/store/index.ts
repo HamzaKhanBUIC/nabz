@@ -1,17 +1,25 @@
 import path from "node:path";
 import {
+  buildEmptyDayFallbackCard,
+  buildSharePreview,
   buildTrend,
   buildZoneResult,
   checkSession,
+  computeReminders,
+  DEFAULT_REMINDER_SCHEDULE,
   evaluateBp,
   foldHistory,
   getProtocol,
+  nextDue,
   pickMostSevereCard,
   PROTOCOL_ID,
   scorePvt,
+  selectCoachSnippets,
   selectReactionCard,
   type BaselineEntryInput,
   type BpHistoryEntry,
+  type ReminderHistoryContext,
+  type ShareSleepRecord,
 } from "../core";
 import type {
   BpGuide,
@@ -19,15 +27,25 @@ import type {
   BpMeasurement,
   CheckinInput,
   CheckinResponse,
+  CoachAskInput,
+  CoachAskResponse,
   Mission,
   Procedure,
   ProcedureBundle,
   ProcedureFor,
   Protocol,
+  ReminderSchedule,
+  RemindersResponse,
+  RoutineBundle,
+  SharePackagePreview,
+  SharePreviewInput,
+  ShareQueuedPackage,
+  ShareSendInput,
   Today,
   Trend,
   TrendQuery,
 } from "../schemas";
+import { createCoachProvider, type CoachProvider } from "../slots/coach";
 import { getNowIso, missionDayFromIso } from "./clock";
 import { loadContentBundle } from "./content";
 import {
@@ -45,6 +63,7 @@ export interface CreateStoreOptions {
   runtimeDir?: string;
   subjectId?: string;
   pinnedNow?: string;
+  coachProvider?: CoachProvider;
 }
 
 export interface CrewPulseStore {
@@ -57,6 +76,12 @@ export interface CrewPulseStore {
   createBpMeasurement(input: BpInput): BpMeasurement;
   getEmergencyProcedures(forWho: ProcedureFor): ProcedureBundle;
   getEmergencyProcedureById(id: string): Procedure | null;
+  getRoutines(): RoutineBundle;
+  getReminders(): RemindersResponse;
+  updateReminders(schedule: ReminderSchedule): RemindersResponse;
+  previewShare(input: SharePreviewInput): SharePackagePreview;
+  createSharePackage(input: ShareSendInput): ShareQueuedPackage;
+  askCoach(input: CoachAskInput): Promise<CoachAskResponse | null>;
 }
 
 function resolveTrendSource(sources: readonly ("simulated" | "live")[]): Trend["source"] {
@@ -85,6 +110,7 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
   const runtimeDir = options.runtimeDir ?? path.join(dataDir, "runtime");
   const contentDir = options.contentDir ?? path.join(root, "content");
   const subjectId = options.subjectId ?? "sara";
+  const coachProvider = options.coachProvider ?? createCoachProvider();
 
   const missionFile = loadMissionFixture(fixturesDir);
   const subjectFixture = loadSubjectFixture(fixturesDir, subjectId);
@@ -94,8 +120,10 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
   let cachedSimCheckins: CheckinResponse[] = [];
   let cachedSimBp: BpMeasurement[] = [];
 
+  const getActiveNowIso = (): string => getNowIso(options.pinnedNow);
+
   const getCurrentMissionDay = (): number =>
-    missionDayFromIso(missionFile.launchDate, getNowIso(options.pinnedNow));
+    missionDayFromIso(missionFile.launchDate, getActiveNowIso());
 
   const ensureSimCache = (beforeDay: number): void => {
     if (cachedDay === beforeDay) return;
@@ -139,6 +167,92 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
     );
   };
 
+  const getSleepRecordsWithSource = (
+    todayDay: number,
+    runtime: RuntimeData,
+  ): Array<ShareSleepRecord & { src: "simulated" | "live" }> => {
+    const liveSleepByDay = new Map<
+      number,
+      { id: string; value: number; effectiveDateTime: string }
+    >();
+    for (const c of runtime.checkins) {
+      if (c.sleepHours !== null) {
+        liveSleepByDay.set(c.missionDay, {
+          id: `slp-${c.id}`,
+          value: c.sleepHours,
+          effectiveDateTime: c.effectiveDateTime,
+        });
+      }
+    }
+
+    const out: Array<ShareSleepRecord & { src: "simulated" | "live" }> = [];
+    for (const day of subjectFixture.days) {
+      if (day.missionDay >= todayDay) continue;
+      const liveOverride = liveSleepByDay.get(day.missionDay);
+      if (liveOverride) {
+        liveSleepByDay.delete(day.missionDay);
+        out.push({
+          id: liveOverride.id,
+          missionDay: day.missionDay,
+          effectiveDateTime: liveOverride.effectiveDateTime,
+          sleepHours: liveOverride.value,
+          src: "live",
+        });
+      } else {
+        out.push({
+          id: `slp-${subjectId}-${day.missionDay}`,
+          missionDay: day.missionDay,
+          effectiveDateTime:
+            day.checkin?.startedAt ??
+            day.bp?.takenAt ??
+            `${missionDateForDay(missionFile.launchDate, day.missionDay)}T08:00:00+00:00`,
+          sleepHours: day.sleepHours,
+          src: "simulated",
+        });
+      }
+    }
+
+    for (const [dayNum, live] of liveSleepByDay.entries()) {
+      out.push({
+        id: live.id,
+        missionDay: dayNum,
+        effectiveDateTime: live.effectiveDateTime,
+        sleepHours: live.value,
+        src: "live",
+      });
+    }
+
+    return out.sort(
+      (a, b) =>
+        a.missionDay - b.missionDay || a.effectiveDateTime.localeCompare(b.effectiveDateTime),
+    );
+  };
+
+  const buildReminderContext = (runtime: RuntimeData): ReminderHistoryContext => {
+    const nowIso = getActiveNowIso();
+    const missionDay = missionDayFromIso(missionFile.launchDate, nowIso);
+    const hasTodayCheckin = runtime.checkins.some((c) => c.missionDay === missionDay);
+    const allBp = getAllBp();
+    const lastBpMissionDay =
+      allBp.length > 0 ? Math.max(...allBp.map((b) => b.missionDay)) : null;
+    return {
+      launchDate: missionFile.launchDate,
+      missionDay,
+      nowIso,
+      hasTodayCheckin,
+      lastBpMissionDay,
+    };
+  };
+
+  const getTodayCards = (runtime: RuntimeData, todayDay: number) => {
+    const todayCheckins = runtime.checkins.filter((c) => c.missionDay === todayDay);
+    const todayBps = runtime.bp.filter((b) => b.missionDay === todayDay);
+    const checkin = todayCheckins.length > 0 ? todayCheckins[todayCheckins.length - 1]! : null;
+    const bp = todayBps.length > 0 ? todayBps[todayBps.length - 1]! : null;
+    const cards = [...(checkin ? [checkin.card] : []), ...(bp ? [bp.card] : [])];
+    return { checkin, bp, cards, primaryCard: pickMostSevereCard(cards) };
+  };
+
   return {
     getMission(): Mission {
       return {
@@ -154,20 +268,16 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
     getToday(): Today {
       const todayDay = getCurrentMissionDay();
       const runtime = loadRuntime();
-      const todayCheckins = runtime.checkins.filter((c) => c.missionDay === todayDay);
-      const todayBps = runtime.bp.filter((b) => b.missionDay === todayDay);
-
-      const checkin = todayCheckins.length > 0 ? todayCheckins[todayCheckins.length - 1]! : null;
-      const bp = todayBps.length > 0 ? todayBps[todayBps.length - 1]! : null;
-      const cards = [...(checkin ? [checkin.card] : []), ...(bp ? [bp.card] : [])];
+      const { checkin, bp, cards, primaryCard } = getTodayCards(runtime, todayDay);
+      const schedule = runtime.reminders ?? DEFAULT_REMINDER_SCHEDULE;
 
       return {
         missionDay: todayDay,
         checkin,
         bp,
-        card: pickMostSevereCard(cards),
+        card: primaryCard,
         cards,
-        nextDue: null,
+        nextDue: nextDue(buildReminderContext(runtime), schedule),
       };
     },
 
@@ -310,51 +420,15 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
       }
 
       const runtime = loadRuntime();
-      const liveSleepByDay = new Map<number, { value: number; effectiveDateTime: string }>();
-      for (const c of runtime.checkins) {
-        if (c.sleepHours !== null) {
-          liveSleepByDay.set(c.missionDay, {
-            value: c.sleepHours,
-            effectiveDateTime: c.effectiveDateTime,
-          });
-        }
-      }
-
-      const sleepPoints: Array<BaselineEntryInput & { src: "simulated" | "live" }> = [];
-      for (const day of subjectFixture.days) {
-        if (day.missionDay >= todayDay) continue;
-        const liveOverride = liveSleepByDay.get(day.missionDay);
-        if (liveOverride) {
-          liveSleepByDay.delete(day.missionDay);
-          sleepPoints.push({
-            missionDay: day.missionDay,
-            effectiveDateTime: liveOverride.effectiveDateTime,
-            value: liveOverride.value,
-            src: "live",
-          });
-        } else {
-          sleepPoints.push({
-            missionDay: day.missionDay,
-            effectiveDateTime:
-              day.checkin?.startedAt ??
-              day.bp?.takenAt ??
-              `${missionDateForDay(missionFile.launchDate, day.missionDay)}T08:00:00+00:00`,
-            value: day.sleepHours,
-            src: "simulated",
-          });
-        }
-      }
-
-      for (const [dayNum, live] of liveSleepByDay.entries()) {
-        sleepPoints.push({
-          missionDay: dayNum,
-          effectiveDateTime: live.effectiveDateTime,
-          value: live.value,
-          src: "live",
-        });
-      }
-
-      const folded = foldHistory(sleepPoints, { direction: "none" });
+      const sleepPoints = getSleepRecordsWithSource(todayDay, runtime);
+      const folded = foldHistory(
+        sleepPoints.map((p) => ({
+          missionDay: p.missionDay,
+          effectiveDateTime: p.effectiveDateTime,
+          value: p.sleepHours,
+        })),
+        { direction: "none" },
+      );
       return buildTrend("sleep-hours", folded, query.days, {
         subjectId,
         source: resolveTrendSource(sleepPoints.map((p) => p.src)),
@@ -395,12 +469,127 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
     getEmergencyProcedures(forWho: ProcedureFor): ProcedureBundle {
       return {
         version: content.proceduresVersion,
-        procedures: forWho === "self" ? content.procedures : [],
+        procedures: content.procedures.filter((p) => p.for === forWho),
       };
     },
 
     getEmergencyProcedureById(id: string): Procedure | null {
       return content.procedures.find((p) => p.id === id) ?? null;
+    },
+
+    getRoutines(): RoutineBundle {
+      return {
+        version: content.routinesVersion,
+        routines: content.routines,
+      };
+    },
+
+    getReminders(): RemindersResponse {
+      const runtime = loadRuntime();
+      const schedule = runtime.reminders ?? DEFAULT_REMINDER_SCHEDULE;
+      return computeReminders(buildReminderContext(runtime), schedule);
+    },
+
+    updateReminders(schedule: ReminderSchedule): RemindersResponse {
+      const runtime = loadRuntime();
+      runtime.reminders = schedule;
+      saveRuntimeFile(runtimeDir, subjectId, runtime);
+      return computeReminders(buildReminderContext(runtime), schedule);
+    },
+
+    previewShare(input: SharePreviewInput): SharePackagePreview {
+      const nowIso = getActiveNowIso();
+      const missionDay = missionDayFromIso(missionFile.launchDate, nowIso);
+      const runtime = loadRuntime();
+      const checkins = getAllCheckins();
+      const sleepRecords = getSleepRecordsWithSource(missionDay, runtime);
+      const bpMeasurements = getAllBp();
+
+      return buildSharePreview({
+        subjectId,
+        missionDay,
+        nowIso,
+        commsDelay: missionFile.commsDelay,
+        checkins,
+        sleepRecords,
+        bpMeasurements,
+        selection: input,
+      });
+    },
+
+    createSharePackage(input: ShareSendInput): ShareQueuedPackage {
+      const nowIso = getActiveNowIso();
+      const missionDay = missionDayFromIso(missionFile.launchDate, nowIso);
+      const runtime = loadRuntime();
+      const pkg = buildSharePreview({
+        subjectId,
+        missionDay,
+        nowIso,
+        commsDelay: missionFile.commsDelay,
+        checkins: getAllCheckins(),
+        sleepRecords: getSleepRecordsWithSource(missionDay, runtime),
+        bpMeasurements: getAllBp(),
+        selection: input,
+      });
+
+      const outbox = runtime.outbox ?? [];
+      const queued: ShareQueuedPackage = {
+        id: `out-${subjectId}-${missionDay}-${outbox.length + 1}`,
+        status: "queued",
+        queuedAt: nowIso,
+        confirmedByUser: true,
+        package: pkg,
+      };
+
+      runtime.outbox = [...outbox, queued];
+      saveRuntimeFile(runtimeDir, subjectId, runtime);
+      return queued;
+    },
+
+    async askCoach(input: CoachAskInput): Promise<CoachAskResponse | null> {
+      const todayDay = getCurrentMissionDay();
+      const runtime = loadRuntime();
+      const { cards, primaryCard } = getTodayCards(runtime, todayDay);
+
+      let targetCard = primaryCard;
+      let hasActiveCard = primaryCard !== null;
+
+      if (input.cardId) {
+        const matched = cards.find(
+          (c) => c.id === input.cardId || c.ruleId === input.cardId,
+        );
+        if (!matched) {
+          return null;
+        }
+        targetCard = matched;
+        hasActiveCard = true;
+      }
+
+      const card = targetCard ?? buildEmptyDayFallbackCard(content.catalog.sources);
+      const linkedRoutine = card.links?.routineId
+        ? content.routines.find((r) => r.id === card.links?.routineId)
+        : undefined;
+      const snippets = selectCoachSnippets(card, input.question, content.coachSnippets);
+
+      const answer = await coachProvider.explain({
+        card,
+        question: input.question,
+        snippets,
+        linkedRoutine,
+        sourceMap: content.sourceMap,
+      });
+
+      return {
+        cardId: hasActiveCard ? card.id : null,
+        ruleId: hasActiveCard ? card.ruleId : null,
+        answer: answer.answer,
+        grounded: answer.grounded,
+        citations: answer.citations,
+        ...(answer.banner ? { banner: answer.banner } : {}),
+        suggestedQuestions: answer.suggestedQuestions,
+        disclaimer: "Decision support, not a diagnosis.",
+        provider: answer.provider,
+      };
     },
   };
 }

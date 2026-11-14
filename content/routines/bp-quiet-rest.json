@@ -1,0 +1,33 @@
+{
+  "id": "bp-quiet-rest",
+  "version": 1,
+  "category": "blood-pressure",
+  "title": "Quiet rest before blood pressure recheck",
+  "summary": "Five-minute CDC settling routine before taking or repeating a blood pressure measurement.",
+  "durationSeconds": 300,
+  "steps": [
+    {
+      "id": "avoid-stimulants",
+      "text": "Avoid food, caffeine and heavy exercise for 30 minutes beforehand."
+    },
+    {
+      "id": "empty-bladder",
+      "text": "Empty your bladder before fitting the cuff."
+    },
+    {
+      "id": "anchor-rest",
+      "text": "Anchor yourself with legs uncrossed and back supported for 5 minutes.",
+      "timerSeconds": 300,
+      "detail": "Microgravity adaptation of CDC seated rest steps."
+    },
+    {
+      "id": "cuff-quiet",
+      "text": "Place the cuff on your bare upper arm at heart level and stay silent."
+    }
+  ],
+  "disclaimer": "Decision support, not a diagnosis.",
+  "sourceIds": [
+    "cdc-bp-measure",
+    "aha-acc-2025-bp"
+  ]
+}

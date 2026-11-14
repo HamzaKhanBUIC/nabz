@@ -1,7 +1,16 @@
 import path from "node:path";
 import cors from "cors";
-import express, { type ErrorRequestHandler, type Express, type RequestHandler } from "express";
-import { BpInput, CheckinInput, ProcedureQuery, TrendQuery } from "../schemas";
+import express, { type ErrorRequestHandler, type Express } from "express";
+import {
+  BpInput,
+  CheckinInput,
+  CoachAskInput,
+  ProcedureQuery,
+  ReminderSchedule,
+  SharePreviewInput,
+  ShareSendInput,
+  TrendQuery,
+} from "../schemas";
 import { createStore, type CrewPulseStore } from "../store";
 
 /** Only pages served from this machine may call the API from a browser. */
@@ -12,18 +21,6 @@ export interface CreateAppOptions {
   runtimeDir?: string;
   pinnedNow?: string;
   consoleDir?: string;
-}
-
-function notBuiltHandler(feature: string, message: string): RequestHandler {
-  return (_req, res) => {
-    res.status(501).json({
-      error: {
-        code: "not_built",
-        message,
-        feature,
-      },
-    });
-  };
 }
 
 export function createApp(options: CreateAppOptions = {}): Express {
@@ -140,13 +137,89 @@ export function createApp(options: CreateAppOptions = {}): Express {
     res.json(procedure);
   });
 
-  // Reserved Should endpoints (501 not_built)
-  app.post("/api/coach/ask", notBuiltHandler("coach", "The AI coach is planned but not built yet."));
-  app.get("/api/routines", notBuiltHandler("routines", "Health routines are planned but not built yet."));
-  app.post("/api/share/preview", notBuiltHandler("share", "Send to Earth is planned but not built yet."));
-  app.post("/api/share", notBuiltHandler("share", "Send to Earth is planned but not built yet."));
-  app.get("/api/reminders", notBuiltHandler("reminders", "Check-up reminders are planned but not built yet."));
-  app.put("/api/reminders", notBuiltHandler("reminders", "Check-up reminders are planned but not built yet."));
+  // Should endpoints (S02, S03, S04, S05)
+  app.post("/api/coach/ask", async (req, res, next) => {
+    try {
+      const parsed = CoachAskInput.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: {
+            code: "invalid_input",
+            message: "Coach request body failed validation.",
+            issues: parsed.error.issues,
+          },
+        });
+        return;
+      }
+      const reply = await store.askCoach(parsed.data);
+      if (!reply) {
+        res.status(404).json({
+          error: {
+            code: "not_found",
+            message: `No matching action card "${parsed.data.cardId ?? ""}" was found for today.`,
+          },
+        });
+        return;
+      }
+      res.json(reply);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.get("/api/routines", (_req, res) => {
+    res.json(store.getRoutines());
+  });
+
+  app.post("/api/share/preview", (req, res) => {
+    const parsed = SharePreviewInput.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: {
+          code: "invalid_input",
+          message: "Share preview request body failed validation.",
+          issues: parsed.error.issues,
+        },
+      });
+      return;
+    }
+    res.json(store.previewShare(parsed.data));
+  });
+
+  app.post("/api/share", (req, res) => {
+    const parsed = ShareSendInput.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: {
+          code: "invalid_input",
+          message: "Share confirmation request body failed validation.",
+          issues: parsed.error.issues,
+        },
+      });
+      return;
+    }
+    const queued = store.createSharePackage(parsed.data);
+    res.status(201).json(queued);
+  });
+
+  app.get("/api/reminders", (_req, res) => {
+    res.json(store.getReminders());
+  });
+
+  app.put("/api/reminders", (req, res) => {
+    const parsed = ReminderSchedule.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: {
+          code: "invalid_input",
+          message: "Reminder schedule body failed validation.",
+          issues: parsed.error.issues,
+        },
+      });
+      return;
+    }
+    res.json(store.updateReminders(parsed.data));
+  });
 
   // Dev test console (only when not production)
   if (process.env.NODE_ENV !== "production") {
@@ -165,7 +238,8 @@ export function createApp(options: CreateAppOptions = {}): Express {
 
   const onError: ErrorRequestHandler = (err, _req, res, _next) => {
     void _next;
-    const badJson = err instanceof SyntaxError || (err as { type?: string }).type === "entity.parse.failed";
+    const badJson =
+      err instanceof SyntaxError || (err as { type?: string }).type === "entity.parse.failed";
     if (badJson) {
       res.status(400).json({
         error: {
