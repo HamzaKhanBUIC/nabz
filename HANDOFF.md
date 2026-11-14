@@ -24,6 +24,7 @@ Sara, a mission commander on day 120 of the trip to Mars, needs a fast, private 
 - Health routines for hands, tension and blood pressure
 - "Send to Earth?": Sara picks what to share
 - Reminder for the health check-up
+- Emergency mode "Who is this for?" with two buttons, **For me** and **For a crewmate**, for when someone collapses in front of Sara (added by Hamza, Nov 14)
 
 **Later (pitch only)**
 - Real wearable sensors
@@ -41,7 +42,7 @@ Sara, a mission commander on day 120 of the trip to Mars, needs a fast, private 
 | 1 | Move crew compare ("me or the ship?") to Should | **Skip.** Crew view stays in Later. |
 | 2 | Must list too big; split out procedure writing | **Skip.** |
 | 3 | Environment switch (station / Moon / Mars) from the brief | **Research first**, then decide. |
-| 4 | Emergency mode for a crewmate | **No.** Emergency mode is first person only. |
+| 4 | Emergency mode for a crewmate | **Must: first person only. Should: add a "For a crewmate" option** (Hamza, Nov 14). Build Must emergency data so procedures can be tagged self / crewmate later without rework. |
 | 5 | No NASA data named | **Yes, must fix.** Name NASA sources and base the simulated astronaut data on them. |
 | 6 | Success numbers (check-in time, false alarms) | **Later.** Set after the backend is built and tested. |
 
@@ -72,8 +73,8 @@ Must → Should → Later. Within Must: data → formulas → action cards → m
 ## Next steps (in order)
 
 1. Research R1–R6 running in Antigravity (Hamza's app, started Nov 14 afternoon). Hamza tells Claude when done.
-   - R1, R3 and R4 outputs are on disk (unverified, not committed).
-   - Research results are committed only after Claude verifies them.
+   - **R1–R6 verified (Nov 14).** 4 corrections, recorded in research/CHECKS.md, which wins over the R files.
+   - R8 (crewmate emergency, Should) has a brief written; not run yet.
 2. Claude verifies each result against its sources; Argon second opinion on key numbers.
 3. Decide: core NASA sources (R1), which emergencies (R4), environment switch yes/no (R5).
 4. Design: data model, formulas, action-card rules, API contract. Write DESIGN.md.
