@@ -42,3 +42,9 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Added `tests/unit/pvt.test.ts` (5/5 pass) verifying protocol defaults, the M1 hand-computed session (`meanSpeed = 3.2905`, `medianRtMs = 250`, `performanceScore = 55.56`), lapse (`354`/`355`) and false-start (`99`/`100`) boundaries, zero-division edge cases, and all 4 QC flag limits.
 - Gate PASS (`npx tsc --noEmit`, `npx eslint .`, `npx vitest run`).
 - Next: F04 normal zone, rolling personal baseline, and trend builder (`src/core/{zone,baseline}.ts`).
+
+## 2026-11-14 — F04 personal baseline, zones, and trend builder
+- Added `src/core/zone.ts` (`classifyZone`, `statusForZone`, `buildZoneResult`) and `src/core/baseline.ts` (`foldHistory`, `buildTrend`) supporting `lower_is_worse`, `two_sided`, and `none` series, 14-session rolling baseline (minimum 5 sessions, sample SD > 0), and exclusion of QC-flagged and `act` entries from subsequent baseline windows.
+- Added `tests/unit/baseline.test.ts` (6/6 pass) verifying 4-vs-5 session calibration, the M2 hand-computed cases, exact z-score boundaries, exclusion of flagged/act entries, `sd === 0` stability, missing mission days, and `Trend` + `TrendBand` schema compliance.
+- Gate PASS (`npx tsc --noEmit`, `npx eslint .`, `npx vitest run`).
+- Next: F05 priority action-card engine (`src/core/cards.ts`).

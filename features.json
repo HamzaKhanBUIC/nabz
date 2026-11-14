@@ -62,8 +62,8 @@
       "verify": [
         "npx vitest run tests/unit/baseline.test.ts"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented pure src/core/{zone,baseline}.ts and tests/unit/baseline.test.ts (6/6 pass); gate PASS."
     },
     {
       "id": "F05",
