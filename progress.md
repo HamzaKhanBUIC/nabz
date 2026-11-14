@@ -83,3 +83,10 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Added `tests/golden/nasa-i4.test.ts` (2/2 pass) verifying 4 subjects × 7 timepoints and confirming `C002` `hematocrit` `34.7` at `R+82` drops below its `35..45` reference range.
 - Gate PASS (`tsc`, `eslint`, `vitest run`).
 - Next: F11 `/dev` browser test console (`tools/console/`).
+
+## 2026-11-14 — F11 offline /dev browser test console
+- Added `tools/console/{index.html,style.css,console.js}` (plain HTML/CSS/JS, zero CDN) serving PVT-B `requestAnimationFrame` + `event.timeStamp` tap test, Day-120 short-sleep sample button, non-color `[alert] Below your normal` status badge, action card + facts/sources/raw JSON, inline SVG 28-day baseline band chart, guided BP 5-step flow with timers and 12 symptom ticks, 5 offline emergency tabs, and clean reset instructions.
+- Extended `tests/contract/api.test.ts` (6/6 pass) to assert `/dev/` serves HTTP 200 HTML outside production.
+- Verified in live browser on `http://localhost:8787/dev/` (screenshot `final_step_30.png`): 0 console/network errors, Day-120 sample renders `[alert] Below your normal` + `RT-SHORT-SLEEP` card (`Decision support, not a diagnosis.`) + updated trend, plus guided BP and 5 emergency tabs.
+- Gate PASS (`tsc`, `eslint`, `vitest run`).
+- Next: F12 `README.md` quickstart and frontend handover documentation.

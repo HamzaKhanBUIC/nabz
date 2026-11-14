@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>crewpulse — Backend Dev Console</title>
+    <link rel="stylesheet" href="/dev/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>crewpulse dev console</h1>
+        <p class="subtitle">Offline backend test harness (/dev) — calls public contract only</p>
+      </div>
+      <div id="mission-summary" class="pill-row">Loading mission...</div>
+    </header>
+
+    <main class="grid">
+      <section class="panel" id="sec-today">
+        <div class="panel-head">
+          <h2>1. Today &amp; Active Card</h2>
+          <button type="button" id="btn-refresh-today">Refresh Today</button>
+        </div>
+        <div id="today-status" class="status-box">Loading today...</div>
+        <div id="today-card"></div>
+      </section>
+
+      <section class="panel" id="sec-tap">
+        <div class="panel-head">
+          <h2>2. Reaction Check-in (PVT-B) &amp; Sample Day</h2>
+        </div>
+        <div class="controls-row">
+          <label>
+            Sleep last night (hours):
+            <input id="sleep-hours" type="number" step="0.1" min="0" max="16" value="5.2" />
+          </label>
+          <button type="button" id="btn-start-pvt" class="primary">Start 3-min Tap Test</button>
+          <button type="button" id="btn-cancel-pvt" disabled>Cancel</button>
+          <button type="button" id="btn-send-sample">Send Day-120 Sample (Short Sleep)</button>
+        </div>
+        <div class="pvt-stage">
+          <div class="pvt-meta">
+            <span id="pvt-timer">00:00 / 03:00</span>
+            <span id="pvt-counts">Stimuli: 0 | False starts: 0</span>
+          </div>
+          <button type="button" id="pvt-target" class="tap-circle idle" disabled>
+            Press "Start 3-min Tap Test" or send sample day
+          </button>
+        </div>
+        <div id="checkin-result"></div>
+        <details>
+          <summary>Raw check-in JSON</summary>
+          <pre id="checkin-raw">{}</pre>
+        </details>
+      </section>
+
+      <section class="panel wide" id="sec-trend">
+        <div class="panel-head">
+          <h2>3. Normal Zone Trend</h2>
+          <div class="controls-row">
+            <select id="trend-code" aria-label="Trend series">
+              <option value="reaction-speed">reaction-speed (1/s)</option>
+              <option value="bp-systolic">bp-systolic (mmHg)</option>
+              <option value="bp-diastolic">bp-diastolic (mmHg)</option>
+              <option value="sleep-hours">sleep-hours (h)</option>
+            </select>
+            <input id="trend-days" type="number" min="7" max="120" value="30" aria-label="Trend days" />
+            <button type="button" id="btn-load-trend">Load Trend</button>
+          </div>
+        </div>
+        <div id="trend-band-info" class="meta-line"></div>
+        <div id="trend-chart-wrap"></div>
+        <div class="table-scroll">
+          <table id="trend-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Value</th>
+                <th>Z-score</th>
+                <th>Zone</th>
+                <th>Baseline Mean</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="sec-bp">
+        <div class="panel-head">
+          <h2>4. Guided Blood Pressure</h2>
+        </div>
+        <ol id="bp-steps" class="steps-list"></ol>
+        <div class="bp-inputs">
+          <div>
+            <strong>Reading 1:</strong>
+            <input id="bp-sys-1" type="number" min="40" max="300" value="184" aria-label="Systolic 1" /> /
+            <input id="bp-dia-1" type="number" min="20" max="200" value="118" aria-label="Diastolic 1" />
+          </div>
+          <div>
+            <strong>Reading 2:</strong>
+            <input id="bp-sys-2" type="number" min="40" max="300" value="186" aria-label="Systolic 2" /> /
+            <input id="bp-dia-2" type="number" min="20" max="200" value="122" aria-label="Diastolic 2" />
+          </div>
+          <label class="inline-label">
+            retestOf ID (if retesting):
+            <input id="bp-retest-of" type="text" placeholder="optional measurement id" />
+          </label>
+        </div>
+        <div id="bp-symptoms" class="symptoms-grid"></div>
+        <div class="controls-row">
+          <button type="button" id="btn-submit-bp" class="primary">Submit BP Readings</button>
+          <span id="bp-retest-timer" class="meta-line"></span>
+        </div>
+        <div id="bp-result"></div>
+      </section>
+
+      <section class="panel" id="sec-emergency">
+        <div class="panel-head">
+          <h2>5. Offline Emergency Procedures (Self)</h2>
+        </div>
+        <div id="emergency-tabs" class="controls-row"></div>
+        <div id="emergency-detail"></div>
+      </section>
+
+      <section class="panel wide" id="sec-reset">
+        <h2>6. Reset Instructions</h2>
+        <p>
+          This dev page does not wipe files automatically. To reset to seeded day-119 history
+          with an empty day 120, stop the server, delete <code>data/runtime/</code>, and restart
+          <code>npm run dev</code>.
+        </p>
+      </section>
+    </main>
+
+    <script src="/dev/console.js"></script>
+  </body>
+</html>

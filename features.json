@@ -159,8 +159,8 @@
       "verify": [
         "manual: screenshot of /dev after a completed tap test showing the zone and card"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Offline /dev test console in tools/console/ (index.html, style.css, console.js); verified via api.test.ts (6/6) and live browser run (Day-120 sample -> act + RT-SHORT-SLEEP card, SVG trend, guided BP, 5 emergency tabs)."
     },
     {
       "id": "S01",

@@ -226,4 +226,18 @@ describe("F08 API contract and JSON store", () => {
       expect(body.error.feature).toBe(item.feature);
     }
   });
+
+  it("serves the offline /dev test console outside production", async () => {
+    const runtimeDir = makeTempRuntimeDir();
+    const app = createApp({ runtimeDir });
+
+    const htmlRes = await request(app).get("/dev/");
+    expect(htmlRes.status).toBe(200);
+    expect(htmlRes.text).toContain("crewpulse dev console");
+    expect(htmlRes.text).toContain("/dev/console.js");
+
+    const jsRes = await request(app).get("/dev/console.js");
+    expect(jsRes.status).toBe(200);
+    expect(jsRes.text).toContain("/api/checkins");
+  });
 });
