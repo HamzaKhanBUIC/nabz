@@ -1,10 +1,10 @@
 # HANDOFF: NOVA TRIO, Space Apps 2026 (Astronaut Health Monitoring)
 
 Last updated: Sat Nov 14, 2026, evening PKT.
-**Phase: research + basic setup.**
+**Phase: architecture locked; build starts with F00.** Read `AGENTS.md` and `docs/blueprint/` next.
 - Git repo is set up, with a gitleaks secret-scan hook in `.githooks/`. Each clone turns it on with `git config core.hooksPath .githooks`.
 - Private GitHub repo: see the bottom of this file.
-- No app code and no API keys yet.
+- No app code and no API keys yet. The build plan is `features.json`; the gate is `python scripts/gate.py`.
 
 ## Problem statement (locked at the team workshop)
 
@@ -77,11 +77,15 @@ Must → Should → Later. Within Must: data → formulas → action cards → m
    - R7 (AI coach + voice) and R8 (crewmate emergency) verified, 1 correction each. All research R1–R8 is done.
 2. Claude verifies each result against its sources; Argon second opinion on key numbers.
 3. Decide: core NASA sources (R1), which emergencies (R4), environment switch yes/no (R5).
-4. Design: data model, formulas, action-card rules, API contract. Write DESIGN.md.
-5. Setup (see docs/setup-plan.md).
-   - Done: git, .gitignore, gitleaks hook, private GitHub repo.
-   - Next: Hamza runs /agentic-architect after research. That creates AGENTS.md / CLAUDE.md, the blueprint, features.json and the gate. Then backend skeleton + CI.
-6. Build Must phase by phase, tested.
+3b. **Decided (Nov 14):** five emergencies (bleeding, burn, eye, allergic reaction, near-fainting); no environment switch, one Mars-transit profile; real NASA file is OSD-569 blood counts, daily signals are simulated.
+4. **Done (Nov 14): architecture.** `/agentic-architect` wrote AGENTS.md, CLAUDE.md, `docs/blueprint/00–03`, `docs/adr/0001`, `docs/features/` (one design per feature), `docs/api-contract.md` (draft), `features.json`, `scripts/gate.py`, and worker briefs in `docs/briefs/`.
+5. **Next: build, in this order** (details in `docs/blueprint/02-agents-and-gates.md`):
+   - F00 skeleton, gate, CI (Claude)
+   - F01 schemas, example JSON, contract (Claude). After this the contract can go to Mariam.
+   - In parallel: F02 data (Antigravity, brief A) · F07 content (Antigravity, brief B) · F03–F06 rules (Claude)
+   - F08 API, F09 hero flow, F12 README; then F10 NASA data and F11 our test page
+6. Should features: one short design pass each, after F09 passes (`docs/features/S-should-slots.md`).
+7. Demo material (30-second video or 7 slides): later, outside the backend plan.
 
 ## Research to queue (not started)
 

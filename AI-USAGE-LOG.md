@@ -14,3 +14,6 @@ The Space Apps submission must describe how SI (AI) was used. Log every AI job h
 | Nov 14 | Claude Code (Opus 5.5) | R7 brief (AI coach + voice) | research/briefs/R7-ai-and-voice.md | Hamza |
 | Nov 14 | Claude Code (Opus 5.5) | Git setup, secret-scan hook (tested: blocked a fake token) | .gitignore, .githooks/ | Claude |
 | Nov 14 | Antigravity app (run by Hamza) | Research R7: AI coach + voice | research/R7-ai-and-voice.md | Claude: verified 8 key claims (Speechmatics pricing/plans, MDN, NASA NTRS slides, HF licence, PubMed), 1 correction |
+| Nov 14 | Claude Code (Fable 5.2), /agentic-architect skill | Backend architecture: blueprint, data model, per-feature designs, API contract draft, features.json, worker briefs | docs/blueprint/, docs/features/, docs/api-contract.md, docs/briefs/, features.json, AGENTS.md | Hamza (5 trade-off picks) |
+| Nov 14 | 2 Claude research subagents (read-only) | Reference repos: jsPsych, json-rules-engine, Synthea, ts-rest, zod-to-openapi, FHIR naming | Summarised in docs/blueprint/00-architecture.md | Claude: ts-rest archive status and package versions re-checked with npm |
+| Nov 14 | Claude Code (Fable 5.2) | Checked 4 more numbers against sources (−1.5 SD, ≤ 6 h sleep, low BP, home BP steps); downloaded OSD-569 CSV | research/CHECKS.md addenda, data/nasa/ | Claude |

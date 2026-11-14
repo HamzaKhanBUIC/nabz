@@ -19,7 +19,15 @@ Status: **verified**
 | Performance score = 100% × [1 − (lapses + false starts) / (valid stimuli + false starts)] | confirmed | same |
 | Mean 1/RT is the most sleep-loss-sensitive metric, better than mean or median RT | consistent with the cited paper; not re-opened | Basner & Dinges 2011, [PMC3079937](https://pmc.ncbi.nlm.nih.gov/articles/PMC3079937/) |
 
-**Note for design:** the ISS Reaction Self Test uses a 2–5 s gap between targets, while the original PVT-B uses 1–4 s. Pick one and keep it fixed.
+**Note for design:** the ISS Reaction Self Test uses a 2–5 s gap between targets, while the original PVT-B uses 1–4 s. **Decided (Nov 14): 1–4 s.**
+
+**Addendum (Nov 14, checked for the architecture):**
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| A score at or below −1.5 SD from the person's own pre-flight baseline counts as low; 20.2% of flight and post-flight PVT speed scores were low | confirmed | Cognition on ISS, [PMC11614644](https://pmc.ncbi.nlm.nih.gov/articles/PMC11614644/) |
+| PVT-B response speed is significantly slower after sleep of ≤ 6 h (34.9% of nights; F = 40.76, p < 0.0001) | confirmed | Jones et al. 2022, [PMC8919197](https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197/). This paper counts a false start at RT < 130 ms; we keep Basner's < 100 ms. |
+| No-response timeout of 30 s | not checked for PVT-B (R2 #6 gives it for the 10-min test). Treated as a design choice. | — |
 
 ## R3: blood pressure
 
@@ -30,7 +38,8 @@ Status: **verified, one correction**
 | Categories: normal < 120 and < 80; elevated 120–129 and < 80; stage 1 130–139 or 80–89; stage 2 ≥ 140 or ≥ 90. The 2025 guideline keeps the 2017 categories. | confirmed | 2025 AHA/ACC guideline summaries ([JournalFeed](https://journalfeed.org/article-a-day/2025/new-2025-aha-acc-hypertension-guidelines/), [EurekAlert](https://www.eurekalert.org/news-releases/1094543)) |
 | > 180/120 = "severe hypertension" (was "hypertensive urgency") | confirmed | same |
 | At > 180/120, "wait at least 1 minute and retest" | **corrected**: AHA patient guidance says wait **about 5 minutes**, then retest. With symptoms (chest pain, shortness of breath, back pain, numbness or weakness, vision change, trouble speaking), act at once; don't wait. | [AHA: When to call 911](https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings/hypertensive-crisis-when-you-should-call-911-for-high-blood-pressure) (via search result; the page blocks direct fetch) |
-| Home steps: 30 min without caffeine, smoking or exercise; empty bladder; 5 min seated rest; 2 readings 1 min apart | unconfirmed (heart.org blocks fetch). These are the widely published AHA steps; ESC says 1–2 min apart. | — |
+| Home steps: 30 min without food, drink, caffeine, smoking, alcohol or exercise; empty bladder; sit with back supported for at least 5 min; feet flat, legs uncrossed; cuff on bare upper arm at chest height; stay silent; at least 2 readings 1–2 min apart | confirmed (Nov 14) | [CDC: Measure your blood pressure](https://www.cdc.gov/high-blood-pressure/measure/index.html). heart.org still blocks fetch. "Anchor yourself" is our microgravity adaptation of "feet flat, back supported", not a sourced step. |
+| Low blood pressure is "lower than 90/60 mm Hg"; symptoms include confusion, dizziness or lightheadedness, fainting; shock signs are cold and sweaty skin, rapid breathing, a blue skin tone, a weak and rapid pulse | confirmed (Nov 14) | [NHLBI: Low blood pressure](https://www.nhlbi.nih.gov/health/low-blood-pressure) |
 | ISS months 3–6: 24-h SBP −8 ± 2, DBP −9 ± 2 mmHg, HR unchanged (Norsk 2015) | see the R6 section (Argon cross-check) | |
 
 ## R4: emergencies
@@ -126,8 +135,8 @@ Status: **verified, one correction.** Nothing here goes into Must code; it feeds
 | R | Status | Corrections |
 |---|---|---|
 | R1 NASA data | verified | none. OSD-569 / OSD-575 CSVs are open and can be used as real NASA data. |
-| R2 reaction test | verified | none |
-| R3 blood pressure | verified | re-test after **~5 min** at > 180/120 (not 1 min) |
+| R2 reaction test | verified | none. Addendum: −1.5 SD and ≤ 6 h sleep confirmed. |
+| R3 blood pressure | verified | re-test after **~5 min** at > 180/120 (not 1 min). Addendum: home steps (CDC) and low BP < 90/60 (NHLBI) confirmed. |
 | R4 emergencies | verified | eye flush **15 min**; tourniquet "2 in" is width, not placement |
 | R5 environments | verified (delays) | none |
 | R6 simulation | verified | PVT-B gap 1–4 s, not 0–4 s |

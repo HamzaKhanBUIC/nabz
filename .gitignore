@@ -22,3 +22,7 @@ playbook-cover.png
 # OS
 .DS_Store
 Thumbs.db
+
+# Runtime data and gate logs
+data/runtime/
+logs/

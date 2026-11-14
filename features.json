@@ -1,0 +1,226 @@
+{
+  "project": "crewpulse",
+  "outcome_metric": "With the network off, a day-120 check-in for Sara returns zone 'act' and the short-sleep action card with sources, the 120-day trend returns her personal band, and python scripts/gate.py exits 0 in under 60 seconds.",
+  "features": [
+    {
+      "id": "F00",
+      "priority": "P0",
+      "description": "A fresh clone installs with one command, the server starts and answers GET /api/health, and the gate and CI run typecheck, lint and tests.",
+      "design": "docs/blueprint/02-agents-and-gates.md",
+      "owner": "claude",
+      "verify": [
+        "python scripts/gate.py",
+        "npm run dev, then curl http://localhost:8787/api/health returns {\"ok\":true}",
+        "manual: .github/workflows/ci.yml runs the gate, gitleaks and npm audit"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F01",
+      "priority": "P0",
+      "description": "Every Must endpoint has a zod schema, an example request and response in contract/examples/, and an entry in docs/api-contract.md; a test proves each example parses against its schema.",
+      "design": "docs/api-contract.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/contract/examples.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F02",
+      "priority": "P0",
+      "description": "The seeded simulator writes 120 days of data for Sara and 3 crew that validate against the schemas, are byte-identical on every run with the same seed, and record the injected events as ground truth.",
+      "design": "docs/features/D1-data-simulation.md",
+      "owner": "antigravity-lane-a",
+      "verify": [
+        "npx vitest run tests/unit/simulate.test.ts",
+        "npm run simulate -- --check (regenerates and reports no difference from data/fixtures)"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F03",
+      "priority": "P0",
+      "description": "Raw reaction-test trials are scored into mean speed, lapses, false starts and performance score exactly as PVT-B defines them, and broken sessions are flagged.",
+      "design": "docs/features/M1-reaction-checkin.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/unit/pvt.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F04",
+      "priority": "P0",
+      "description": "Each check-in is compared with Sara's own rolling baseline and placed in a zone (building, in_zone, watch, act), and a trend series with her personal band is produced for the chart.",
+      "design": "docs/features/M2-normal-zone.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/unit/baseline.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F05",
+      "priority": "P0",
+      "description": "A fixed priority table turns the rule inputs into one action card with what changed, why it matters, what to do, the facts used, sources and the disclaimer.",
+      "design": "docs/features/M3-action-card.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/unit/cards.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F06",
+      "priority": "P0",
+      "description": "A blood pressure measurement is averaged, categorised, compared with Sara's own normal, and returns the next action: nothing, retest after 5 minutes, or alert the crew.",
+      "design": "docs/features/M4-blood-pressure.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/unit/bp.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F07",
+      "priority": "P0",
+      "description": "Five first-person emergency procedures, the blood pressure guide and the action-card templates exist as schema-valid JSON whose wording matches research/CHECKS.md, corrections included.",
+      "design": "docs/features/M5-emergency.md",
+      "owner": "antigravity-lane-b",
+      "verify": [
+        "npx vitest run tests/unit/content.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F08",
+      "priority": "P0",
+      "description": "The API serves every Must endpoint in the contract, rejects malformed input with a 400, persists new entries, and answers 501 not_built on every reserved Should endpoint.",
+      "design": "docs/api-contract.md",
+      "owner": "core-builder",
+      "verify": [
+        "npx vitest run tests/contract/api.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F09",
+      "priority": "P0",
+      "description": "Hero flow, network off: Sara's day-120 check-in returns zone act and the short-sleep card; the trend shows the drop below her band; a blood pressure reading and an emergency procedure are served.",
+      "design": "docs/blueprint/01-scope.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/golden/hero-flow.test.ts",
+        "python scripts/gate.py finishes in under 60 seconds"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F12",
+      "priority": "P0",
+      "description": "README starts with the one command that runs the backend, and a handover note tells the frontend developer where the contract and example JSON are.",
+      "design": "docs/blueprint/01-scope.md",
+      "owner": "claude",
+      "verify": [
+        "manual: on a clean clone, follow README only; server runs and /api/today answers"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F10",
+      "priority": "P1",
+      "description": "The real NASA Inspiration4 blood counts (OSD-569) run through the same baseline engine and are served as a trend with their reference range.",
+      "design": "docs/features/D1-data-simulation.md",
+      "owner": "claude",
+      "verify": [
+        "npx vitest run tests/golden/nasa-i4.test.ts"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "F11",
+      "priority": "P1",
+      "description": "Our own test page at /dev runs the tap test in a browser, posts the trials, and shows the returned zone, card, trend, blood pressure result and emergency steps.",
+      "design": "docs/features/T1-test-console.md",
+      "owner": "core-builder",
+      "verify": [
+        "manual: screenshot of /dev after a completed tap test showing the zone and card"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "S01",
+      "priority": "P2",
+      "description": "Emergency mode asks who it is for and serves crewmate procedures (collapse, microgravity CPR) when Sara picks 'For a crewmate'.",
+      "design": "docs/features/S-should-slots.md",
+      "owner": "unassigned",
+      "verify": [
+        "design pass first: docs/adr/ entry and verify steps added before any code"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "S02",
+      "priority": "P2",
+      "description": "The AI coach answers a follow-up question about a card using only that card, its facts and verified content, and gives the fixed no-source reply otherwise.",
+      "design": "docs/features/S-should-slots.md",
+      "owner": "unassigned",
+      "verify": [
+        "design pass first: docs/adr/ entry and verify steps added before any code"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "S03",
+      "priority": "P2",
+      "description": "Health routines for hands, tension and blood pressure are served and linked from action cards.",
+      "design": "docs/features/S-should-slots.md",
+      "owner": "unassigned",
+      "verify": [
+        "design pass first: docs/adr/ entry and verify steps added before any code"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "S04",
+      "priority": "P2",
+      "description": "Send to Earth: Sara previews exactly which entries would be shared and confirms before a package is queued.",
+      "design": "docs/features/S-should-slots.md",
+      "owner": "unassigned",
+      "verify": [
+        "design pass first: docs/adr/ entry and verify steps added before any code"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "S05",
+      "priority": "P2",
+      "description": "A check-up reminder tells Sara when the next check-in or measurement is due.",
+      "design": "docs/features/S-should-slots.md",
+      "owner": "unassigned",
+      "verify": [
+        "design pass first: docs/adr/ entry and verify steps added before any code"
+      ],
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
