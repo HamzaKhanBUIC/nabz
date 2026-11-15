@@ -231,6 +231,105 @@
       ],
       "passes": true,
       "notes": "ADR 0002 + pure reminder state machine in src/core/reminders.ts; wired into Today.nextDue and GET/PUT /api/reminders with runtime persistence; verified in should.test.ts."
+    },
+    {
+      "id": "E00",
+      "priority": "P3",
+      "description": "Extras design pass: ADR 0003, feature design E-extras.md, research briefs R9-R11, approved by Hamza before any build.",
+      "design": "docs/adr/0003-extras.md",
+      "owner": "Claude",
+      "verify": [
+        "docs/adr/0003-extras.md and docs/features/E-extras.md exist",
+        "research/briefs/R9, R10, R11 exist",
+        "Hamza approves ADR 0003 (status changes from proposed to accepted)"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "E01",
+      "priority": "P3",
+      "description": "Each crew member signs in with name and code; the server checks the code and gives each person their own data. Emergency stays usable without signing in.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Claude",
+      "verify": [
+        "npx vitest run tests/contract/session.test.ts",
+        "Personal endpoints return 401 without a token; Mateo's token never returns Sara's data",
+        "Emergency, BP guide, protocol and mission work without a token",
+        "Existing contract and golden tests pass through the login helper with unchanged numbers"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "E02",
+      "priority": "P3",
+      "description": "A 'Real astronaut data' screen shows the Inspiration4 crew's real NASA blood counts (OSD-569) run through the same personal-baseline engine as Sara.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "npx vitest run tests/contract/nasa.test.ts",
+        "GET /api/nasa/osd-569/trend values match the CSV for a hand-checked crew member and measure",
+        "Browser: the screen shows the pre-launch band, post-flight points, lab range and the OSD-569 source line"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "E03",
+      "priority": "P3",
+      "description": "Every action card names the NASA hazard and HRP risk it relates to, and a '5 hazards' section shows what CrewPulse watches for each.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "research/CHECKS.md has the R11 mapping marked confirmed",
+        "npx vitest run tests/unit/content.test.ts (every card has at least one known hazard id)",
+        "Browser: hazard chip with label and icon on the action card; 5-hazards section links to NASA pages"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "E04",
+      "priority": "P3",
+      "description": "A radiation card estimates the mission dose to date from real Curiosity RAD measurements (or the published average if no clean file exists), against NASA's 600 mSv career limit.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "research/CHECKS.md has the R9 values marked confirmed; data/nasa/rad/README.md names source and fetch date",
+        "npx vitest run tests/unit/radiation.test.ts (hand-computed doses, limit crossing)",
+        "Browser: the card says 'estimate' and shows its source"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "E05",
+      "priority": "P3",
+      "description": "The crew Medical Officer sees a summary card for each crewmate who has turned sharing on; each person sees who viewed their summary and when.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Claude",
+      "verify": [
+        "npx vitest run tests/contract/officer.test.ts",
+        "Non-officers get 403; crewmates with consent off show no data; no raw trials or readings in the response",
+        "Each overview read adds an access-log entry for every shown crewmate"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "E06",
+      "priority": "P3",
+      "description": "An environment switch (ISS, Moon, Mars transit, Mars surface, and Remote Earth if sourced) changes delay, time to care, who leads care and escalation wording, never health thresholds.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "research/CHECKS.md has the R10 values marked confirmed",
+        "npx vitest run tests/unit/environment.test.ts (same check-in gives the same zone and card id in every environment)",
+        "Browser: header context strip and card escalation line change with the environment"
+      ],
+      "passes": false,
+      "notes": ""
     }
   ]
 }

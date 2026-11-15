@@ -1,7 +1,7 @@
 # crewpulse — agent rules
 
 Backend, data and AI for the NOVA TRIO Space Apps 2026 entry. Tier C · hackathon · Node.
-The frontend is another person's work. We never edit it; our shared point is `docs/api-contract.md`.
+The frontend in `frontend/` started as Mariam's work; Hamza took it over on 2026-11-15 and it is now built by Claude and agents. `docs/api-contract.md` stays the contract between `frontend/` and the API.
 
 ## Commands
 - Setup: `./init.ps1` (Windows) or `./init.sh`
@@ -33,6 +33,7 @@ Never delete or reword features in `features.json`; raise it with Hamza instead.
 | `src/core/` | Claude | Pure TypeScript. No `node:*`, `fs`, `express`, `Date.now()` or `Math.random()`. Time and data come in as arguments. |
 | `src/schemas/` | Claude | zod schemas. The contract's single source of truth. |
 | `src/api/`, `src/store/`, `src/server.ts`, `tools/console/` | `core-builder` | HTTP and file I/O only. No thresholds or health logic here. |
+| `frontend/` | Claude, or an agent lane per `docs/features/E-extras.md` | Renders what the API returns. No scoring, zones or thresholds in the client. Status never colour alone. |
 | `src/slots/` | Claude | Interfaces and READMEs for Should features. No logic until that feature's design pass. |
 | `content/` | Antigravity lane B | JSON only. Wording copied from `research/CHECKS.md`. |
 | `tools/simulate/`, `data/fixtures/`, `data/README.md` | Antigravity lane A | Seeded generator and its output. |
