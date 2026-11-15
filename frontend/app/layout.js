@@ -33,6 +33,8 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`h-full ${inter.variable}`}
+      // themeBootstrapScript sets data-theme and color-scheme here before hydration, on purpose.
+      suppressHydrationWarning
     >
       <body className="min-h-full antialiased">
         {/* Applies the stored theme before first paint — no flash. */}
