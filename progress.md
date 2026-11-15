@@ -221,3 +221,12 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Gate PASS (21 files, 155 tests); API on 8787 answers /api/health and /dev; frontend on 3005: /welcome has no console errors, Sara's code opens Today with API data. CI on main green.
 - Fixed: `scripts/gate.py` now decodes command output as UTF-8 (Windows cp1252 threw UnicodeDecodeError on vitest's check marks). `frontend/app/layout.js` sets `suppressHydrationWarning` on `<html>`, since the theme bootstrap script changes `data-theme` before hydration on purpose.
 - Open, Windows only: about 1 vitest run in 6 to 11 dies with a native Node crash (exit 3221226505 = 0xC0000409), mostly in `tests/contract/api.test.ts`. Not an assertion; Linux CI never shows it. `pool: "threads"` did not help (the main process crashed instead), so it was reverted. Local Node is v24.15.0; a v24.15.0 Windows crash report exists (nodejs/node#62991). Rerun the gate if it shows that exit code.
+## 2026-11-15: free hosting for judging
+- Live: https://nabz-drab.vercel.app (site, Vercel Hobby) with the API on Render's free web service (https://nabz-api-m9ov.onrender.com). Vercel forwards `/api/*` to Render, so the browser only talks to one origin.
+- Code: `src/server.ts` reads `HOST` (default `127.0.0.1`; Render sets `0.0.0.0`). `frontend/next.config.mjs` adds the `/api` rewrite and same-origin API calls when `API_PROXY_TARGET` is set. Setup steps in `deploy/README.md` (PR #8).
+- Sign-in page lists the four demo crew codes in demo builds, because judges can't read the private repo's README (PR #9).
+- Vercel project root directory is `frontend`; merges into main redeploy both the site (Vercel) and the API (Render). Render runs Node 24 with `HOST=0.0.0.0` and health check `/api/health`.
+- UptimeRobot checks the API every 5 minutes so the free service doesn't sleep. Render's 750 free hours are shared with the other free services in the workspace, so only nabz-api has a pinger.
+- Limits: crew data added on the live site resets when Render restarts or redeploys; the seeded fixtures stay.
+- Tried first: Oracle Always Free (Singapore out of capacity), Hugging Face Docker Space (now needs PRO). `deploy/huggingface/` keeps the single-container Dockerfile for any Docker host.
+- Checks: gate PASS; split setup tested locally (proxy health, sign-in 201 with a foreign Origin, no `localhost:8787` in browser code); live pages and `/api/health` 200, emergency flow and crew roster in the browser; PR #8 and #9 CI green.
