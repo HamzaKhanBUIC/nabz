@@ -85,6 +85,12 @@ export default function AppShell({ children }) {
   const { isAuthenticated } = useSession();
   const isEmergency = pathname === "/emergency";
   const isSignIn = pathname === "/sign-in";
+  const isWelcome = pathname === "/welcome";
+
+  // The welcome page is a full-bleed landing page with its own header and footer.
+  if (isWelcome) {
+    return <div className="min-h-dvh overflow-x-clip bg-canvas text-primary">{children}</div>;
+  }
 
   if (isEmergency) {
     return (

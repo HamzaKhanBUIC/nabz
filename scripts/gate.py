@@ -52,7 +52,13 @@ def run_gate() -> tuple[bool, str]:
             report.append(f"FAIL {label}: '{cmd[0]}' not found. Run the init script first.")
             return False, "\n".join(report)
         proc = subprocess.run(
-            [exe, *cmd[1:]], check=False, cwd=ROOT, capture_output=True, text=True
+            [exe, *cmd[1:]],
+            check=False,
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         output = (proc.stdout or "") + (proc.stderr or "")
         if proc.returncode != 0:

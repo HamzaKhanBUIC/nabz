@@ -217,6 +217,10 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Checks: gate PASS, frontend lint, browser walkthrough of every changed page at 1440x900 and 375 px (no sideways scroll).
 - Follow-up: Send to Earth has a closed "See exactly what will be sent" toggle that shows the exact outgoing text, so consent is informed without bringing back the clutter. Light-theme text tokens darkened (attention #8a5700, accent #1b66c4, emergency #c62828), the Environment "Current" pill is solid, and the body-map selected button uses accent tokens. Contrast check: 0 failures across 510 text elements on 10 pages in light and dark. CI on PR #7 green (6 checks, including the production build).
 
+## 2026-11-15: repo health check
+- Gate PASS (21 files, 155 tests); API on 8787 answers /api/health and /dev; frontend on 3005: /welcome has no console errors, Sara's code opens Today with API data. CI on main green.
+- Fixed: `scripts/gate.py` now decodes command output as UTF-8 (Windows cp1252 threw UnicodeDecodeError on vitest's check marks). `frontend/app/layout.js` sets `suppressHydrationWarning` on `<html>`, since the theme bootstrap script changes `data-theme` before hydration on purpose.
+- Open, Windows only: about 1 vitest run in 6 to 11 dies with a native Node crash (exit 3221226505 = 0xC0000409), mostly in `tests/contract/api.test.ts`. Not an assertion; Linux CI never shows it. `pool: "threads"` did not help (the main process crashed instead), so it was reverted. Local Node is v24.15.0; a v24.15.0 Windows crash report exists (nodejs/node#62991). Rerun the gate if it shows that exit code.
 ## 2026-11-15: free hosting for judging
 - Live: https://nabz-drab.vercel.app (site, Vercel Hobby) with the API on Render's free web service (https://nabz-api-m9ov.onrender.com). Vercel forwards `/api/*` to Render, so the browser only talks to one origin.
 - Code: `src/server.ts` reads `HOST` (default `127.0.0.1`; Render sets `0.0.0.0`). `frontend/next.config.mjs` adds the `/api` rewrite and same-origin API calls when `API_PROXY_TARGET` is set. Setup steps in `deploy/README.md` (PR #8).
