@@ -25,6 +25,7 @@ import {
   LOW_BP_SYMPTOM_IDS,
   SEVERE_BP_SYMPTOM_IDS,
 } from "./constants";
+import { assessVitals } from "./vitals";
 import { buildZoneResult } from "./zone";
 
 const SEVERE_SYMPTOM_SET: ReadonlySet<string> = new Set(SEVERE_BP_SYMPTOM_IDS);
@@ -253,6 +254,8 @@ export function evaluateBp(
     nextAction = { type: "retest", afterSeconds: BP_RETEST_SECONDS };
   }
 
+  const vitals = assessVitals(average.pulse, input.spo2, options.catalog.sources);
+
   const subjectId = options.subjectId ?? "sara";
   return {
     id: options.id ?? `bp-${subjectId}-${missionDay}`,
@@ -262,6 +265,8 @@ export function evaluateBp(
     readings: [...input.readings],
     average,
     category,
+    ...(input.spo2 !== undefined ? { spo2: input.spo2 } : {}),
+    vitals,
     symptoms: [...input.symptoms],
     ...(input.retestOf ? { retestOf: input.retestOf } : {}),
     zone,

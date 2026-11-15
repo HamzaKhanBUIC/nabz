@@ -74,13 +74,13 @@ export default function NormalZoneWidget({ className = "", code = "reaction-spee
               <LineChart data={chartData} margin={{ top: 10, right: 12, bottom: 4, left: -12 }}>
                 <XAxis
                   dataKey="day"
-                  tick={{ fill: "var(--color-muted)", fontSize: 11 }}
+                  tick={{ fill: "var(--color-muted)", fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   domain={["auto", "auto"]}
-                  tick={{ fill: "var(--color-muted)", fontSize: 11 }}
+                  tick={{ fill: "var(--color-muted)", fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}
                   width={44}

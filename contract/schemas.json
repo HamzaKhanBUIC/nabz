@@ -666,6 +666,112 @@
                       "severe"
                     ]
                   },
+                  "spo2": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "vitals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "heart-rate",
+                            "spo2"
+                          ]
+                        },
+                        "value": {
+                          "type": "number"
+                        },
+                        "unit": {
+                          "type": "string",
+                          "enum": [
+                            "bpm",
+                            "%"
+                          ]
+                        },
+                        "status": {
+                          "type": "object",
+                          "properties": {
+                            "level": {
+                              "type": "string",
+                              "enum": [
+                                "info",
+                                "in_zone",
+                                "watch",
+                                "act",
+                                "urgent"
+                              ]
+                            },
+                            "label": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "iconKey": {
+                              "type": "string",
+                              "enum": [
+                                "info",
+                                "hourglass",
+                                "check",
+                                "eye",
+                                "alert",
+                                "siren"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "level",
+                            "label",
+                            "iconKey"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sources": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "title": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "value",
+                        "unit",
+                        "status",
+                        "message",
+                        "sources"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
                   "symptoms": {
                     "type": "array",
                     "items": {
@@ -2425,6 +2531,11 @@
               "additionalProperties": false
             }
           },
+          "spo2": {
+            "type": "integer",
+            "minimum": 50,
+            "maximum": 100
+          },
           "symptoms": {
             "maxItems": 12,
             "type": "array",
@@ -2553,6 +2664,112 @@
               "stage2",
               "severe"
             ]
+          },
+          "spo2": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "vitals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "heart-rate",
+                    "spo2"
+                  ]
+                },
+                "value": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": [
+                    "bpm",
+                    "%"
+                  ]
+                },
+                "status": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "in_zone",
+                        "watch",
+                        "act",
+                        "urgent"
+                      ]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "iconKey": {
+                      "type": "string",
+                      "enum": [
+                        "info",
+                        "hourglass",
+                        "check",
+                        "eye",
+                        "alert",
+                        "siren"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "level",
+                    "label",
+                    "iconKey"
+                  ],
+                  "additionalProperties": false
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sources": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "code",
+                "value",
+                "unit",
+                "status",
+                "message",
+                "sources"
+              ],
+              "additionalProperties": false
+            }
           },
           "symptoms": {
             "type": "array",

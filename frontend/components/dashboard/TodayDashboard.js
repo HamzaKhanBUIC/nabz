@@ -5,7 +5,6 @@ import Icon from "@/components/ui/Icon";
 import MetricTile from "@/components/ui/MetricTile";
 import StatusBadge from "@/components/ui/StatusBadge";
 import TodayChecks from "@/components/dashboard/TodayChecks";
-import ClinicalActionCard from "@/components/dashboard/ClinicalActionCard";
 import NormalZoneWidget from "@/components/dashboard/NormalZoneWidget";
 import ReminderCard from "@/components/dashboard/ReminderCard";
 import RadiationDoseCard from "@/components/hazards/RadiationDoseCard";
@@ -27,9 +26,6 @@ export default function TodayDashboard() {
   const greeting = now ? greetingFor(now) : "Mission brief";
   const latestCheckin = today?.checkin;
   const latestBp = today?.bp;
-  const secondaryCards = (today?.cards || []).filter(
-    (c) => c.id !== today?.card?.id,
-  );
 
   return (
     <div className="space-y-6">
@@ -59,7 +55,7 @@ export default function TodayDashboard() {
             {greeting}, {activeCrew.name}
           </h1>
           <p className="t-body-md mt-1 text-secondary">
-            Reaction speed, sleep, and blood pressure against your personal normal.
+            How are you feeling today?
           </p>
         </div>
 
@@ -69,81 +65,61 @@ export default function TodayDashboard() {
         </StatusBadge>
       </section>
 
-      <TodayChecks checkin={latestCheckin} bp={latestBp} reminders={reminders} />
-
-      <section aria-label="Today's readings" className="grid divide-y divide-line rounded-lg border border-line bg-surface md:grid-cols-3 md:divide-x md:divide-y-0">
-        <MetricTile
-          bare
-          label="Today's reaction speed"
-          value={
-            latestCheckin
-              ? formatMetricValue("reaction-speed", latestCheckin.metrics.meanSpeed)
-              : "—"
-          }
-          unit={latestCheckin ? "resp/s" : undefined}
-          helper={
-            latestCheckin && (latestCheckin.qcFlags?.length ?? 0) > 0
-              ? "Not scored: failed the quality checks"
-              : latestCheckin
-              ? `Median RT ${Math.round(latestCheckin.metrics.medianRtMs ?? 0)} ms · ${formatTime(latestCheckin.effectiveDateTime)}`
-              : "No check-in logged today"
-          }
-        />
-
-        <MetricTile
-          bare
-          label="Today's sleep"
-          value={
-            latestCheckin?.sleepHours != null
-              ? formatMetricValue("sleep-hours", latestCheckin.sleepHours)
-              : "—"
-          }
-          unit={latestCheckin?.sleepHours != null ? "hours" : undefined}
-          helper={
-            latestCheckin?.sleepHours != null
-              ? "Logged with check-in"
-              : "Log hours rested at check-in"
-          }
-        />
-
-        <MetricTile
-          bare
-          label="Today's blood pressure"
-          value={
-            latestBp
-              ? `${latestBp.average.systolic}/${latestBp.average.diastolic}`
-              : "—"
-          }
-          unit={latestBp ? "mmHg" : undefined}
-          helper={
-            latestBp
-              ? `Category: ${latestBp.category} · ${formatTime(latestBp.effectiveDateTime)}`
-              : "No reading logged today"
-          }
-        />
-      </section>
-
-      <ClinicalActionCard card={today?.card} heading="Today's focus" />
-
-      {secondaryCards.length > 0 ? (
-        <div className="space-y-4">
-          {secondaryCards.map((card) => (
-            <ClinicalActionCard
-              key={card.id}
-              card={card}
-              heading="Also keep in mind"
-              compact
-            />
-          ))}
+      <div className="grid items-start gap-5 sm:gap-6 lg:grid-cols-2">
+        <div className="min-w-0 space-y-5 sm:space-y-6">
+          <TodayChecks checkin={latestCheckin} bp={latestBp} reminders={reminders} />
+          <RadiationDoseCard />
         </div>
-      ) : null}
 
-      <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
-        <NormalZoneWidget />
-        <ReminderCard />
+        <div className="min-w-0 space-y-5 sm:space-y-6">
+          <section aria-label="Today's readings" className="grid divide-y divide-line rounded-lg border border-line bg-surface sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            <MetricTile
+              bare
+              label="Reaction speed"
+              value={
+                latestCheckin
+                  ? formatMetricValue("reaction-speed", latestCheckin.metrics.meanSpeed)
+                  : "—"
+              }
+              unit={latestCheckin ? "taps/s" : undefined}
+              helper={
+                latestCheckin && (latestCheckin.qcFlags?.length ?? 0) > 0
+                  ? "Not scored today"
+                  : latestCheckin
+                  ? `At ${formatTime(latestCheckin.effectiveDateTime)}`
+                  : "No check-in yet"
+              }
+            />
+
+            <MetricTile
+              bare
+              label="Sleep"
+              value={
+                latestCheckin?.sleepHours != null
+                  ? formatMetricValue("sleep-hours", latestCheckin.sleepHours)
+                  : "—"
+              }
+              unit={latestCheckin?.sleepHours != null ? "hours" : undefined}
+              helper={latestCheckin?.sleepHours != null ? "From your check-in" : "Logged at check-in"}
+            />
+
+            <MetricTile
+              bare
+              label="Blood pressure"
+              value={
+                latestBp
+                  ? `${latestBp.average.systolic}/${latestBp.average.diastolic}`
+                  : "—"
+              }
+              unit={latestBp ? "mmHg" : undefined}
+              helper={latestBp ? `At ${formatTime(latestBp.effectiveDateTime)}` : "No reading yet"}
+            />
+          </section>
+
+          <NormalZoneWidget />
+          <ReminderCard />
+        </div>
       </div>
-
-      <RadiationDoseCard />
     </div>
   );
 }

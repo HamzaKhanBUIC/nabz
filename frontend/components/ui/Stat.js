@@ -15,7 +15,7 @@ export default function Stat({ label, value, unit, tone = "default", size = "md"
 
   return (
     <div>
-      <p className="text-[10px] font-mediumr text-muted">
+      <p className="text-xs font-mediumr text-muted">
         {label}
       </p>
       <p className={`mt-1 tabular-nums font-medium leading-none ${valueSize} ${valueTone}`}>

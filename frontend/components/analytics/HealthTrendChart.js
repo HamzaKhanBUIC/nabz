@@ -86,7 +86,7 @@ export default function HealthTrendChart({
                     value: "Mean",
                     position: "insideTopLeft",
                     fill: "var(--color-normal)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -99,7 +99,7 @@ export default function HealthTrendChart({
                     value: "Watch",
                     position: "insideTopLeft",
                     fill: "var(--color-attention)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -112,7 +112,7 @@ export default function HealthTrendChart({
                     value: "Act",
                     position: "insideBottomLeft",
                     fill: "var(--color-emergency)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}

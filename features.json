@@ -330,6 +330,20 @@
       ],
       "passes": true,
       "notes": "2026-11-15: five profiles from CHECKS R5/R10 in content/environments.json; Commander-only switch; escalation line added to act and urgent cards at response time. Same-check-in test is in tests/contract/environment.test.ts (unit escalation tests in tests/unit/environment.test.ts). Browser: header strip, Today card line and emergency line changed with the environment; Mateo sees no switch. Local only."
+    },
+    {
+      "id": "E07",
+      "priority": "P3",
+      "description": "Resting heart rate (from the cuff pulse) and blood oxygen (SpO2) are checked with each blood pressure measurement against sourced cut-offs, shown next to the BP card without changing it.",
+      "design": "docs/features/E07-vitals.md",
+      "owner": "Claude",
+      "verify": [
+        "research/CHECKS.md R12 rows marked confirmed for every threshold used",
+        "npx vitest run tests/unit/vitals.test.ts tests/contract/vitals.test.ts",
+        "Browser: BP flow with pulse 104 and SpO2 91 shows the Pulse and oxygen panel with labels, icons and sources"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: requested by the team. Heart rate has no urgent level (no source gives one). SpO2 93-94% watch band is a design choice. Browser-checked on an isolated API (port 8791) with pulse 104 / SpO2 91."
     }
   ]
 }

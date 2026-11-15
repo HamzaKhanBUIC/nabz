@@ -46,7 +46,7 @@ function NasaTooltip({ active, payload, unit }) {
     <div className="rounded-md border border-line-strong bg-surface px-3 py-2.5 text-xs shadow-lg">
       <div className="flex items-center justify-between gap-3">
         <p className="font-semibold text-primary">{pt.label}</p>
-        <span className="text-[11px] text-muted">{pt.phase}</span>
+        <span className="text-xs text-muted">{pt.phase}</span>
       </div>
       <p className="mt-1 text-secondary">
         Value:{" "}
@@ -190,7 +190,7 @@ export default function NasaTrendChart({
                     value: `Lab high (${formatNumber(referenceRange.high)})`,
                     position: "insideTopRight",
                     fill: "var(--color-accent)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -205,7 +205,7 @@ export default function NasaTrendChart({
                     value: `Lab low (${formatNumber(referenceRange.low)})`,
                     position: "insideBottomRight",
                     fill: "var(--color-accent)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -220,7 +220,7 @@ export default function NasaTrendChart({
                     value: `Personal mean (${formatNumber(band.mean)})`,
                     position: "insideTopLeft",
                     fill: "var(--color-normal)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -235,7 +235,7 @@ export default function NasaTrendChart({
                     value: `Watch (${formatNumber(band.watchAt)})`,
                     position: "insideTopLeft",
                     fill: "var(--color-attention)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -250,7 +250,7 @@ export default function NasaTrendChart({
                     value: `Act (${formatNumber(band.actAt)})`,
                     position: "insideBottomLeft",
                     fill: "var(--color-emergency)",
-                    fontSize: 11,
+                    fontSize: 12,
                   }}
                 />
               ) : null}
@@ -311,7 +311,7 @@ export default function NasaTrendChart({
                   <span className="tabular-nums text-sm font-semibold text-primary">
                     {pt.label}
                   </span>
-                  <span className="text-[11px] font-medium text-muted">
+                  <span className="text-xs font-medium text-muted">
                     {pt.phase}
                   </span>
                 </div>

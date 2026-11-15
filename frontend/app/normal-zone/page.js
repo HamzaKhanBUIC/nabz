@@ -43,8 +43,8 @@ export default function NormalZonePage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="t-h1 mt-1 text-primary">Your normal zone</h1>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-secondary">
-            Your normal range comes from your last 14 valid check-ins (at least 5 needed). A watch flag means today is noticeably outside that range.
+          <p className="mt-1 text-sm text-secondary">
+            Your usual range, built from your own recent check-ins.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export default function NormalZonePage() {
             height={320}
           />
 
-          <div className="mt-5 grid gap-3 border-t border-line pt-5 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-5 grid gap-3 border-t border-line pt-5 sm:grid-cols-3">
             <div className="min-w-0">
               <p className="text-xs text-muted">Latest reading</p>
               <p className="mt-1 tabular-nums text-base font-semibold tabular-nums text-primary">
@@ -107,25 +107,19 @@ export default function NormalZonePage() {
               </p>
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-muted">Personal mean</p>
+              <p className="text-xs text-muted">Your usual level</p>
               <p className="mt-1 tabular-nums text-base font-semibold tabular-nums text-primary">
                 {band?.ready && band.mean != null
                   ? `${formatMetricValue(selectedMetric, band.mean)} ${metric.unit}`
-                  : "Building"}
+                  : "Still learning"}
               </p>
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-muted">Watch / Act thresholds</p>
+              <p className="text-xs text-muted">We flag it at</p>
               <p className="mt-1 tabular-nums text-sm font-semibold tabular-nums text-primary">
                 {band?.ready && band.watchAt != null
-                  ? `${formatMetricValue(selectedMetric, band.watchAt)} / ${band.actAt != null ? formatMetricValue(selectedMetric, band.actAt) : "—"}`
-                  : "Not ready"}
-              </p>
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs text-muted">Shift (z-score)</p>
-              <p className="mt-1 tabular-nums text-base font-semibold tabular-nums text-primary">
-                {latest?.z != null ? Number(latest.z).toFixed(2) : "—"}
+                  ? `Watch ${formatMetricValue(selectedMetric, band.watchAt)}${band.actAt != null ? ` · Act ${formatMetricValue(selectedMetric, band.actAt)}` : ""} ${metric.unit}`
+                  : "Not enough readings yet"}
               </p>
             </div>
           </div>

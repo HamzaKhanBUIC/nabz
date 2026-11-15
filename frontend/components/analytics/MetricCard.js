@@ -52,7 +52,7 @@ export default function MetricCard({
 
       <p className="mt-3 text-xs tabular-nums text-muted">
         {band?.ready && band.mean != null
-          ? `Mean ${formatMetricValue(metricKey, band.mean)} ${metric.unit} · ${series.length} pts`
+          ? `Usual ${formatMetricValue(metricKey, band.mean)} ${metric.unit} · ${series.length} readings`
           : `${series.length} sessions · ${status.label}`}
       </p>
     </button>

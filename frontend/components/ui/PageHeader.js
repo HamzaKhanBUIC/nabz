@@ -8,7 +8,7 @@ export default function PageHeader({ eyebrow, title, description, actions }) {
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="mb-1 text-[11px] font-semibold text-nasa-blue">
+          <p className="mb-1 text-xs font-semibold text-nasa-blue">
             {eyebrow}
           </p>
         ) : null}

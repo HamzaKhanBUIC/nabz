@@ -291,13 +291,13 @@ export default function AstronautBodyMap({
             {/* Region labels */}
             {showLabels ? (
               <g aria-hidden="true">
-                <text x="100" y="12" textAnchor="middle" fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
+                <text x="100" y="12" textAnchor="middle" fontSize="11" fill="var(--color-secondary)" fontFamily="monospace">
                   HEAD
                 </text>
-                <text x="100" y="150" textAnchor="middle" fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
+                <text x="100" y="150" textAnchor="middle" fontSize="11" fill="var(--color-secondary)" fontFamily="monospace">
                   CHEST
                 </text>
-                <text x="100" y="215" textAnchor="middle" fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
+                <text x="100" y="215" textAnchor="middle" fontSize="11" fill="var(--color-secondary)" fontFamily="monospace">
                   ABDOMEN
                 </text>
               </g>
@@ -307,7 +307,7 @@ export default function AstronautBodyMap({
 
         {/* Side panel */}
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold text-nasa-blue">
+          <p className="text-xs font-semibold text-nasa-blue">
             Body regions
           </p>
           <p className="mt-1 text-sm text-muted">
@@ -324,9 +324,9 @@ export default function AstronautBodyMap({
                   type="button"
                   onClick={() => handleSelect(region.id)}
                   aria-pressed={active}
-                  className={`rounded-md border px-2 py-1 text-[11px] font-medium transition-colors ${
+                  className={`rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
                     active
-                      ? "border-nasa-blue bg-nasa-blue text-white"
+                      ? "border-accent bg-accent text-on-status"
                       : "border-line bg-surface text-navy hover:border-nasa-blue/40 hover:bg-canvas"
                   }`}
                 >
@@ -357,7 +357,7 @@ export default function AstronautBodyMap({
                   {activeRegion.metrics.map((metric) => (
                     <span
                       key={metric}
-                      className="rounded-md border border-line bg-canvas px-2 py-0.5 tabular-nums text-[10px] text-navy"
+                      className="rounded-md border border-line bg-canvas px-2 py-0.5 tabular-nums text-xs text-navy"
                     >
                       {metric}
                     </span>
