@@ -204,6 +204,55 @@ Send request (`POST /api/share`): same body plus `"confirm": true` (returns `201
 Schedule body for `PUT /api/reminders`: `{ "enabled": true, "checkinTimeUtc": "08:00", "bpIntervalDays": 3, "bpTimeUtc": "08:30" }`.
 Response `200`: `{ "version": 1, "schedule": { … }, "nextDue": "2026-11-15T08:00:00+00:00", "items": [ { "kind": "checkin", "label": "…", "dueAt": "…", "overdue": false, "reason": "…" } ] }`.
 
+## Extra endpoints (E01, E02, E05; design in `docs/features/E-extras.md`)
+
+### Signing in (E01)
+
+Personal endpoints need `Authorization: Bearer <token>`:
+- `GET /api/today`, `POST /api/checkins`, `GET /api/trends`, `POST /api/measurements/bp`;
+- `POST /api/coach/ask`, `POST /api/share/preview`, `POST /api/share`;
+- `GET/PUT /api/reminders`, `GET/PUT /api/consent`, `GET /api/session`.
+
+Without a valid token they answer `401 { error: { code: "no_session" } }`. Everything else stays public, **including all emergency endpoints**: emergency never waits for sign-in.
+
+| Call | Body / query | Answer |
+|---|---|---|
+| `GET /api/crew` | — | `{ crew: [{ id, name, role }] }`: who can sign in |
+| `POST /api/session` | `{ crewId, code }` (code: 4–8 digits) | `201 { token, crew, expiresAt }` |
+| | wrong code | `401 { error: { code: "invalid_code" } }` |
+| | 5 wrong codes for one crew id | `429 { error: { code: "locked", retryAfterSeconds } }` for 60 s |
+| `GET /api/session` | token | `{ crew, expiresAt }` |
+| `DELETE /api/session` | token | `204`, and the token stops working |
+
+- The session lasts 12 h, and restarting the server ends every session.
+- Keep the token in `sessionStorage`.
+- On any `401`, go back to the sign-in screen.
+- Each person's data is separate: Mateo's token never sees Sara's data.
+
+### Consent and the Medical Officer view (E05)
+
+| Call | Who | Body | Answer |
+|---|---|---|---|
+| `GET /api/consent` | signed in | — | `{ shareWithMedicalOfficer, accessLog: [{ viewerId, viewerName, at }] }` |
+| `PUT /api/consent` | signed in | `{ shareWithMedicalOfficer: boolean }` | same as `GET` |
+| `GET /api/crew/overview` | Medical Officer only (others get `403 forbidden`) | — | `{ missionDay, crew: [{ id, name, role, shared, summary }] }` |
+
+- `summary` is `null` unless that crewmate shared. When shared, it holds `{ missionDay, lastCheckinDay, reaction (Status), bpCategory, primaryCard: { id, title, severity }, nextDue }`. It never contains raw trials, readings, notes or coach questions.
+- Every overview read adds `{ viewerId, viewerName, at }` to each shown crewmate's `accessLog`.
+- Sharing is off by default.
+
+### Real astronaut data (E02, public)
+
+| Call | Query | Answer |
+|---|---|---|
+| `GET /api/nasa/osd-569` | — | `{ study: "OSD-569", title, url, citation, crew: ["C001".."C004"], analytes: [{ key, label, unit }], timepoints: [{ label, relativeDay }] }` |
+| `GET /api/nasa/osd-569/trend` | `crew=C001&analyte=<key>` | a `Trend`, the same shape as `GET /api/trends` |
+
+- `missionDay` is the day relative to launch: negative before launch, and after return counted from launch.
+- `band` is the personal baseline from the pre-launch samples.
+- `referenceRange` is the lab's normal range.
+- An unknown crew id or analyte gets `400 invalid_input`.
+
 ## Changes
 
 - **2026-11-14 (P2 Should pass):** Implemented `S01`–`S05` endpoints, added `metronomeBpm` to `ProcedureStep`, populated `Today.nextDue`, and updated `contract/schemas.json`.

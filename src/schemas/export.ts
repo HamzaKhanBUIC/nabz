@@ -16,6 +16,7 @@ export function buildContractJson(): JsonSchema {
     endpoints[`${e.method} ${e.path}`] = {
       id: e.id,
       tier: e.tier,
+      access: e.access ?? "public",
       status: e.status,
       ...(e.query ? { query: toJson(e.query, "input") } : {}),
       ...(e.request ? { request: toJson(e.request, "input") } : {}),
