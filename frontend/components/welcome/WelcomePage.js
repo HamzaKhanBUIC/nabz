@@ -135,6 +135,7 @@ function Header() {
         </Link>
         <nav aria-label="Sections" className="hidden items-center gap-8 text-[15px] text-white/70 md:flex">
           {[
+            ["#missions", "Missions"],
             ["#features", "Features"],
             ["#demo", "Demo"],
             ["#rules", "Rules"],
@@ -172,21 +173,16 @@ function Countdown() {
     }, 1000);
     return () => clearInterval(id);
   }, []);
+  // The page's one live thing: a 22-minute radio delay counting down from the moment you arrived.
   return (
-    <div className="flex items-start gap-3 text-[15px] leading-6 text-white/75">
-      <span className="relative mt-[7px] flex h-2.5 w-2.5 shrink-0" aria-hidden>
-        <span className="absolute inset-0 rounded-full bg-[#4D8DFF] welcome-ping" />
-        <span className="relative h-2.5 w-2.5 rounded-full bg-[#4D8DFF]" />
-      </span>
-      <p className="max-w-[30ch]">
-        {left > 0 ? (
-          <>
-            Send a message from Mars now and it reaches Earth in{" "}
-            <span className="font-semibold tabular-nums text-white">{fmt(left)}</span>.
-          </>
-        ) : (
-          <>That message just reached Earth. The reply takes another 22 minutes.</>
-        )}
+    <div className="lg:text-right">
+      <p className="text-[clamp(56px,6.5vw,104px)] font-semibold leading-none tracking-[-0.045em] tabular-nums text-[#7ea6ff]">
+        {fmt(left)}
+      </p>
+      <p className="mt-3 max-w-[26ch] text-[15px] leading-[1.45] text-white/70 lg:ml-auto">
+        {left > 0
+          ? "Until a message sent from Mars as you arrived reaches Earth."
+          : "That message just reached Earth. The reply takes another 22 minutes."}
       </p>
     </div>
   );
@@ -220,7 +216,8 @@ function Hero() {
           style={{ left: `${DOT_X}%`, top: `${DOT_Y}%` }}
           aria-hidden
         >
-          <span className="block h-16 w-16 rounded-full border-2 border-[#4D8DFF] welcome-ping" />
+          <span className="block h-12 w-12 rounded-full border-2 border-[#4D8DFF]" />
+          <span className="absolute inset-0 rounded-full border-2 border-[#4D8DFF] welcome-ping" />
           <motion.span
             className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap text-[14px] font-medium text-white/85"
             initial={{ opacity: 0 }}
@@ -232,40 +229,47 @@ function Hero() {
         </div>
       </motion.div>
 
-      <div className={`${WRAP} w-full pb-12 sm:pb-16`}>
-        <Lines
-          as="h1"
-          id="hero-h"
-          onView={false}
-          delay={0.3}
-          className="text-[clamp(56px,11.5vw,184px)] font-semibold leading-[0.9] tracking-[-0.055em]"
-          lines={[
-            "That dot",
-            <>
-              is <Soft>Earth.</Soft>
-            </>,
-          ]}
-        />
+      {/* One block on the left (headline, sentence, action), the live clock on the right. */}
+      <div className={`${WRAP} grid w-full gap-12 pb-12 sm:pb-16 lg:grid-cols-12 lg:items-end`}>
+        <div className="lg:col-span-8">
+          <Lines
+            as="h1"
+            id="hero-h"
+            onView={false}
+            delay={0.3}
+            className="text-[clamp(56px,11.5vw,184px)] font-semibold leading-[0.9] tracking-[-0.055em]"
+            lines={[
+              "That dot",
+              <>
+                is <Soft>Earth.</Soft>
+              </>,
+            ]}
+          />
+          <motion.div
+            initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.6 }}
+          >
+            <p className="mt-8 max-w-[30ch] text-[clamp(20px,1.7vw,24px)] leading-[1.4] tracking-[-0.015em] text-white/85">
+              The nearest doctor is up to 22 minutes away by radio. Nabz keeps the crew&apos;s health checks on board.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <Btn href="#demo" tone="blue">
+                Watch Sara&apos;s day
+              </Btn>
+              <Link href="/sign-in" className="text-[16px] font-medium text-white/80 underline-offset-4 transition-colors hover:text-white hover:underline">
+                {IS_DEMO_BUILD ? "Or try it as Sara, code 4120" : "Or open the app"}
+              </Link>
+            </div>
+          </motion.div>
+        </div>
         <motion.div
-          className="mt-10 grid gap-8 lg:grid-cols-12 lg:items-end"
+          className="lg:col-span-4"
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE, delay: 0.6 }}
+          transition={{ duration: 0.6, ease: EASE, delay: 0.75 }}
         >
-          <p className={`max-w-[32ch] text-white lg:col-span-5 ${LEAD} sm:text-[21px]`}>
-            The nearest doctor is up to 22 minutes away by radio. Nabz keeps the crew&apos;s health checks on board.
-          </p>
-          <div className="flex flex-wrap items-start gap-3 lg:col-span-4">
-            <Btn href="#demo" tone="blue">
-              Watch Sara&apos;s day
-            </Btn>
-            <Btn href="/sign-in" tone="dark">
-              {IS_DEMO_BUILD ? "Try it: Sara, 4120" : "Open the app"}
-            </Btn>
-          </div>
-          <div className="lg:col-span-3">
-            <Countdown />
-          </div>
+          <Countdown />
         </motion.div>
       </div>
     </section>
@@ -275,7 +279,7 @@ function Hero() {
 /* ---------------------------------------------------------------- story */
 
 const BEATS = [
-  { min: 0, img: "s-today", alt: "Nabz Today screen for Sara, day 120 of the Mars transit.", t: "Day 120. Sara opens her check-in." },
+  { min: 0, img: "s-today", alt: "Nabz Today screen for Sara, day 120 of the Mars transit.", t: "Mars transit, day 120. Sara opens her check-in." },
   { min: 3, img: "s-checkin", alt: "Check-in result: slower than your personal normal.", t: "She's slower than her own normal." },
   { min: 5, img: "s-bp-typed", alt: "Blood pressure form with 186 over 122 entered.", t: "Her blood pressure reads 186/122." },
   { min: 6, img: "s-bp-card", alt: "Card: very high reading, measure again. Act now with the crew medical officer.", t: "Nabz: measure again, get the medical officer." },
@@ -301,7 +305,7 @@ function Story() {
         <div className={`${WRAP} w-full`}>
           <div className="relative" aria-hidden>
             <div className="flex items-center justify-between gap-3 text-[15px] font-medium text-white/60">
-              <span>Mars</span>
+              <span>Mars transit</span>
               <span className="text-center tabular-nums text-white">
                 {b.min < DELAY_MAX_MIN ? `Message to Earth: ${b.min} of ${DELAY_MAX_MIN} min` : "Message reaches Earth"}
               </span>
@@ -378,6 +382,133 @@ function Story() {
   );
 }
 
+/* ---------------------------------------------------------------- missions */
+
+// Copied from content/environments.json (each line has its sources there). Display text only.
+const MISSIONS = [
+  {
+    name: "Space station",
+    delay: "Under 1 s",
+    care: "Flight surgeon in Mission Control",
+    worse: "Evacuation in 1.5 to 36 h",
+    gravity: "Microgravity",
+    gaps: "None",
+    says: "Contact the flight surgeon in Mission Control now.",
+  },
+  {
+    name: "Moon",
+    delay: "About 1.3 s",
+    care: "Crew, with the flight surgeon when linked",
+    worse: "Return to Earth in 72 to 144 h",
+    gravity: "1/6 g",
+    gaps: "No direct link from the far side and parts of the South Pole.",
+    says: "Call the flight surgeon if linked; if not, act now.",
+  },
+  {
+    name: "Mars transit",
+    delay: "3 to 22 min",
+    care: "Crew medical officer on board",
+    worse: "No evacuation",
+    gravity: "Microgravity",
+    gaps: "About 2 to 3 weeks at solar conjunction, every 26 months or so.",
+    says: "Act now with the crew medical officer; tell Earth after.",
+    story: true,
+  },
+  {
+    name: "Mars surface",
+    delay: "3 to 22 min",
+    care: "Crew medical officer on board",
+    worse: "No evacuation",
+    gravity: "0.38 g",
+    gaps: "No line of sight to Earth for about 12 h a day, plus solar conjunction.",
+    says: "Act now with the crew medical officer; queue a message for Earth.",
+  },
+  {
+    name: "Concordia, Antarctica",
+    delay: "Satellite link only",
+    care: "Station doctor",
+    worse: "No evacuation for about 9 months of winter",
+    gravity: "1 g",
+    gaps: "Satellite phone and internet are the only links.",
+    says: "Alert the station doctor now.",
+  },
+];
+
+function Missions() {
+  const [sel, setSel] = useState(2);
+  const m = MISSIONS[sel];
+  const facts = [
+    ["Who leads care", m.care],
+    ["If it gets worse", m.worse],
+    ["Gravity", m.gravity],
+    ["Contact gaps", m.gaps],
+  ];
+  return (
+    <section id="missions" aria-labelledby="missions-h" className={PAD} style={{ background: C.cabin, color: C.cabinInk }}>
+      <div className={WRAP}>
+        <div className="grid gap-8 lg:grid-cols-12">
+          <Lines id="missions-h" className={`${H2} lg:col-span-8`} lines={["Five missions.", <Soft key="s">One app.</Soft>]} />
+          <Rise i={1} as="p" className={`max-w-[30ch] self-end text-[#45474d] lg:col-span-4 ${LEAD}`}>
+            Pick where the crew is. The delay, who to call and the first step change with it.
+          </Rise>
+        </div>
+
+        <Rise className="mt-14 grid gap-4 lg:grid-cols-12">
+          <div role="tablist" aria-label="Missions" className="flex flex-wrap gap-2 lg:col-span-4 lg:flex-col lg:gap-1.5">
+            {MISSIONS.map((x, k) => (
+              <button
+                key={x.name}
+                type="button"
+                role="tab"
+                id={`mission-tab-${k}`}
+                aria-selected={k === sel}
+                aria-controls="mission-panel"
+                onClick={() => setSel(k)}
+                className={`rounded-[16px] px-4 py-3 text-left transition-colors duration-300 lg:px-5 lg:py-4 ${
+                  k === sel ? "bg-[#121316] text-white" : "bg-[#f6f5f3] text-[#121316] hover:bg-white"
+                }`}
+              >
+                <span className="block text-[17px] font-semibold tracking-[-0.015em]">{x.name}</span>
+                <span className={`block text-[14px] ${k === sel ? "text-white/65" : "text-[#5a5c62]"}`}>{x.delay} to Earth</span>
+              </button>
+            ))}
+          </div>
+
+          <div
+            role="tabpanel"
+            id="mission-panel"
+            aria-labelledby={`mission-tab-${sel}`}
+            className="rounded-[24px] bg-[#121316] p-7 text-white sm:p-10 lg:col-span-8"
+          >
+            <motion.div key={sel} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE }}>
+              <div className="flex flex-wrap items-end justify-between gap-6">
+                <div>
+                  <p className="text-[15px] text-white/60">One-way message to Earth</p>
+                  <p className="mt-1 text-[clamp(40px,5vw,72px)] font-semibold leading-none tracking-[-0.04em] text-[#7ea6ff]">{m.delay}</p>
+                </div>
+                <p className="text-[clamp(24px,2.2vw,32px)] font-semibold tracking-[-0.03em]">{m.name}</p>
+              </div>
+              <dl className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+                {facts.map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="text-[14px] text-white/55">{k}</dt>
+                    <dd className="mt-1 text-[17px] leading-[1.4]">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-10 rounded-[16px] bg-[#4D8DFF] p-6 text-[#08090b]">
+                <p className="text-[14px] font-medium opacity-75">What Nabz tells the crew</p>
+                <p className="mt-1 text-[clamp(20px,1.8vw,26px)] font-semibold leading-[1.25] tracking-[-0.02em]">{m.says}</p>
+              </div>
+              {m.story ? <p className="mt-5 text-[14px] text-white/55">Sara&apos;s story above runs on this mission.</p> : null}
+            </motion.div>
+          </div>
+        </Rise>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------------------------------------------------------- features */
 
 // Every tile is a real screen from the app as Sara sees it.
@@ -395,7 +526,7 @@ const FEATURES = [
 
 function Features() {
   return (
-    <section id="features" aria-labelledby="feat-h" className={PAD} style={{ background: C.cabin, color: C.cabinInk }}>
+    <section id="features" aria-labelledby="feat-h" className={PAD} style={{ background: C.space }}>
       <div className={WRAP}>
         <div className="grid gap-8 lg:grid-cols-12">
           <Lines
@@ -408,14 +539,14 @@ function Features() {
               </>,
             ]}
           />
-          <Rise i={1} as="p" className={`max-w-[30ch] self-end text-[#45474d] lg:col-span-4 ${LEAD}`}>
+          <Rise i={1} as="p" className={`max-w-[30ch] self-end text-white/70 lg:col-span-4 ${LEAD}`}>
             Nine tools, all working without Earth.
           </Rise>
         </div>
         <div className="mt-14 grid gap-4 lg:grid-cols-12">
           {FEATURES.map((f, k) => (
             <Rise key={f.tag} i={k % 3} className={`group ${f.span}`}>
-              <article className="flex h-full flex-col overflow-hidden rounded-[24px] bg-[#f6f5f3]">
+              <article className="flex h-full flex-col overflow-hidden rounded-[24px] bg-[#f6f5f3] text-[#121316]">
                 <div className="px-6 pt-6 sm:px-8 sm:pt-8">
                   <p className="text-[14px] font-medium text-[#1d4fc4]">{f.tag}</p>
                   <h3 className="mt-2 text-[clamp(24px,2.2vw,32px)] font-semibold leading-[1.08] tracking-[-0.03em]">{f.h}</h3>
@@ -707,6 +838,7 @@ export default function WelcomePage() {
       <Hero />
       <main>
         <Story />
+        <Missions />
         <Features />
         <Demo />
         <Rules />
