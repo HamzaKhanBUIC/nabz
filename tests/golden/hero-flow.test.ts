@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
-import { createApp } from "../../src/api/app";
+import { SARA_AUTH, createApp } from "../helpers/app";
 import {
   CheckinResponse,
   BpMeasurement,
@@ -62,7 +62,7 @@ describe("F09 offline hero flow golden suite", () => {
     const app = createApp({ runtimeDir, pinnedNow: "2026-11-15T08:00:00+00:00" });
 
     // 1. Before check-in, today has no card
-    const beforeTodayRes = await request(app).get("/api/today");
+    const beforeTodayRes = await request(app).get("/api/today").set(SARA_AUTH);
     expect(beforeTodayRes.status).toBe(200);
     const beforeToday = Today.parse(beforeTodayRes.body);
     expect(beforeToday.missionDay).toBe(120);
@@ -70,7 +70,7 @@ describe("F09 offline hero flow golden suite", () => {
     expect(beforeToday.checkin).toBeNull();
 
     // 2. Sara submits day-120 PVT-B check-in after short sleep
-    const checkinRes = await request(app).post("/api/checkins").send({
+    const checkinRes = await request(app).post("/api/checkins").set(SARA_AUTH).send({
       protocolId: "pvt-b-3min",
       startedAt: day120Fixture.checkin!.startedAt,
       sleepHours: day120Fixture.sleepHours,
@@ -85,7 +85,7 @@ describe("F09 offline hero flow golden suite", () => {
     expect(postedCheckin.card.sources.length).toBeGreaterThanOrEqual(1);
 
     // 3. Trend chart shows day 120 dropping below her personal act band
-    const trendRes = await request(app).get("/api/trends?code=reaction-speed&days=30");
+    const trendRes = await request(app).get("/api/trends?code=reaction-speed&days=30").set(SARA_AUTH);
     expect(trendRes.status).toBe(200);
     const trend = Trend.parse(trendRes.body);
     const lastPoint = trend.points[trend.points.length - 1]!;
@@ -95,7 +95,7 @@ describe("F09 offline hero flow golden suite", () => {
     expect(lastPoint.value).toBeLessThanOrEqual(trend.band.actAt!);
 
     // 4. Sara logs a severe BP reading -> 5-minute retest action
-    const bpRes = await request(app).post("/api/measurements/bp").send({
+    const bpRes = await request(app).post("/api/measurements/bp").set(SARA_AUTH).send({
       takenAt: "2026-11-15T08:20:00+00:00",
       readings: [
         { systolic: 184, diastolic: 118 },
@@ -111,18 +111,18 @@ describe("F09 offline hero flow golden suite", () => {
     expect(postedBp.card.facts.retestMinutes).toBe(5);
 
     // 5. Today reflects both cards; emergency bundle and single procedure are served offline
-    const afterTodayRes = await request(app).get("/api/today");
+    const afterTodayRes = await request(app).get("/api/today").set(SARA_AUTH);
     expect(afterTodayRes.status).toBe(200);
     const afterToday = Today.parse(afterTodayRes.body);
     expect(afterToday.checkin?.id).toBe(postedCheckin.id);
     expect(afterToday.bp?.id).toBe(postedBp.id);
     expect(afterToday.cards.length).toBe(2);
 
-    const bundleRes = await request(app).get("/api/emergency/procedures");
+    const bundleRes = await request(app).get("/api/emergency/procedures").set(SARA_AUTH);
     expect(bundleRes.status).toBe(200);
     expect(ProcedureBundle.parse(bundleRes.body).procedures.length).toBe(5);
 
-    const eyeRes = await request(app).get("/api/emergency/procedures/eye");
+    const eyeRes = await request(app).get("/api/emergency/procedures/eye").set(SARA_AUTH);
     expect(eyeRes.status).toBe(200);
     const eyeProc = Procedure.parse(eyeRes.body);
     expect(eyeProc.steps.map((s) => s.text).join(" ")).toContain("15 minutes");

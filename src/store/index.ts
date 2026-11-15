@@ -23,6 +23,7 @@ import {
   type ShareSleepRecord,
 } from "../core";
 import type {
+  AccessLogEntry,
   BpGuide,
   BpInput,
   BpMeasurement,
@@ -30,6 +31,8 @@ import type {
   CheckinResponse,
   CoachAskInput,
   CoachAskResponse,
+  ConsentResponse,
+  CrewHealthSummary,
   Mission,
   Procedure,
   ProcedureBundle,
@@ -83,7 +86,15 @@ export interface CrewPulseStore {
   previewShare(input: SharePreviewInput): SharePackagePreview;
   createSharePackage(input: ShareSendInput): ShareQueuedPackage;
   askCoach(input: CoachAskInput): Promise<CoachAskResponse | null>;
+  /** E05 */
+  getConsent(): ConsentResponse;
+  setConsent(share: boolean): ConsentResponse;
+  recordAccess(entry: AccessLogEntry): void;
+  getHealthSummary(): CrewHealthSummary;
 }
+
+/** E05 design choice: keep the newest 200 access-log entries per person. */
+const ACCESS_LOG_MAX = 200;
 
 function resolveTrendSource(sources: readonly ("simulated" | "live")[]): Trend["source"] {
   let hasSim = false;
@@ -483,6 +494,44 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
       return {
         version: content.routinesVersion,
         routines: content.routines,
+      };
+    },
+
+    getConsent(): ConsentResponse {
+      const runtime = loadRuntime();
+      return {
+        shareWithMedicalOfficer: runtime.consent?.shareWithMedicalOfficer ?? false,
+        accessLog: runtime.accessLog ?? [],
+      };
+    },
+
+    setConsent(share: boolean): ConsentResponse {
+      const runtime = loadRuntime();
+      runtime.consent = { shareWithMedicalOfficer: share };
+      saveRuntimeFile(runtimeDir, subjectId, runtime);
+      return { shareWithMedicalOfficer: share, accessLog: runtime.accessLog ?? [] };
+    },
+
+    recordAccess(entry: AccessLogEntry): void {
+      const runtime = loadRuntime();
+      runtime.accessLog = [...(runtime.accessLog ?? []), entry].slice(-ACCESS_LOG_MAX);
+      saveRuntimeFile(runtimeDir, subjectId, runtime);
+    },
+
+    getHealthSummary(): CrewHealthSummary {
+      const todayDay = getCurrentMissionDay();
+      const runtime = loadRuntime();
+      const { primaryCard } = getTodayCards(runtime, todayDay);
+      const due = nextDue(buildReminderContext(runtime), runtime.reminders ?? DEFAULT_REMINDER_SCHEDULE);
+      const lastCheckin = getAllCheckins().at(-1) ?? null;
+      const lastBp = getAllBp().at(-1) ?? null;
+      return {
+        missionDay: todayDay,
+        lastCheckinDay: lastCheckin?.missionDay ?? null,
+        reaction: lastCheckin?.zone.status ?? null,
+        bpCategory: lastBp?.category ?? null,
+        primaryCard: primaryCard ? { id: primaryCard.id, title: primaryCard.title, severity: primaryCard.severity } : null,
+        nextDue: due,
       };
     },
 

@@ -1,0 +1,144 @@
+{
+  "study": "OSD-569",
+  "title": "SpaceX Inspiration4 crew: complete blood count (whole blood)",
+  "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-569",
+  "citation": "NASA Open Science Data Repository, study OSD-569 (SpaceX Inspiration4), file LSDS-7_Complete_Blood_Count_CBC_TRANSFORMED.csv",
+  "crew": [
+    "C001",
+    "C002",
+    "C003",
+    "C004"
+  ],
+  "analytes": [
+    {
+      "key": "absolute_basophils",
+      "label": "Absolute basophils",
+      "unit": "cells/uL"
+    },
+    {
+      "key": "absolute_eosinophils",
+      "label": "Absolute eosinophils",
+      "unit": "cells/uL"
+    },
+    {
+      "key": "absolute_lymphocytes",
+      "label": "Absolute lymphocytes",
+      "unit": "cells/uL"
+    },
+    {
+      "key": "absolute_monocytes",
+      "label": "Absolute monocytes",
+      "unit": "cells/uL"
+    },
+    {
+      "key": "absolute_neutrophils",
+      "label": "Absolute neutrophils",
+      "unit": "cells/uL"
+    },
+    {
+      "key": "basophils",
+      "label": "Basophils",
+      "unit": "%"
+    },
+    {
+      "key": "eosinophils",
+      "label": "Eosinophils",
+      "unit": "%"
+    },
+    {
+      "key": "hematocrit",
+      "label": "Hematocrit",
+      "unit": "%"
+    },
+    {
+      "key": "hemoglobin",
+      "label": "Hemoglobin",
+      "unit": "%"
+    },
+    {
+      "key": "lymphocytes",
+      "label": "Lymphocytes",
+      "unit": "%"
+    },
+    {
+      "key": "mch",
+      "label": "MCH",
+      "unit": "pg"
+    },
+    {
+      "key": "mchc",
+      "label": "MCHC",
+      "unit": "g/dL"
+    },
+    {
+      "key": "mcv",
+      "label": "MCV",
+      "unit": "fL"
+    },
+    {
+      "key": "monocytes",
+      "label": "Monocytes",
+      "unit": "%"
+    },
+    {
+      "key": "mpv",
+      "label": "MPV",
+      "unit": "fL"
+    },
+    {
+      "key": "neutrophils",
+      "label": "Neutrophils",
+      "unit": "%"
+    },
+    {
+      "key": "platelet_count",
+      "label": "Platelet count",
+      "unit": "10^3/uL"
+    },
+    {
+      "key": "rdw",
+      "label": "RDW",
+      "unit": "%"
+    },
+    {
+      "key": "red_blood_cell_count",
+      "label": "Red blood cell count",
+      "unit": "10^6/uL"
+    },
+    {
+      "key": "white_blood_cell_count",
+      "label": "White blood cell count",
+      "unit": "10^3/uL"
+    }
+  ],
+  "timepoints": [
+    {
+      "label": "L-92",
+      "relativeDay": -92
+    },
+    {
+      "label": "L-44",
+      "relativeDay": -44
+    },
+    {
+      "label": "L-3",
+      "relativeDay": -3
+    },
+    {
+      "label": "R+1",
+      "relativeDay": 1
+    },
+    {
+      "label": "R+45",
+      "relativeDay": 45
+    },
+    {
+      "label": "R+82",
+      "relativeDay": 82
+    },
+    {
+      "label": "R+194",
+      "relativeDay": 194
+    }
+  ]
+}

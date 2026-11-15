@@ -1,0 +1,82 @@
+{
+  "code": "hemoglobin",
+  "unit": "%",
+  "subjectId": "C001",
+  "source": "nasa-osd-569",
+  "points": [
+    {
+      "missionDay": -92,
+      "effectiveDateTime": "2021-06-16T08:00:00+00:00",
+      "value": 14.1,
+      "z": null,
+      "zone": "building",
+      "baselineMean": null,
+      "baselineSd": null
+    },
+    {
+      "missionDay": -44,
+      "effectiveDateTime": "2021-08-03T08:00:00+00:00",
+      "value": 14.9,
+      "z": null,
+      "zone": "building",
+      "baselineMean": null,
+      "baselineSd": null
+    },
+    {
+      "missionDay": -3,
+      "effectiveDateTime": "2021-09-13T08:00:00+00:00",
+      "value": 14.7,
+      "z": null,
+      "zone": "building",
+      "baselineMean": null,
+      "baselineSd": null
+    },
+    {
+      "missionDay": 1,
+      "effectiveDateTime": "2021-09-17T08:00:00+00:00",
+      "value": 14.7,
+      "z": 0.3203,
+      "zone": "in_zone",
+      "baselineMean": 14.5667,
+      "baselineSd": 0.4163
+    },
+    {
+      "missionDay": 45,
+      "effectiveDateTime": "2021-10-31T08:00:00+00:00",
+      "value": 14.3,
+      "z": -0.866,
+      "zone": "in_zone",
+      "baselineMean": 14.6,
+      "baselineSd": 0.3464
+    },
+    {
+      "missionDay": 82,
+      "effectiveDateTime": "2021-12-07T08:00:00+00:00",
+      "value": 15.7,
+      "z": 3.5298,
+      "zone": "watch",
+      "baselineMean": 14.54,
+      "baselineSd": 0.3286
+    },
+    {
+      "missionDay": 194,
+      "effectiveDateTime": "2022-03-29T08:00:00+00:00",
+      "value": 14.1,
+      "z": -1.1363,
+      "zone": "in_zone",
+      "baselineMean": 14.7333,
+      "baselineSd": 0.5574
+    }
+  ],
+  "band": {
+    "ready": true,
+    "mean": 14.7333,
+    "sd": 0.5574,
+    "watchAt": 15.5694,
+    "actAt": null
+  },
+  "referenceRange": {
+    "low": 13.2,
+    "high": 17.1
+  }
+}

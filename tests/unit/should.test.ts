@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
-import { createApp } from "../../src/api/app";
+import { SARA_AUTH, createApp } from "../helpers/app";
 import { createStore } from "../../src/store";
 import {
   COACH_NO_SOURCE_REPLY,
@@ -52,11 +52,11 @@ describe("S01 crewmate emergency procedures (?for=crewmate)", () => {
   it("serves all 4 crewmate procedures with CHECKS.md R8 wording and metronome", async () => {
     const app = createApp({ runtimeDir: makeTempDir(), pinnedNow: NOW });
 
-    const selfRes = await request(app).get("/api/emergency/procedures?for=self");
+    const selfRes = await request(app).get("/api/emergency/procedures?for=self").set(SARA_AUTH);
     expect(selfRes.status).toBe(200);
     expect(ProcedureBundle.parse(selfRes.body).procedures).toHaveLength(5);
 
-    const crewRes = await request(app).get("/api/emergency/procedures?for=crewmate");
+    const crewRes = await request(app).get("/api/emergency/procedures?for=crewmate").set(SARA_AUTH);
     expect(crewRes.status).toBe(200);
     const bundle = ProcedureBundle.parse(crewRes.body);
     expect(bundle.procedures.map((p) => p.id)).toEqual([
@@ -105,7 +105,7 @@ describe("S02 deterministic offline-first AI coach", () => {
     const app = createApp({ runtimeDir: makeTempDir(), pinnedNow: NOW });
     const d120 = day120Fixture();
 
-    const chkRes = await request(app).post("/api/checkins").send({
+    const chkRes = await request(app).post("/api/checkins").set(SARA_AUTH).send({
       protocolId: "pvt-b-3min",
       startedAt: d120.checkin!.startedAt,
       sleepHours: d120.sleepHours,
@@ -113,10 +113,10 @@ describe("S02 deterministic offline-first AI coach", () => {
     });
     expect(chkRes.status).toBe(201);
 
-    const todayBefore = Today.parse((await request(app).get("/api/today")).body);
+    const todayBefore = Today.parse((await request(app).get("/api/today").set(SARA_AUTH)).body);
 
     // 1. Grounded follow-up questions on active card
-    const whyRes = await request(app).post("/api/coach/ask").send({
+    const whyRes = await request(app).post("/api/coach/ask").set(SARA_AUTH).send({
       question: "Why is my reaction slower?",
     });
     expect(whyRes.status).toBe(200);
@@ -130,14 +130,14 @@ describe("S02 deterministic offline-first AI coach", () => {
     expect(whyReply.answer).toContain(String(d120.sleepHours));
     expect(whyReply.disclaimer).toBe(DISCLAIMER);
 
-    const worseRes = await request(app).post("/api/coach/ask").send({
+    const worseRes = await request(app).post("/api/coach/ask").set(SARA_AUTH).send({
       question: "What if it gets worse?",
     });
     const worseReply = CoachAskResponse.parse(worseRes.body);
     expect(worseReply.grounded).toBe(true);
     expect(worseReply.answer).toContain("3 consecutive days");
 
-    const earthRes = await request(app).post("/api/coach/ask").send({
+    const earthRes = await request(app).post("/api/coach/ask").set(SARA_AUTH).send({
       question: "Should I tell Earth?",
     });
     const earthReply = CoachAskResponse.parse(earthRes.body);
@@ -150,7 +150,7 @@ describe("S02 deterministic offline-first AI coach", () => {
       "What antibiotics treat pneumonia?",
       "How do I bake sourdough bread?",
     ]) {
-      const oosRes = await request(app).post("/api/coach/ask").send({ question: outOfScope });
+      const oosRes = await request(app).post("/api/coach/ask").set(SARA_AUTH).send({ question: outOfScope });
       expect(oosRes.status).toBe(200);
       const oosReply = CoachAskResponse.parse(oosRes.body);
       expect(oosReply.grounded).toBe(false);
@@ -164,7 +164,7 @@ describe("S02 deterministic offline-first AI coach", () => {
       "I have chest pain and shortness of breath",
       "What if I am fainting?",
     ]) {
-      const rfRes = await request(app).post("/api/coach/ask").send({ question: redFlagQ });
+      const rfRes = await request(app).post("/api/coach/ask").set(SARA_AUTH).send({ question: redFlagQ });
       expect(rfRes.status).toBe(200);
       const rfReply = CoachAskResponse.parse(rfRes.body);
       expect(rfReply.banner).toEqual({
@@ -175,14 +175,14 @@ describe("S02 deterministic offline-first AI coach", () => {
     }
 
     // 4. Explicit missing cardId returns 404; coach never alters today's card state
-    const missingCard = await request(app).post("/api/coach/ask").send({
+    const missingCard = await request(app).post("/api/coach/ask").set(SARA_AUTH).send({
       question: "Why is my reaction slower?",
       cardId: "nonexistent-card",
     });
     expect(missingCard.status).toBe(404);
     expect(ErrorBody.parse(missingCard.body).error.code).toBe("not_found");
 
-    const todayAfter = Today.parse((await request(app).get("/api/today")).body);
+    const todayAfter = Today.parse((await request(app).get("/api/today").set(SARA_AUTH)).body);
     expect(todayAfter).toEqual(todayBefore);
 
     // 5. Optional Ollama provider safely abstains offline and falls back deterministically when unreachable
@@ -199,7 +199,7 @@ describe("S02 deterministic offline-first AI coach", () => {
     const offlineOos = CoachAskResponse.parse(
       (
         await request(ollamaApp)
-          .post("/api/coach/ask")
+          .post("/api/coach/ask").set(SARA_AUTH)
           .send({ question: "Can I take ibuprofen?" })
       ).body,
     );
@@ -210,7 +210,7 @@ describe("S02 deterministic offline-first AI coach", () => {
     const offlineFallback = CoachAskResponse.parse(
       (
         await request(ollamaApp)
-          .post("/api/coach/ask")
+          .post("/api/coach/ask").set(SARA_AUTH)
           .send({ question: "What should I do today?" })
       ).body,
     );
@@ -222,7 +222,7 @@ describe("S02 deterministic offline-first AI coach", () => {
 describe("S03 health routines", () => {
   it("serves hands, tension and blood-pressure routines and resolves card routineId links", async () => {
     const app = createApp({ runtimeDir: makeTempDir(), pinnedNow: NOW });
-    const res = await request(app).get("/api/routines");
+    const res = await request(app).get("/api/routines").set(SARA_AUTH);
     expect(res.status).toBe(200);
     const bundle = RoutineBundle.parse(res.body);
 
@@ -237,7 +237,7 @@ describe("S03 health routines", () => {
 
     // Day-120 short sleep card links directly to tension-winddown
     const d120 = day120Fixture();
-    const chkRes = await request(app).post("/api/checkins").send({
+    const chkRes = await request(app).post("/api/checkins").set(SARA_AUTH).send({
       protocolId: "pvt-b-3min",
       startedAt: d120.checkin!.startedAt,
       sleepHours: d120.sleepHours,
@@ -254,7 +254,7 @@ describe("S04 send to Earth (preview + confirmed outbox)", () => {
     const app = createApp({ runtimeDir, pinnedNow: NOW });
     const d120 = day120Fixture();
 
-    await request(app).post("/api/checkins").send({
+    await request(app).post("/api/checkins").set(SARA_AUTH).send({
       protocolId: "pvt-b-3min",
       startedAt: d120.checkin!.startedAt,
       sleepHours: d120.sleepHours,
@@ -262,7 +262,7 @@ describe("S04 send to Earth (preview + confirmed outbox)", () => {
     });
 
     // Preview with only reaction + note (sleep, bp, cards unchecked)
-    const previewRes = await request(app).post("/api/share/preview").send({
+    const previewRes = await request(app).post("/api/share/preview").set(SARA_AUTH).send({
       includeReaction: true,
       includeSleep: false,
       includeBp: false,
@@ -280,14 +280,14 @@ describe("S04 send to Earth (preview + confirmed outbox)", () => {
     expect(preview.disclaimer).toBe(DISCLAIMER);
 
     // Confirm: false must fail strict schema check
-    const unconfirmed = await request(app).post("/api/share").send({
+    const unconfirmed = await request(app).post("/api/share").set(SARA_AUTH).send({
       includeReaction: true,
       confirm: false,
     });
     expect(unconfirmed.status).toBe(400);
 
     // Confirm: true queues packet in local runtime file
-    const sendRes = await request(app).post("/api/share").send({
+    const sendRes = await request(app).post("/api/share").set(SARA_AUTH).send({
       includeReaction: true,
       includeSleep: true,
       includeBp: false,
@@ -329,16 +329,16 @@ describe("S05 check-up reminders", () => {
     expect(afterCheckin).toBe("2026-11-16T08:00:00+00:00");
 
     const app = createApp({ runtimeDir: makeTempDir(), pinnedNow: NOW });
-    const remRes = await request(app).get("/api/reminders");
+    const remRes = await request(app).get("/api/reminders").set(SARA_AUTH);
     expect(remRes.status).toBe(200);
     const initial = RemindersResponse.parse(remRes.body);
     expect(initial.nextDue).not.toBeNull();
 
-    const todayBefore = Today.parse((await request(app).get("/api/today")).body);
+    const todayBefore = Today.parse((await request(app).get("/api/today").set(SARA_AUTH)).body);
     expect(todayBefore.nextDue).toBe(initial.nextDue);
 
     // Disable reminders -> nextDue becomes null everywhere
-    const putRes = await request(app).put("/api/reminders").send({
+    const putRes = await request(app).put("/api/reminders").set(SARA_AUTH).send({
       enabled: false,
       checkinTimeUtc: "09:00",
       bpIntervalDays: 5,
@@ -348,11 +348,11 @@ describe("S05 check-up reminders", () => {
     const updated = RemindersResponse.parse(putRes.body);
     expect(updated.nextDue).toBeNull();
 
-    const todayAfter = Today.parse((await request(app).get("/api/today")).body);
+    const todayAfter = Today.parse((await request(app).get("/api/today").set(SARA_AUTH)).body);
     expect(todayAfter.nextDue).toBeNull();
 
     // Reject bad time format
-    const badPut = await request(app).put("/api/reminders").send({
+    const badPut = await request(app).put("/api/reminders").set(SARA_AUTH).send({
       enabled: true,
       checkinTimeUtc: "25:99",
       bpIntervalDays: 3,

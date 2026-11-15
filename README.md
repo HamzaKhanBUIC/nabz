@@ -24,6 +24,19 @@ Optional environment variables:
 - `NEXT_PUBLIC_DEMO=1` (frontend, at build time): shows a demo button on the check-in screen that submits a made-up 64-trial session instead of real taps. Leave it unset for real use.
 - `MISSION_NOW` — ISO-8601 clock override (default `2026-11-15T08:00:00+00:00`, Day 120 for Sara)
 
+### Demo crew codes
+
+Each crew member signs in with their name and a code. These are the codes for the four **synthetic** crew members. They are demo access control for an offline build, not real security. Only scrypt hashes are stored, in `data/crew/access.json`.
+
+| Crew member | Role | Code |
+|---|---|---|
+| Sara | Commander | `4120` |
+| Mateo | Pilot | `7316` |
+| Elena | Medical officer (can open Crew health) | `2468` |
+| Kenji | Engineer | `9053` |
+
+Emergency procedures never need a sign-in. To change a code: `npx tsx tools/crew-access/make.ts sara=4120 mateo=7316 elena=2468 kenji=9053`.
+
 ---
 
 ## Frontend Handover (for Mariam & UI/UX)
