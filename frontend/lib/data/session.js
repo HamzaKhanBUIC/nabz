@@ -14,7 +14,7 @@ import * as api from "@/lib/api";
 
 export const MEDICAL_OFFICER_ROLE = "Medical officer";
 
-export const PUBLIC_ROUTES = ["/emergency", "/real-data", "/hazards", "/sign-in"];
+export const PUBLIC_ROUTES = ["/emergency", "/real-data", "/hazards", "/sign-in", "/welcome"];
 
 export function isPublicRoute(pathname) {
   if (!pathname) return false;

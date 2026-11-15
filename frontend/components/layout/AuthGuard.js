@@ -13,7 +13,8 @@ export default function AuthGuard({ children }) {
 
   useEffect(() => {
     if (!publicRoute && hydrated && !token) {
-      router.replace("/sign-in");
+      // Signed-out visitors to the home route meet the welcome page first.
+      router.replace(pathname === "/" ? "/welcome" : "/sign-in");
     }
   }, [publicRoute, hydrated, token, router]);
 
