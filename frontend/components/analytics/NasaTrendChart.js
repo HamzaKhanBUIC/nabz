@@ -50,7 +50,7 @@ function NasaTooltip({ active, payload, unit }) {
       </div>
       <p className="mt-1 text-secondary">
         Value:{" "}
-        <span className="font-mono font-semibold text-primary">
+        <span className="tabular-nums font-semibold text-primary">
           {formatNumber(pt.value)} {unit}
         </span>
       </p>
@@ -298,7 +298,7 @@ export default function NasaTrendChart({
 
       {data.length > 0 ? (
         <div className="space-y-2 border-t border-line pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <p className="text-xs font-semibold text-muted">
             Timepoint breakdown
           </p>
           <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
@@ -308,7 +308,7 @@ export default function NasaTrendChart({
                 className="flex flex-col justify-between gap-2 rounded-md border border-line bg-raised p-3.5"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-sm font-semibold text-primary">
+                  <span className="tabular-nums text-sm font-semibold text-primary">
                     {pt.label}
                   </span>
                   <span className="text-[11px] font-medium text-muted">
@@ -317,7 +317,7 @@ export default function NasaTrendChart({
                 </div>
 
                 <div>
-                  <p className="font-mono text-base font-semibold tabular-nums text-primary">
+                  <p className="tabular-nums text-base font-semibold tabular-nums text-primary">
                     {formatNumber(pt.value)}{" "}
                     <span className="font-sans text-xs font-normal text-muted">
                       {unit}

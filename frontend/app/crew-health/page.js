@@ -198,16 +198,16 @@ export default function CrewHealthPage() {
                       </div>
 
                       <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-md border border-line bg-raised p-3.5">
+                        <div className="min-w-0">
                           <p className="text-xs text-muted">Blood pressure</p>
                           <p className="mt-1 text-sm font-semibold text-primary">
                             {formatBpCategory(summary.bpCategory)}
                           </p>
                         </div>
 
-                        <div className="rounded-md border border-line bg-raised p-3.5">
+                        <div className="min-w-0">
                           <p className="text-xs text-muted">Last check-in day</p>
-                          <p className="mt-1 font-mono text-sm font-semibold text-primary">
+                          <p className="mt-1 tabular-nums text-sm font-semibold text-primary">
                             {summary.lastCheckinDay != null
                               ? `Day ${summary.lastCheckinDay}`
                               : "None yet"}
@@ -215,7 +215,7 @@ export default function CrewHealthPage() {
                         </div>
                       </div>
 
-                      <div className="rounded-md border border-line bg-raised p-3.5">
+                      <div className="min-w-0">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="text-xs text-muted">Primary card</p>
                           {cardSeverity ? (
@@ -235,7 +235,7 @@ export default function CrewHealthPage() {
 
                       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3 text-xs text-muted">
                         <span>Next check due</span>
-                        <span className="font-mono font-medium text-secondary">
+                        <span className="tabular-nums font-medium text-secondary">
                           {summary.nextDue
                             ? formatDateTime(summary.nextDue)
                             : "Not scheduled"}

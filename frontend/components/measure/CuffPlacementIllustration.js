@@ -163,7 +163,7 @@ export default function CuffPlacementIllustration({
       </svg>
 
       <figcaption className="mt-3 text-center text-xs text-muted">
-        Cuff edge sits <span className="font-mono">2 to 3 cm</span> above the elbow
+        Cuff edge sits <span className="tabular-nums">2 to 3 cm</span> above the elbow
         crease, snug on bare skin, heart level.
       </figcaption>
     </figure>

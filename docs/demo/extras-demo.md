@@ -46,8 +46,8 @@ Five wrong codes in a row lock that crew member out for 60 seconds. On camera, s
 - [ ] Signed out, `/hazards` opens and lists five NASA hazards. `/emergency` also opens without a sign-in.
 - [ ] A wrong code shows an error. Sara's code `4120` opens Today.
 - [ ] Today shows the radiation card: Mars transit, day 120, about 189.6 mSv, 31.6% of the 600 mSv limit, marked as an estimate with sources.
-- [ ] Measure, then Blood pressure: enter 186 / 122. The card that comes back has a hazard chip (Gravity fields) and a "Who to contact" line for Mars transit.
-- [ ] Environment page: switch to ISS and save. The header chips, the card's contact line, the emergency screen and the dose (81.6 mSv) all change. The card's advice stays the same.
+- [ ] Today's checks, Blood pressure, Measure: enter 186 / 122. The card that comes back has a hazard chip (Gravity fields) and a "Who to contact" line for Mars transit.
+- [ ] Environment page: switch to ISS and save. The mission line at the top, the card's contact line, the emergency screen and the dose (81.6 mSv) all change. The card's advice stays the same.
 - [ ] Switch to Remote Earth: the radiation card says "Not tracked here". Switch back to Mars transit.
 - [ ] Real data page shows the OSD-569 blood count trend from the Inspiration4 crew.
 - [ ] Privacy: Sara turns on "Share my daily summary with the crew Medical Officer".
@@ -63,7 +63,7 @@ Record the browser window at 1280 wide or more. Speak slowly; the team will watc
 | # | Time | On screen | Say |
 |---|---|---|---|
 | 1 | 0:00 | Sign-in page | "This is CrewPulse with the six extras. First, sign-in. Each crew member has their own code." Type a wrong code, show the error, then sign in as Sara. |
-| 2 | 0:20 | Today | "Sara is the Commander, day 120 of a Mars transit. Her data is private to her now." Point at the header chips. |
+| 2 | 0:20 | Today | "Sara is the Commander, day 120 of a Mars transit. Her data is private to her now." Point at "Today's checks" and the mission line at the top. |
 | 3 | 0:35 | Today, radiation card | "This card estimates her mission radiation dose from published NASA-funded measurements, against the 600 millisievert career limit. It says Estimate, and it lists its sources." |
 | 4 | 0:55 | Blood pressure, 186 / 122 | "Say she logs a high blood pressure reading." Submit. "The rules pick the card, not the AI. The card now names the NASA hazard it relates to and tells her who to contact from where she is." |
 | 5 | 1:20 | Environment page, switch to ISS | "The Commander can change the mission environment." Save, go back to Today. "On the station, the contact line and the dose change. The medical advice doesn't, because thresholds never change with location." |

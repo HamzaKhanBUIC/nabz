@@ -15,10 +15,10 @@ export default function Stat({ label, value, unit, tone = "default", size = "md"
 
   return (
     <div>
-      <p className="text-[10px] font-medium uppercase tracking-wider text-muted">
+      <p className="text-[10px] font-mediumr text-muted">
         {label}
       </p>
-      <p className={`mt-1 font-mono font-medium leading-none ${valueSize} ${valueTone}`}>
+      <p className={`mt-1 tabular-nums font-medium leading-none ${valueSize} ${valueTone}`}>
         {value}
         {unit ? (
           <span className="ml-1 text-xs font-normal text-muted">{unit}</span>

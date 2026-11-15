@@ -130,10 +130,9 @@ export default function RealDataPage() {
       </BackLink>
 
       <div className="space-y-2">
-        <p className="t-label-md text-muted">Open NASA blood count dataset</p>
         <h1 className="t-h1 text-primary">Real astronaut data</h1>
         <p className="max-w-2xl text-sm leading-6 text-secondary">
-          The same engine that watches Sara, run on real astronauts.
+          NASA&apos;s open blood count dataset, run through the same engine that watches Sara.
         </p>
       </div>
 
@@ -166,9 +165,9 @@ export default function RealDataPage() {
                         disabled={loadingCatalog}
                         onClick={() => setSelectedCrew(crewId)}
                         aria-pressed={active}
-                        className={`min-h-11 cursor-pointer rounded-md border px-4 py-2 font-mono text-sm font-semibold transition-[transform,background-color,border-color,color] duration-150 ease-[var(--ease-smooth)] active:scale-95 ${
+                        className={`min-h-11 cursor-pointer rounded-md border px-4 py-2 tabular-nums text-sm font-semibold transition-[transform,background-color,border-color,color] duration-150 ease-[var(--ease-smooth)] active:scale-95 ${
                           active
-                            ? "border-accent bg-accent text-on-accent shadow-xs"
+                            ? "border-accent bg-accent text-on-accent"
                             : "border-line bg-raised text-secondary hover:border-line-strong hover:bg-hover hover:text-primary"
                         }`}
                       >
@@ -249,31 +248,31 @@ export default function RealDataPage() {
           )}
 
           <div className="mt-5 grid gap-3 border-t border-line pt-5 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-md border border-line bg-raised p-3.5">
+            <div className="min-w-0">
               <p className="text-xs text-muted">Latest sample</p>
-              <p className="mt-1 font-mono text-base font-semibold tabular-nums text-primary">
+              <p className="mt-1 tabular-nums text-base font-semibold tabular-nums text-primary">
                 {latest ? formatStat(latest.value, unit) : "Not available"}
               </p>
             </div>
-            <div className="rounded-md border border-line bg-raised p-3.5">
+            <div className="min-w-0">
               <p className="text-xs text-muted">Personal mean</p>
-              <p className="mt-1 font-mono text-base font-semibold tabular-nums text-primary">
+              <p className="mt-1 tabular-nums text-base font-semibold tabular-nums text-primary">
                 {band?.ready && band.mean != null
                   ? formatStat(band.mean, unit)
                   : "Building"}
               </p>
             </div>
-            <div className="rounded-md border border-line bg-raised p-3.5">
+            <div className="min-w-0">
               <p className="text-xs text-muted">Watch threshold</p>
-              <p className="mt-1 font-mono text-base font-semibold tabular-nums text-primary">
+              <p className="mt-1 tabular-nums text-base font-semibold tabular-nums text-primary">
                 {band?.ready && band.watchAt != null
                   ? formatStat(band.watchAt, unit)
                   : "Not ready"}
               </p>
             </div>
-            <div className="rounded-md border border-line bg-raised p-3.5">
+            <div className="min-w-0">
               <p className="text-xs text-muted">Lab reference range</p>
-              <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-primary">
+              <p className="mt-1 tabular-nums text-sm font-semibold tabular-nums text-primary">
                 {referenceRange
                   ? `${formatStat(referenceRange.low)} to ${formatStat(referenceRange.high, unit)}`
                   : "Not provided"}

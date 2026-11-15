@@ -9,7 +9,6 @@ import Icon from "@/components/ui/Icon";
 import ReportPreview from "@/components/reports/ReportPreview";
 import { REPORT_SECTIONS } from "@/lib/data/reportSections";
 import { useStore } from "@/lib/data/store";
-import { getEarthDelayLabel } from "@/lib/data/mission";
 
 export default function SendToEarthPage() {
   const router = useRouter();
@@ -80,9 +79,6 @@ export default function SendToEarthPage() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">
-          Voluntary downlink · {getEarthDelayLabel(mission, environment)}
-        </p>
         <h1 className="t-h1 mt-1 text-primary">Send summary to Earth</h1>
         <p className="mt-1 text-sm text-secondary">
           Review every line first. Nothing is queued until you confirm.
@@ -108,7 +104,7 @@ export default function SendToEarthPage() {
           <CardBody>
             <form onSubmit={handleSend} className="space-y-5">
               <fieldset className="space-y-2.5">
-                <legend className="text-xs font-semibold uppercase tracking-wide text-muted">
+                <legend className="text-xs font-semibold text-muted">
                   Included sections
                 </legend>
                 {REPORT_SECTIONS.map((sec) => {

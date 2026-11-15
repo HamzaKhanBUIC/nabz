@@ -9,7 +9,7 @@ import { statusToPill } from "@/lib/api";
 import { useStore } from "@/lib/data/store";
 
 function barFillForLevel(level) {
-  if (level === "urgent") return "bg-emergency";
+  if (level === "urgent") return "bg-emergency-solid";
   if (level === "act") return "bg-attention";
   return "bg-accent";
 }
@@ -46,7 +46,7 @@ function RadiationDoseBody({ radiation }) {
             aria-valuemin={0}
             aria-valuemax={radiation.careerLimitMsv}
             aria-valuenow={radiation.doseToDateMsv}
-            className="h-3.5 w-full overflow-hidden rounded-pill border border-line bg-raised"
+            className="h-2.5 w-full overflow-hidden rounded-pill bg-raised"
           >
             <div
               className={`h-full rounded-pill transition-[width] duration-300 ${barFillForLevel(pill.level)}`}
@@ -60,8 +60,8 @@ function RadiationDoseBody({ radiation }) {
           </div>
 
           {radiation.daysUntilLimit !== null && radiation.daysUntilLimit !== undefined ? (
-            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-line bg-raised px-3.5 py-2.5 text-sm text-primary">
-              <Icon name="schedule" size={18} className="shrink-0 text-accent" />
+            <div className="flex flex-wrap items-center gap-2 text-sm text-primary">
+              <Icon name="schedule" size={18} className="shrink-0 text-muted" />
               <span className="font-medium">
                 At this rate: {radiation.daysUntilLimit} days until the career limit
               </span>
@@ -137,7 +137,7 @@ export default function RadiationDoseCard({ embedded = false }) {
 
     if (embedded) {
       return (
-        <div className="mt-4 rounded-xl border border-line bg-raised/60 p-4">
+        <div className="mt-1 border-t border-line pt-4">
           <p className="t-label-md mb-2 text-muted">Mission radiation dose</p>
           {emptyBody}
         </div>
@@ -167,7 +167,7 @@ export default function RadiationDoseCard({ embedded = false }) {
 
   if (embedded) {
     return (
-      <div className="mt-4 rounded-xl border border-line bg-raised/60 p-4 sm:p-5">
+      <div className="mt-1 border-t border-line pt-4">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="t-label-md text-muted">Mission radiation dose</p>

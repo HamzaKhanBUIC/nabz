@@ -7,13 +7,13 @@ import Icon from "@/components/ui/Icon";
  */
 const VARIANTS = {
   primary:
-    "bg-accent text-on-accent border border-transparent shadow-sm shadow-accent/20 hover:bg-accent-hover hover:shadow-md hover:shadow-accent/25",
+    "bg-primary text-canvas border border-transparent hover:bg-soft",
   secondary:
     "bg-surface text-primary border border-line hover:bg-hover hover:border-line-strong",
   ghost:
     "bg-transparent text-secondary border border-transparent hover:bg-hover hover:text-primary",
   danger:
-    "bg-emergency text-white border border-transparent shadow-sm shadow-emergency/20 hover:bg-emergency-hover",
+    "bg-emergency-solid text-white border border-transparent hover:bg-emergency-hover",
 };
 
 const SIZES = {
@@ -25,7 +25,7 @@ const SIZES = {
 
 export function buttonClassName(variant = "primary", size = "md", className = "") {
   return [
-    "inline-flex items-center justify-center rounded-md font-heading select-none cursor-pointer",
+    "inline-flex items-center justify-center rounded-pill font-heading select-none cursor-pointer",
     "transition-[transform,background-color,border-color,color,box-shadow] duration-200 ease-[var(--ease-smooth)]",
     "active:scale-[0.985]",
     "disabled:opacity-50 disabled:pointer-events-none",

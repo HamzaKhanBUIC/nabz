@@ -6,37 +6,34 @@
    ========================================================================= */
 @theme {
   --font-heading:
-    var(--font-jakarta), var(--font-inter), -apple-system, BlinkMacSystemFont,
-    "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+    var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    ui-sans-serif, system-ui, sans-serif;
   --font-body:
     var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Text",
     ui-sans-serif, system-ui, sans-serif;
-  --font-mono:
-    var(--font-mono-face), ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, monospace;
 
   /* Backgrounds */
-  --color-canvas: #070b14;
-  --color-surface: #0d1320;
-  --color-raised: #131a2a;
-  --color-hover: #1a2336;
+  --color-canvas: #0c0d0f;
+  --color-surface: #15171a;
+  --color-raised: #1f2226;
+  --color-hover: #25282d;
 
   /* Borders */
-  --color-line: #263049;
-  --color-line-strong: #3a4561;
+  --color-line: #26292e;
+  --color-line-strong: #3d4148;
 
   /* Text */
-  --color-primary: #f7f8fb;
-  --color-soft: #d6dae5;
-  --color-secondary: #b4bbce;
-  --color-muted: #8a93ad;
+  --color-primary: #f4f5f6;
+  --color-soft: #d9dbde;
+  --color-secondary: #b6b9be;
+  --color-muted: #9a9da3;
   --color-on-accent: #ffffff;
-  --color-on-status: #070b14;
+  --color-on-status: #0c0d0f;
 
   /* Accent */
-  --color-accent: #4d8dff;
-  --color-accent-hover: #7aaaff;
-  --color-accent-subtle: #0f2552;
+  --color-accent: #6cb6ff;
+  --color-accent-hover: #96caff;
+  --color-accent-subtle: #15283b;
 
   /* Status */
   --color-normal: #5ad08f;
@@ -44,19 +41,21 @@
   --color-attention: #f6c266;
   --color-attention-bg: #3d2a0a;
   --color-emergency: #f04e4e;
-  --color-emergency-hover: #d93a3a;
+  --color-emergency-hover: #b92525;
+  /* Fill behind white text: 5:1. --color-emergency stays brighter for text and icons on dark. */
+  --color-emergency-solid: #d32f2f;
   --color-emergency-bg: #3f1212;
-  --color-focus: #7aaaff;
+  --color-focus: #96caff;
 
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 20px;
   --radius-pill: 999px;
 
   /* Depth */
-  --shadow-card:
-    0 1px 2px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  /* Surfaces are told apart by a lightness step and a 1px line; nothing at rest casts a shadow. */
+  --shadow-card: none;
 
   /* Legacy aliases mapped onto the Nova palette */
   --color-navy: #f7f8fb;
@@ -110,29 +109,30 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --color-canvas: #f7f8fb;
+  --color-canvas: #f6f7f8;
   --color-surface: #ffffff;
-  --color-raised: #edeff5;
-  --color-hover: #edeff5;
-  --color-line: #d6dae5;
-  --color-line-strong: #b4bbce;
-  --color-primary: #070b14;
-  --color-soft: #070b14;
-  --color-secondary: #3a4561;
-  --color-muted: #5b6684;
-  --color-accent: #2f6bff;
-  --color-accent-hover: #4d8dff;
-  --color-accent-subtle: #e3ecff;
-  --color-normal: #1e9e5a;
+  --color-raised: #f2f3f5;
+  --color-hover: #eceef1;
+  --color-line: #e4e6e9;
+  --color-line-strong: #cdd1d7;
+  --color-primary: #111315;
+  --color-soft: #1c1f23;
+  --color-secondary: #4b5058;
+  --color-muted: #62676f;
+  --color-accent: #1f6fd1;
+  --color-accent-hover: #1a5fb4;
+  --color-accent-subtle: #e4effc;
+  --color-normal: #247b50;
   --color-normal-bg: #ddf5e8;
-  --color-attention: #c98512;
+  --color-attention: #9a6200;
   --color-attention-bg: #fdf0d9;
   --color-emergency: #d93a3a;
-  --color-emergency-hover: #b92f2f;
+  --color-emergency-hover: #a82222;
+  --color-emergency-solid: #c62828;
   --color-emergency-bg: #fde2e2;
-  --color-focus: #2f6bff;
+  --color-focus: #1f6fd1;
   --color-on-status: #ffffff;
-  --shadow-card: 0 1px 3px rgba(7, 11, 20, 0.06);
+  --shadow-card: none;
   --color-navy: #070b14;
   --color-ink: #070b14;
   --color-nasa-blue: #2f6bff;
@@ -141,9 +141,9 @@
   --color-nasa-red: #d93a3a;
   --color-nasa-red-hover: #f04e4e;
   --color-nasa-red-soft: #fde2e2;
-  --color-ok: #1e9e5a;
+  --color-ok: #247b50;
   --color-ok-soft: #ddf5e8;
-  --color-warn: #c98512;
+  --color-warn: #9a6200;
   --color-warn-soft: #fdf0d9;
   --color-bad: #d93a3a;
   --color-bad-soft: #fde2e2;
@@ -223,23 +223,23 @@
 @layer components {
   .t-display {
     font-family: var(--font-heading);
-    font-size: clamp(1.875rem, 1.35rem + 1.8vw, 2.5rem);
+    font-size: clamp(1.625rem, 1.4rem + 0.8vw, 2rem);
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.025em;
   }
 
   .t-h1 {
     font-family: var(--font-heading);
-    font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
-    line-height: 1.22;
+    font-size: clamp(1.375rem, 1.25rem + 0.5vw, 1.625rem);
+    line-height: 1.25;
     font-weight: 600;
     letter-spacing: -0.022em;
   }
 
   .t-h2 {
     font-family: var(--font-heading);
-    font-size: clamp(1.25rem, 1.1rem + 0.55vw, 1.5rem);
+    font-size: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
     line-height: 1.3;
     font-weight: 600;
     letter-spacing: -0.018em;
@@ -247,7 +247,7 @@
 
   .t-h3 {
     font-family: var(--font-heading);
-    font-size: 1.125rem;
+    font-size: 1rem;
     line-height: 1.4;
     font-weight: 600;
     letter-spacing: -0.01em;
@@ -289,15 +289,14 @@
     font-size: 0.75rem;
     line-height: 1.35;
     font-weight: 500;
-    letter-spacing: 0.015em;
   }
 
   .t-metric {
     font-family: var(--font-heading);
-    font-size: clamp(2.125rem, 1.6rem + 2vw, 2.875rem);
-    line-height: 1.12;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-size: clamp(1.75rem, 1.6rem + 0.6vw, 2.125rem);
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
 
@@ -310,10 +309,6 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .interactive-surface:hover {
-      transform: translateY(-1px);
-    }
-
     .interactive-surface:active {
       transform: scale(0.985);
     }
@@ -372,10 +367,6 @@
   p,
   li {
     text-wrap: pretty;
-  }
-
-  .font-mono {
-    font-variant-numeric: tabular-nums;
   }
 
   :where(button, select, input:not([type="checkbox"], [type="radio"]), [role="button"], nav a) {
@@ -486,26 +477,23 @@ dialog {
 }
 
 dialog::backdrop {
-  background-color: rgba(5, 8, 15, 0);
-  backdrop-filter: blur(0px);
+  background-color: rgba(0, 0, 0, 0);
   overflow: hidden;
   overscroll-behavior: contain;
-  transition-property: background-color, backdrop-filter, display, overlay;
+  transition-property: background-color, display, overlay;
   transition-duration: 240ms;
   transition-timing-function: var(--ease-smooth);
   transition-behavior: allow-discrete;
 }
 
 :is(dialog[open]):where(:not([data-closing]))::backdrop {
-  background-color: rgba(5, 8, 15, 0.72);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.72);
 }
 
 @starting-style {
   :is(dialog[open]):where(:not([data-closing]))::backdrop {
-    background-color: rgba(5, 8, 15, 0);
-    backdrop-filter: blur(0px);
-  }
+    background-color: rgba(0, 0, 0, 0);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

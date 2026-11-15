@@ -188,3 +188,10 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Hamza accepted ADR 0003. Added an Amendments section for what changed in the build (E04 published rates, days until limit, `estimateDose` in `environment.ts`, Remote Earth not tracked, escalation added at response time). E00 passes; E00 to E06 all pass.
 - `docs/demo/extras-demo.md`: run and reset steps, crew codes, a test checklist, a 3-minute shot list with narration, Windows recording tips, and a before/after note for the team.
 - Next: Hamza tests, records the video and sends it to the team. Push or merge only after their OK.
+
+## 2026-11-15: frontend restyle, anti-slop pass (local only)
+- Header: one row. Mission day and environment as one link with labelled facts ("Earth delay 3 to 22 min · Microgravity"); the crew member moved into an account menu on phone and tablet. Phone header went from three rows of pills to one line.
+- Today: a "Today's checks" list replaces four equal tiles. It shows done, not scored or due for the check-in and blood pressure (from today.checkin.qcFlags, today.bp and the reminders API) with one primary button on the next step. The three readings sit in one divided strip; a failed check-in says "Not scored" under its number.
+- Theme: navy darks replaced by neutral near-black (#0c0d0f / #15171a); blue kept for data only; primary button is an ink pill; one typeface (Inter, as on nasa.gov); no resting shadows, glows, blur, tracked capitals, kickers over titles, icons in tinted squares or nested boxes. Light theme green and amber darkened to pass 4.5:1 as text.
+- NASA brand guidelines checked: no NASA insignia, logotype, seal or look-alike, and no wording that implies endorsement. NASA appears only as a source credit.
+- Checks: tasteskill lint 10 FAIL / 72 WARN before, 0 FAIL / 12 WARN after (remaining: overlay shadows, clock zero-padding, missing-value dashes); inspector on the production build 0 FAIL on sign-in, hazards, emergency; frontend lint and next build pass; gate PASS. Browser check at 375, 900 and 1280 px, dark and light.

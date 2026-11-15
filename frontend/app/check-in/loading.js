@@ -3,7 +3,7 @@ import { Activity } from "lucide-react";
 /** Route-level loading state for the check-in flow. */
 export default function Loading() {
   return (
-    <div className="mx-auto max-w-2xl animate-pulse">
+    <div className="mx-auto max-w-2xl">
       <div className="mb-6 h-4 w-32 rounded bg-line" />
       <div className="mb-6 h-8 w-64 rounded bg-line" />
       <div className="rounded-xl border border-line bg-surface p-6">

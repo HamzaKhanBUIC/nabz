@@ -250,18 +250,18 @@ export default function ReactionPad({
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface px-4 py-3.5 shadow-card sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface px-4 py-3.5 sm:px-5">
         <div className="flex items-center gap-4">
           <div>
             <p className="text-xs text-muted">Time left</p>
-            <p className="font-mono text-lg font-semibold text-primary tabular-nums">
+            <p className="tabular-nums text-lg font-semibold text-primary tabular-nums">
               {String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
             </p>
           </div>
           <div className="h-8 w-px bg-line" />
           <div>
             <p className="text-xs text-muted">Trials logged</p>
-            <p className="font-mono text-lg font-semibold text-primary tabular-nums">
+            <p className="tabular-nums text-lg font-semibold text-primary tabular-nums">
               {trials.length}
             </p>
           </div>
@@ -315,7 +315,7 @@ export default function ReactionPad({
         aria-label="PVT reaction test tap pad: press Space or click when target appears"
         className={`flex min-h-[260px] w-full flex-col items-center justify-center rounded-lg border-2 p-6 text-center select-none transition-[transform,background-color,border-color,box-shadow] duration-100 active:scale-[0.995] focus-visible:outline-2 focus-visible:outline-accent sm:min-h-[340px] sm:p-8 ${
           phase === "stimulus"
-            ? "border-accent bg-accent text-on-status shadow-lg shadow-accent/25"
+            ? "border-accent bg-accent text-on-status"
             : phase === "feedback" && feedbackText.startsWith("Too early")
               ? "border-attention bg-attention/15 text-primary"
               : "border-line-strong bg-surface text-primary hover:bg-raised"

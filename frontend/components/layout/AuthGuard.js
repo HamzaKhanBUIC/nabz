@@ -24,7 +24,7 @@ export default function AuthGuard({ children }) {
   if (!hydrated || !token) {
     return (
       <div className="flex min-h-[45vh] items-center justify-center">
-        <div className="rounded-lg border border-line bg-surface px-6 py-5 text-center shadow-card">
+        <div className="rounded-lg border border-line bg-surface px-6 py-5 text-center">
           <p className="text-sm font-medium text-primary">
             {!hydrated ? "Checking crew session..." : "Redirecting to sign in..."}
           </p>

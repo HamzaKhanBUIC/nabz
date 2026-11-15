@@ -307,7 +307,7 @@ export default function AstronautBodyMap({
 
         {/* Side panel */}
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-nasa-blue">
+          <p className="text-[11px] font-semibold text-nasa-blue">
             Body regions
           </p>
           <p className="mt-1 text-sm text-muted">
@@ -344,7 +344,7 @@ export default function AstronautBodyMap({
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
                 transition={{ duration: reduceMotion ? 0 : 0.18 }}
-                className="mt-3 rounded-xl border border-line bg-surface p-4 shadow-card"
+                className="mt-3 rounded-xl border border-line bg-surface p-4"
               >
                 <div className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-nasa-blue" aria-hidden="true" />
@@ -357,7 +357,7 @@ export default function AstronautBodyMap({
                   {activeRegion.metrics.map((metric) => (
                     <span
                       key={metric}
-                      className="rounded-md border border-line bg-canvas px-2 py-0.5 font-mono text-[10px] text-navy"
+                      className="rounded-md border border-line bg-canvas px-2 py-0.5 tabular-nums text-[10px] text-navy"
                     >
                       {metric}
                     </span>

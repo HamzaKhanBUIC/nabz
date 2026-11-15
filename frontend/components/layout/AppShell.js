@@ -24,12 +24,12 @@ function EmergencyBar() {
   const { isAuthenticated } = useSession();
 
   return (
-    <header className="sticky top-0 z-40 flex min-h-[68px] items-center justify-between gap-3 bg-emergency px-4 py-2 shadow-md sm:min-h-[72px] sm:px-6">
+    <header className="sticky top-0 z-40 flex min-h-[68px] items-center justify-between gap-3 bg-emergency-solid px-4 py-2 sm:min-h-[72px] sm:px-6">
       <div className="flex min-w-0 items-center gap-2.5">
         <Icon name="emergency" filled size={24} className="shrink-0 text-white" />
         <div className="min-w-0">
           <p className="t-h3 truncate text-white">Emergency mode</p>
-          <p className="font-mono text-xs text-white/90">
+          <p className="tabular-nums text-xs text-white/90">
             Offline guides · {formatElapsed(elapsedMs)}
           </p>
         </div>
@@ -51,12 +51,10 @@ function EmergencyBar() {
 
 function SignInBar() {
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-line bg-canvas">
       <div className="mx-auto flex min-h-[64px] max-w-[1120px] items-center justify-between gap-2 px-4 py-2 sm:min-h-[72px] sm:gap-3 sm:px-6 lg:px-8">
         <Link href="/sign-in" className="flex min-w-0 items-center gap-2.5 group">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent text-on-status shadow-xs transition-transform duration-200 ease-[var(--ease-smooth)] group-hover:scale-[1.03]">
-            <Icon name="pulse_alert" size={20} />
-          </span>
+          <Icon name="pulse_alert" size={28} className="shrink-0 text-accent" />
           <span className="t-h3 truncate text-primary">{APP_NAME}</span>
         </Link>
 
@@ -73,7 +71,7 @@ function SignInBar() {
 
           <Link
             href="/emergency"
-            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emergency px-3.5 sm:px-4 text-sm font-semibold text-white shadow-sm shadow-emergency/25 transition-[transform,background-color,box-shadow] duration-150 ease-[var(--ease-smooth)] hover:bg-emergency-hover active:scale-[0.98]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emergency-solid px-3.5 sm:px-4 text-sm font-semibold text-white transition-[transform,background-color,box-shadow] duration-150 ease-[var(--ease-smooth)] hover:bg-emergency-hover active:scale-[0.98]"
             aria-label="Open emergency mode"
           >
             <Icon name="emergency" filled size={20} />

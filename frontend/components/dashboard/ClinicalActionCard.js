@@ -92,7 +92,7 @@ export default function ClinicalActionCard({
                   <Icon
                     name={hazardIcon(hazard.id)}
                     size={14}
-                    className="text-accent"
+                    className="text-muted"
                   />
                   <span>{hazard.name}</span>
                 </Link>
@@ -107,7 +107,7 @@ export default function ClinicalActionCard({
                   ? "border-emergency/40 bg-emergency/10"
                   : escalationTone === "attention"
                     ? "border-attention/40 bg-attention/10"
-                    : "border-accent/30 bg-accent/10"
+                    : "border-line bg-raised"
               }`}
             >
               <Icon
@@ -118,7 +118,7 @@ export default function ClinicalActionCard({
                     ? "text-emergency"
                     : escalationTone === "attention"
                       ? "text-attention"
-                      : "text-accent"
+                      : "text-muted"
                 }`}
               />
               <div className="min-w-0">
@@ -130,9 +130,9 @@ export default function ClinicalActionCard({
             </div>
           ) : null}
 
-          <div className={`mt-5 grid gap-3.5 sm:gap-4 ${compact ? "md:grid-cols-1" : "md:grid-cols-3"}`}>
-            <div className="rounded-md border border-line bg-raised p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <div className={`mt-5 grid gap-x-8 gap-y-5 border-t border-line pt-5 ${compact ? "md:grid-cols-1" : "md:grid-cols-3"}`}>
+            <div>
+              <p className="text-sm font-medium text-muted">
                 What changed
               </p>
               <p className="mt-2 text-sm leading-6 text-primary">
@@ -140,8 +140,8 @@ export default function ClinicalActionCard({
               </p>
             </div>
 
-            <div className="rounded-md border border-line bg-raised p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+            <div>
+              <p className="text-sm font-medium text-muted">
                 Why it matters
               </p>
               <p className="mt-2 text-sm leading-6 text-secondary">
@@ -149,8 +149,8 @@ export default function ClinicalActionCard({
               </p>
             </div>
 
-            <div className="rounded-md border border-line bg-raised p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+            <div>
+              <p className="text-sm font-medium text-muted">
                 What to do
               </p>
               <ul className="mt-2 space-y-2 text-sm leading-6 text-primary">

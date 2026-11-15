@@ -11,7 +11,7 @@ import Icon from "@/components/ui/Icon";
 const STATUSES = {
   normal: { className: "bg-normal", icon: "check_circle" },
   attention: { className: "bg-attention", icon: "warning" },
-  emergency: { className: "bg-emergency", icon: "error" },
+  emergency: { className: "bg-emergency-solid", icon: "error" },
 };
 
 export function StatusPill({
@@ -48,11 +48,11 @@ const TONES = {
 const DOT_TONES = {
   ok: "bg-normal",
   warn: "bg-attention",
-  bad: "bg-emergency",
+  bad: "bg-emergency-solid",
   info: "bg-accent",
   neutral: "bg-muted",
   demo: "bg-attention",
-  danger: "bg-emergency",
+  danger: "bg-emergency-solid",
 };
 
 export default function StatusBadge({

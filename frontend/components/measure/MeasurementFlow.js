@@ -67,7 +67,7 @@ function CountdownControl({ initialSeconds, label }) {
     <div className="mt-2 flex flex-wrap items-center gap-2">
       <span
         aria-live="polite"
-        className="inline-flex items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 font-mono text-xs font-semibold text-primary"
+        className="inline-flex items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 tabular-nums text-xs font-semibold text-primary"
       >
         <Icon name="timer" size={14} className="text-accent" />
         {remaining === 0 ? `${label}: Complete` : `${label}: ${formatClock(remaining)}`}
@@ -211,12 +211,9 @@ export default function MeasurementFlow() {
       <BackLink href="/measure">Measurements</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">
-          {retestOf ? `Follow-up retest (${retestOf})` : "Guided resting measurement"}
-        </p>
         <h1 className="t-h1 mt-1 text-primary">Blood pressure guide</h1>
         <p className="mt-1 text-sm text-secondary">
-          Follow the AHA + microgravity preparation steps, log 1 to 3 readings, and check acute symptoms.
+          {retestOf ? `Follow-up retest (${retestOf}). ` : ""}Follow the AHA + microgravity preparation steps, log 1 to 3 readings, and check acute symptoms.
         </p>
       </div>
 

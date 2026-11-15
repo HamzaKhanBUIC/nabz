@@ -15,9 +15,7 @@ export default function MeasurementItem({
 }) {
   const inner = (
     <>
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-raised text-accent">
-        <Icon name={icon} size={24} />
-      </span>
+      <Icon name={icon} size={24} className="shrink-0 text-muted" />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-base font-semibold leading-6 text-primary">
           {title}

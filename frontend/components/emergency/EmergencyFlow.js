@@ -38,7 +38,7 @@ function StepCountdown({ seconds }) {
     <div className="mt-2 flex flex-wrap items-center gap-2">
       <span
         aria-live="polite"
-        className="inline-flex min-h-9 items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 font-mono text-xs font-semibold tabular-nums text-primary"
+        className="inline-flex min-h-9 items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 tabular-nums text-xs font-semibold tabular-nums text-primary"
       >
         <Icon name="timer" size={14} className="text-emergency" />
         {remaining === 0 ? "Timer finished" : formatClock(remaining)}
@@ -125,9 +125,9 @@ function MetronomeControl({ bpm = 110 }) {
     <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-emergency/50 bg-emergency/10 p-3">
       <div
         aria-hidden="true"
-        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-emergency font-mono text-xs font-bold transition-transform duration-100 ${
+        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-emergency tabular-nums text-xs font-bold transition-transform duration-100 ${
           beat
-            ? "scale-110 bg-emergency text-white"
+            ? "scale-110 bg-emergency-solid text-white"
             : "scale-100 bg-canvas text-emergency"
         }`}
       >
@@ -216,9 +216,6 @@ function EmergencyFlowInner() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="t-label-md text-emergency">
-            Cached locally · Offline ready
-          </p>
           <h1 className="t-h1 mt-1 text-primary">Emergency action guides</h1>
           <p className="mt-1 text-sm text-secondary">
             Works offline without internet. Follow each step carefully and alert crewmates early if red flags appear.
@@ -241,7 +238,7 @@ function EmergencyFlowInner() {
             }}
             className={`min-h-10 flex-1 cursor-pointer rounded-md px-4 py-2 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-[var(--ease-smooth)] sm:flex-initial ${
               target === "self"
-                ? "bg-emergency text-white shadow-sm"
+                ? "bg-emergency-solid text-white"
                 : "text-secondary hover:bg-hover hover:text-primary"
             }`}
           >
@@ -258,7 +255,7 @@ function EmergencyFlowInner() {
             }}
             className={`min-h-10 flex-1 cursor-pointer rounded-md px-4 py-2 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-[var(--ease-smooth)] sm:flex-initial ${
               target === "crewmate"
-                ? "bg-emergency text-white shadow-sm"
+                ? "bg-emergency-solid text-white"
                 : "text-secondary hover:bg-hover hover:text-primary"
             }`}
           >
@@ -295,7 +292,7 @@ function EmergencyFlowInner() {
 
       <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <p className="text-xs font-semibold text-muted">
             {target === "self" ? "Self-care procedures" : "Crewmate responder protocols"}
           </p>
           {list.length === 0 ? (
@@ -341,7 +338,7 @@ function EmergencyFlowInner() {
           {emergencyLog.length > 0 ? (
             <Card className="mt-4">
               <CardBody className="p-4 sm:p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                <p className="text-xs font-semibold text-muted">
                   Local alert log ({emergencyLog.length})
                 </p>
                 <ul className="mt-2 space-y-1.5 text-xs text-secondary">
@@ -431,7 +428,7 @@ function EmergencyFlowInner() {
                 </div>
 
                 <div className="rounded-lg border border-emergency/50 bg-emergency/10 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wide text-emergency">
+                  <p className="text-xs font-bold text-emergency">
                     Red flags: escalate immediately
                   </p>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-primary">

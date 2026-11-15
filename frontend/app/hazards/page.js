@@ -60,11 +60,10 @@ export default function HazardsPage() {
       </BackLink>
 
       <div className="space-y-2">
-        <p className="t-label-md text-muted">NASA Human Research Program</p>
         <h1 className="t-h1 text-primary">5 hazards of human spaceflight</h1>
         <p className="max-w-2xl text-sm leading-6 text-secondary">
-          NASA groups the health risks of deep-space flight into five hazards. Each
-          CrewPulse action card names the hazard it relates to.
+          NASA&apos;s Human Research Program groups the health risks of deep-space flight
+          into five hazards. Each CrewPulse action card names the hazard it relates to.
         </p>
       </div>
 
@@ -82,7 +81,7 @@ export default function HazardsPage() {
               <Icon
                 name={hazardIcon(hazard.id)}
                 size={15}
-                className="text-accent"
+                className="text-muted"
               />
               <span>{hazard.name}</span>
             </a>
@@ -128,25 +127,21 @@ export default function HazardsPage() {
                 className="scroll-mt-28 sm:scroll-mt-24"
               >
                 <CardBody className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line bg-raised text-accent">
-                      <Icon name={hazardIcon(hazard.id)} size={22} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h2 className="t-h2 text-primary">{hazard.name}</h2>
-                    </div>
-                  </div>
+                  <h2 className="flex items-center gap-2.5 t-h2 text-primary">
+                    <Icon name={hazardIcon(hazard.id)} size={22} className="shrink-0 text-muted" />
+                    <span>{hazard.name}</span>
+                  </h2>
 
-                  <blockquote className="rounded-lg border-l-4 border-accent bg-raised px-4 py-3 text-sm leading-relaxed text-primary">
+                  <blockquote className="text-base leading-relaxed text-primary">
                     <p>&ldquo;{hazard.summary}&rdquo;</p>
                     <footer className="mt-1.5 text-xs font-medium text-muted">
                       NASA Human Research Program
                     </footer>
                   </blockquote>
 
-                  <div className="rounded-lg border border-line bg-raised px-4 py-3 text-sm">
-                    <p className="t-label-md text-secondary">
-                      What CrewPulse watches:
+                  <div className="text-sm">
+                    <p className="t-label-md text-muted">
+                      What CrewPulse watches
                     </p>
                     <p className="mt-1 leading-relaxed text-primary">
                       {hazard.watches}

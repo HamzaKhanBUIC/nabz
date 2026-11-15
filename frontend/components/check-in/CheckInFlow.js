@@ -49,7 +49,6 @@ export default function CheckInFlow() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">Daily readiness · PVT-B + Sleep</p>
         <h1 className="t-h1 mt-1 text-primary">3-minute reaction check-in</h1>
         <p className="mt-1 text-sm text-secondary">
           Tap as soon as each blue cue appears. Takes {Math.max(1, Math.round(protoDurationSec / 60))} minutes.
@@ -140,7 +139,7 @@ export default function CheckInFlow() {
                       required
                       value={sleepHours}
                       onChange={(e) => setSleepHours(e.target.value)}
-                      className="mt-1.5 w-full max-w-[200px] rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-sm text-primary transition-colors focus:border-accent focus:outline-none"
+                      className="mt-1.5 w-full max-w-[200px] rounded-md border border-line bg-canvas px-3.5 py-2.5 tabular-nums text-sm text-primary transition-colors focus:border-accent focus:outline-none"
                     />
                   </div>
                 ) : null}

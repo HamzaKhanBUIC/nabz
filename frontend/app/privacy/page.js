@@ -86,7 +86,6 @@ export default function PrivacyPage() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">Crew data control</p>
         <h1 className="t-h1 mt-1 text-primary">Privacy</h1>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-secondary">
           Control whether the crew Medical Officer can see your daily summary. Sharing is off by default.
@@ -155,7 +154,7 @@ export default function PrivacyPage() {
                 Share my daily summary with the crew Medical Officer
               </span>
               <span
-                className={`inline-block h-6 w-6 rounded-full bg-white shadow-xs transition-transform duration-200 ${
+                className={`inline-block h-6 w-6 rounded-full bg-white transition-transform duration-200 ${
                   shareWithMedicalOfficer ? "translate-x-7" : "translate-x-1"
                 }`}
               />

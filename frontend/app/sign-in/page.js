@@ -175,6 +175,7 @@ export default function SignInPage() {
       <Card>
         <CardHeader
           title="Crew sign in"
+          titleAs="h1"
           subtitle="Pick your name and enter your numeric crew code to view your own health records."
         />
 
@@ -210,7 +211,7 @@ export default function SignInPage() {
                       aria-pressed={selected}
                       className={`interactive-surface flex min-h-14 cursor-pointer items-center gap-3 rounded-md border p-3.5 text-left ${
                         selected
-                          ? "border-accent bg-raised shadow-xs"
+                          ? "border-accent bg-raised"
                           : "border-line bg-canvas hover:border-line-strong hover:bg-hover"
                       }`}
                     >
@@ -274,7 +275,7 @@ export default function SignInPage() {
                   }}
                   aria-invalid={activeError ? true : undefined}
                   aria-describedby={activeError ? codeErrorId : undefined}
-                  className={`h-14 min-w-0 flex-1 rounded-md border bg-surface px-4 font-mono text-base tracking-[0.2em] text-primary outline-none transition-colors placeholder:font-sans placeholder:tracking-normal placeholder:text-muted focus:border-focus focus:shadow-[inset_0_0_0_1px_var(--color-focus)] disabled:opacity-50 ${
+                  className={`h-14 min-w-0 flex-1 rounded-md border bg-surface px-4 tabular-nums text-base tracking-[0.2em] text-primary outline-none transition-colors placeholder:font-sans placeholder:tracking-normal placeholder:text-muted focus:border-focus focus:shadow-[inset_0_0_0_1px_var(--color-focus)] disabled:opacity-50 ${
                     activeError ? "border-emergency" : "border-line"
                   }`}
                 />

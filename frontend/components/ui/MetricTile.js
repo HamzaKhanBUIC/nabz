@@ -6,11 +6,12 @@ export default function MetricTile({
   value,
   unit,
   helper,
+  bare = false,
   className = "",
 }) {
   return (
     <div
-      className={`rounded-lg border border-line bg-surface p-4 sm:p-6 shadow-card transition-colors duration-200 ${className}`}
+      className={`${bare ? "" : "rounded-lg border border-line bg-surface"} p-4 sm:p-6 ${className}`}
     >
       <p className="t-label-md text-secondary">{label}</p>
       <p className="mt-2 flex flex-wrap items-baseline gap-x-2 t-metric text-primary">

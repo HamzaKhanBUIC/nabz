@@ -5,27 +5,11 @@ import { SessionProvider } from "@/lib/data/session";
 import { ThemeProvider, themeBootstrapScript } from "@/lib/theme";
 import AppShell from "@/components/layout/AppShell";
 
-const plusJakarta = localFont({
-  src: "../node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2",
-  weight: "200 800",
-  style: "normal",
-  variable: "--font-jakarta",
-  display: "swap",
-});
-
 const inter = localFont({
   src: "../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
   weight: "100 900",
   style: "normal",
   variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = localFont({
-  src: "../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2",
-  weight: "100 800",
-  style: "normal",
-  variable: "--font-mono-face",
   display: "swap",
 });
 
@@ -48,7 +32,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`h-full ${plusJakarta.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`h-full ${inter.variable}`}
     >
       <body className="min-h-full antialiased">
         {/* Applies the stored theme before first paint — no flash. */}

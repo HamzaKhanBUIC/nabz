@@ -123,7 +123,7 @@ export default function ReminderCard() {
                   value={checkinTimeUtc}
                   onChange={(e) => setCheckinTimeUtc(e.target.value)}
                   placeholder="08:00"
-                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-sm text-primary transition-colors focus:border-accent focus:outline-none"
+                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 tabular-nums text-sm text-primary transition-colors focus:border-accent focus:outline-none"
                 />
               </div>
 
@@ -140,7 +140,7 @@ export default function ReminderCard() {
                   max={30}
                   value={bpIntervalDays}
                   onChange={(e) => setBpIntervalDays(e.target.value)}
-                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-sm text-primary transition-colors focus:border-accent focus:outline-none"
+                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 tabular-nums text-sm text-primary transition-colors focus:border-accent focus:outline-none"
                 />
               </div>
 
@@ -157,7 +157,7 @@ export default function ReminderCard() {
                   value={bpTimeUtc}
                   onChange={(e) => setBpTimeUtc(e.target.value)}
                   placeholder="08:30"
-                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-sm text-primary transition-colors focus:border-accent focus:outline-none"
+                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 tabular-nums text-sm text-primary transition-colors focus:border-accent focus:outline-none"
                 />
               </div>
             </div>

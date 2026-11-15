@@ -90,7 +90,6 @@ export default function EnvironmentPage() {
       <BackLink href="/">Today</BackLink>
 
       <div className="space-y-2">
-        <p className="t-label-md text-muted">Mission profile</p>
         <h1 className="t-h1 text-primary">Mission environment</h1>
         <p className="max-w-2xl text-sm leading-6 text-secondary">
           Communication delay, gravity, time to care, radiation estimates, and who to
@@ -136,11 +135,11 @@ export default function EnvironmentPage() {
               }
             />
             <CardBody className="space-y-5">
-              <div className="flex items-start gap-3 rounded-lg border border-attention/40 bg-attention/10 px-4 py-3">
+              <div className="flex items-start gap-3">
                 <Icon
                   name="contact_phone"
                   size={20}
-                  className="mt-0.5 shrink-0 text-attention"
+                  className="mt-0.5 shrink-0 text-muted"
                 />
                 <div className="min-w-0">
                   <p className="t-label-md text-secondary">Escalation rule</p>
@@ -151,31 +150,31 @@ export default function EnvironmentPage() {
               </div>
 
               <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="rounded-lg border border-line bg-raised p-3.5">
+                <div className="min-w-0">
                   <dt className="t-label-md text-muted">One-way Earth delay</dt>
                   <dd className="mt-1 text-base font-semibold text-primary">
                     {activeEnv.oneWayDelay?.text || "Unknown"}
                   </dd>
                 </div>
-                <div className="rounded-lg border border-line bg-raised p-3.5">
+                <div className="min-w-0">
                   <dt className="t-label-md text-muted">Time to definitive care</dt>
                   <dd className="mt-1 text-base font-semibold text-primary">
                     {activeEnv.timeToCare}
                   </dd>
                 </div>
-                <div className="rounded-lg border border-line bg-raised p-3.5">
+                <div className="min-w-0">
                   <dt className="t-label-md text-muted">Care lead</dt>
                   <dd className="mt-1 text-base font-semibold text-primary">
                     {activeEnv.careLead}
                   </dd>
                 </div>
-                <div className="rounded-lg border border-line bg-raised p-3.5">
+                <div className="min-w-0">
                   <dt className="t-label-md text-muted">Gravity</dt>
                   <dd className="mt-1 text-base font-semibold text-primary">
                     {activeEnv.gravity}
                   </dd>
                 </div>
-                <div className="rounded-lg border border-line bg-raised p-3.5">
+                <div className="min-w-0">
                   <dt className="t-label-md text-muted">Day length</dt>
                   <dd className="mt-1 text-base font-semibold text-primary">
                     {activeEnv.dayLengthHours} h
