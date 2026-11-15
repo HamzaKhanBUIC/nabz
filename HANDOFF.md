@@ -99,5 +99,5 @@ Must → Should → Later. Within Must: data → formulas → action cards → m
 
 ## Repo
 
-- GitHub (private): https://github.com/HamzaKhanBUIC/space-apps-2026-astronaut-health
+- GitHub (private): https://github.com/HamzaKhanBUIC/nabz
 - Branch: `main`. Only Claude merges; every push needs Hamza's OK.
