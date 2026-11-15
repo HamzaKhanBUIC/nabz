@@ -212,3 +212,18 @@ export const CURIOSITY_CRUISE_MSV_PER_DAY = 1.84;
 
 /** design choice (docs/blueprint/03-data-model.md): card levels that show the environment's escalation line. */
 export const ESCALATION_LEVELS = ["act", "urgent"] as const;
+
+/** research/CHECKS.md R12 (MedlinePlus Pulse; NHLBI): normal adult resting heart rate starts at 60 bpm. */
+export const HR_REST_NORMAL_MIN = 60;
+
+/** research/CHECKS.md R12 (MedlinePlus Pulse; NHLBI): normal adult resting heart rate ends at 100 bpm. */
+export const HR_REST_NORMAL_MAX = 100;
+
+/** research/CHECKS.md R12 (MedlinePlus Pulse oximetry): normal oxygen saturation is 95% to 100%. */
+export const SPO2_NORMAL_MIN = 95;
+
+/** research/CHECKS.md R12 (MedlinePlus Pulse oximetry): contact a provider at 92% or lower. */
+export const SPO2_CONTACT_AT_OR_BELOW = 92;
+
+/** research/CHECKS.md R12 (MedlinePlus Pulse oximetry): seek immediate medical attention at 88% or lower. */
+export const SPO2_URGENT_AT_OR_BELOW = 88;

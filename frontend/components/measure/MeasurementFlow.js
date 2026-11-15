@@ -96,6 +96,52 @@ function CountdownControl({ initialSeconds, label }) {
   );
 }
 
+const VITAL_TITLES = { "heart-rate": "Resting heart rate", spo2: "Oxygen level (SpO2)" };
+
+/** E07: heart rate and SpO2 checks returned by the API. Scoring is server-side; this only renders. */
+function VitalsPanel({ vitals }) {
+  return (
+    <section
+      aria-labelledby="vitals-title"
+      className="rounded-lg border border-line bg-surface p-5 sm:p-6"
+    >
+      <h2 id="vitals-title" className="t-h3 text-primary">
+        Pulse and oxygen
+      </h2>
+      <ul className="mt-4 divide-y divide-line">
+        {vitals.map((v) => (
+          <li key={v.code} className="py-4 first:pt-0 last:pb-0">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-medium text-secondary">{VITAL_TITLES[v.code] || v.code}</p>
+              <StatusBadge tone={statusToBadgeTone(v.status.level)} dot={false}>
+                <Icon name={iconNameForKey(v.status.iconKey)} size={14} />
+                <span>{v.status.label}</span>
+              </StatusBadge>
+            </div>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-primary">
+              {v.value}
+              <span className="ml-1 text-sm font-medium text-muted">{v.unit === "%" ? "%" : "bpm"}</span>
+            </p>
+            <p className="mt-1 text-sm leading-6 text-secondary">{v.message}</p>
+            <p className="mt-2 text-xs text-muted">
+              Sources:{" "}
+              {v.sources.map((s, i) => (
+                <span key={s.id}>
+                  {i > 0 ? ", " : ""}
+                  <a href={s.url} target="_blank" rel="noreferrer" className="text-accent underline-offset-2 hover:underline">
+                    {s.title}
+                  </a>
+                </span>
+              ))}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 border-t border-line pt-3 text-xs text-muted">Decision support, not a diagnosis.</p>
+    </section>
+  );
+}
+
 export default function MeasurementFlow() {
   const { bpGuide, submitBpMeasurement } = useStore();
   const [step, setStep] = useState(1); // 1: Prep | 2: Readings | 3: Symptoms | 4: Result
@@ -103,6 +149,7 @@ export default function MeasurementFlow() {
   const [readings, setReadings] = useState([
     { key: "r1", systolic: "118", diastolic: "76", pulse: "68" },
   ]);
+  const [spo2, setSpo2] = useState("");
   const [symptoms, setSymptoms] = useState([]);
   const [retestOf, setRetestOf] = useState(undefined);
   const [submitting, setSubmitting] = useState(false);
@@ -175,6 +222,12 @@ export default function MeasurementFlow() {
           : { systolic: sys, diastolic: dia, pulse: pul },
       );
     }
+    if (spo2 !== "") {
+      const ox = Number(spo2);
+      if (!Number.isInteger(ox) || ox < 50 || ox > 100) {
+        return { error: "Oxygen level must be a whole number (50 to 100%)." };
+      }
+    }
     return { parsed };
   };
 
@@ -193,6 +246,7 @@ export default function MeasurementFlow() {
       const payload = {
         takenAt: new Date().toISOString(),
         readings: check.parsed,
+        ...(spo2 !== "" ? { spo2: Number(spo2) } : {}),
         symptoms,
         ...(retestOf ? { retestOf } : {}),
       };
@@ -459,6 +513,32 @@ export default function MeasurementFlow() {
                 </button>
               ) : null}
 
+              <div className="rounded-lg border border-line bg-surface p-4 sm:p-5">
+                <label
+                  htmlFor={`${baseId}-spo2`}
+                  className="block text-sm font-semibold text-primary"
+                >
+                  Oxygen level, SpO2 (%, optional)
+                </label>
+                <p className="mt-1 text-xs leading-5 text-secondary">
+                  Clip the pulse oximeter on a finger with no nail polish. Keep the hand warm,
+                  relaxed and below heart level, stay still, and enter the number once it stops
+                  changing.
+                </p>
+                <input
+                  id={`${baseId}-spo2`}
+                  name="spo2"
+                  type="number"
+                  min={50}
+                  max={100}
+                  step={1}
+                  inputMode="numeric"
+                  value={spo2}
+                  onChange={(e) => setSpo2(e.target.value)}
+                  className="mt-3 w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 text-sm text-primary tabular-nums transition-colors focus:border-accent focus:outline-none sm:w-40"
+                />
+              </div>
+
               <div className="flex flex-wrap justify-between gap-3 pt-2">
                 <Button type="button" variant="secondary" onClick={() => setStep(1)}>
                   Back to preparation
@@ -675,6 +755,8 @@ export default function MeasurementFlow() {
 
           <ClinicalActionCard card={result.card} heading="Blood pressure action card" />
 
+          {result.vitals?.length ? <VitalsPanel vitals={result.vitals} /> : null}
+
           <div className="flex flex-wrap gap-3">
             <Link
               href="/normal-zone"
@@ -689,6 +771,7 @@ export default function MeasurementFlow() {
               onClick={() => {
                 setResult(null);
                 setRetestOf(undefined);
+                setSpo2("");
                 setSymptoms([]);
                 setDoneSteps({});
                 setStep(1);

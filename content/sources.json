@@ -130,6 +130,26 @@
       "id": "esa-concordia-communication",
       "title": "Concordia communication (ESA)",
       "url": "https://www.esa.int/media/concordia-communication"
+    },
+    {
+      "id": "medlineplus-pulse",
+      "title": "MedlinePlus: Pulse",
+      "url": "https://medlineplus.gov/ency/article/003399.htm"
+    },
+    {
+      "id": "nhlbi-heart-beats",
+      "title": "NHLBI: How the Heart Beats",
+      "url": "https://www.nhlbi.nih.gov/health/heart/heart-beats"
+    },
+    {
+      "id": "medlineplus-pulse-oximetry",
+      "title": "MedlinePlus: Pulse Oximetry",
+      "url": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+    },
+    {
+      "id": "fda-pulse-oximeter-basics",
+      "title": "FDA: Pulse Oximeter Basics",
+      "url": "https://www.fda.gov/consumers/consumer-updates/pulse-oximeter-basics"
     }
   ]
 }

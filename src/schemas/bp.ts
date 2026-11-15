@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Card } from "./card";
 import { EntrySource, ZoneResult } from "./checkin";
-import { Disclaimer, IsoDateTime, SourceRef } from "./common";
+import { Disclaimer, IsoDateTime, SourceRef, Status } from "./common";
 
 /** Symptoms that turn a severe reading into "act now" (research/CHECKS.md, R3). */
 export const SevereSymptom = z.enum([
@@ -40,6 +40,8 @@ export type BpReading = z.infer<typeof BpReading>;
 export const BpInput = z.strictObject({
   takenAt: IsoDateTime,
   readings: z.array(BpReading).min(1).max(3),
+  /** Blood oxygen saturation (%) from a finger pulse oximeter, taken once. Optional. */
+  spo2: z.number().int().min(50).max(100).optional(),
   symptoms: z.array(BpSymptom).max(12),
   /** Set on a retest: the id of the measurement that asked for it. */
   retestOf: z.string().min(1).optional(),
@@ -48,6 +50,17 @@ export type BpInput = z.infer<typeof BpInput>;
 
 export const BpCategory = z.enum(["low", "normal", "elevated", "stage1", "stage2", "severe"]);
 export type BpCategory = z.infer<typeof BpCategory>;
+
+/** One extra reading taken with blood pressure (E07): resting heart rate or SpO2. */
+export const VitalAssessment = z.object({
+  code: z.enum(["heart-rate", "spo2"]),
+  value: z.number(),
+  unit: z.enum(["bpm", "%"]),
+  status: Status,
+  message: z.string().min(1),
+  sources: z.array(SourceRef).min(1),
+});
+export type VitalAssessment = z.infer<typeof VitalAssessment>;
 
 export const NextAction = z.object({
   type: z.enum(["none", "retest", "alert_crew"]),
@@ -64,6 +77,10 @@ export const BpMeasurement = z.object({
   readings: z.array(BpReading).min(1),
   average: BpReading,
   category: BpCategory,
+  /** SpO2 (%) as entered; absent when not measured. */
+  spo2: z.number().int().optional(),
+  /** Heart rate and SpO2 checks (E07). Absent on measurements saved before E07. */
+  vitals: z.array(VitalAssessment).optional(),
   symptoms: z.array(BpSymptom),
   retestOf: z.string().optional(),
   zone: ZoneResult,

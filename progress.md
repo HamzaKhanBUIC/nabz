@@ -201,3 +201,8 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - On 2026-11-15 the project was renamed from CrewPulse to Nabz across code, tests, localStorage keys, package names, and current docs, and the Nabz logo and favicon were added to the frontend.
 - Captured three 1280x800 screenshots in `docs/assets/screenshots/` (`today.png`, `bp-action-card.png`, `real-data.png`) and rewrote root `README.md`.
 - Work done by a Gemini 4 Hydrogen worker (agy), verified by Claude.
+
+## 2026-11-15: E07 heart rate and oxygen level
+- Team asked for two more measurements with blood pressure. Claude checked MedlinePlus, NHLBI and FDA pages and added R12 to `research/CHECKS.md`.
+- `src/core/vitals.ts` checks the averaged cuff pulse (60-100 bpm normal) and an optional SpO2 (95% normal, 92% contact, 88% act now). The BP card is unchanged.
+- API accepts `spo2` and returns `vitals`; the BP result screen shows a "Pulse and oxygen" panel. 21 new tests; gate passes; browser-checked on an isolated API.

@@ -180,6 +180,26 @@ Status: **verified; the card mapping is a design choice, not a NASA mapping**
 
 **Design note:** NASA publishes no card-to-risk mapping, so R11's mapping is our proposal and must be labelled `// design choice`. Most risks touch all five hazards, so tagging a card with every hazard says nothing. E03 should show each card's **primary** hazard only.
 
+## R12: heart rate and blood oxygen (for E07)
+
+Status: **verified** (Nov 15). Claude opened each page and copied the numbers.
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| Normal resting heart rate for adults is 60 to 100 beats per minute | confirmed | [MedlinePlus: Pulse](https://medlineplus.gov/ency/article/003399.htm); [NHLBI: How the heart beats](https://www.nhlbi.nih.gov/health/heart/heart-beats) ("At rest, a heart rate of 60 to 100 beats per minute is normal.") |
+| Well-trained athletes: 40 to 60 beats per minute | confirmed | MedlinePlus: Pulse |
+| Resting rate: rest at least 10 minutes first; count for 1 full minute (or 30 s and double) | confirmed | MedlinePlus: Pulse |
+| Resting rates that are continually high, or below normal, are worth talking to a provider about | confirmed | MedlinePlus: Pulse. No source gives an "urgent" heart rate number; we set none. |
+| Normal oxygen saturation is 95% to 100% | confirmed | [MedlinePlus: Pulse oximetry](https://medlineplus.gov/lab-tests/pulse-oximetry/); FDA says 95% to 100% "for most healthy individuals" |
+| Contact your provider at 92% or lower; seek immediate medical attention at 88% or lower | confirmed | MedlinePlus: Pulse oximetry |
+| A pulse oximeter can read 2% to 4% higher or lower than the actual blood oxygen level | confirmed | MedlinePlus: Pulse oximetry |
+| Accuracy is affected by poor circulation, skin pigmentation, skin thickness, skin temperature, tobacco use and nail polish | confirmed | [FDA: Pulse oximeter basics](https://www.fda.gov/consumers/consumer-updates/pulse-oximeter-basics) (content current as of 03/26/2025) |
+| How to read: hand warm, relaxed, below heart level; remove nail polish; sit still; wait until one steady number; write it down to track changes | confirmed | FDA: Pulse oximeter basics |
+| Low-oxygen signs that need care: bluish face, lips or nails; shortness of breath or worsening cough; restlessness; chest pain or tightness; fast pulse. Some people with low oxygen show no symptoms | confirmed | FDA: Pulse oximeter basics |
+| NASA studied an exploration cabin of 8.2 psia and 34% oxygen, which lowers SpO2 compared with sea-level air | unconfirmed (seen in search results, PDF not opened) | [NASA NTRS 20150021491](https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20150021491.pdf). Not used in any rule. |
+
+**Decided (Nov 15):** the cut-offs are the sea-level ones above. Heart rate outside 60 to 100 shows "watch" only (no urgent level, because no source gives one). SpO2 93 to 94% is "watch" (below the 95% normal, above MedlinePlus's 92% contact line); this band is a design choice.
+
 ## Summary
 
 | R | Status | Corrections |
@@ -194,4 +214,5 @@ Status: **verified; the card mapping is a design choice, not a NASA mapping**
 | R8 crewmate emergency | verified | ER leg position wording; toxic-air steps defer to spacecraft procedure |
 | R9 radiation data | verified for the tracker | use George 2024 Table 2 for all environments (Mars transit 1.58 Dec 2022; 1.84 is the 2011–12 measurement); Hassler 0.64 unconfirmed; no shippable raw RAD file; no Remote Earth rate |
 | R10 environments | verified | Concordia care is led by the station doctor; the ESA doctor is an observer; no "24/7" Flight Surgeon claim |
+| R12 heart rate and SpO2 | verified | no urgent heart rate number exists in the sources; SpO2 lines are 92% (contact) and 88% (act now) |
 | R11 hazards and risks | verified | card mapping is a design choice; show the primary hazard only |
