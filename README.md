@@ -1,3 +1,4 @@
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/nabz-logo-on-dark.svg">
@@ -5,37 +6,25 @@
   </picture>
 </p>
 
-<p align="center"><b>Health checks and emergency guidance for crews far from help.</b><br>An offline app for astronauts on long missions, from the ISS to Mars.</p>
-
-<p align="center">NASA Space Apps Challenge 2026 · Team NOVA TRIO</p>
-
-
 <p align="center">
-  <a href="https://nabz-drab.vercel.app/">
-    <img src="https://img.shields.io/badge/🌐_Live_Demo-2563EB?style=for-the-badge&logoColor=white" alt="Live Demo"/>
-  </a>
-  &nbsp;
-  <a href="https://github.com/HamzaKhanBUIC/nabz">
-    <img src="https://img.shields.io/badge/💻_GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
-  </a>
-  &nbsp;
-  <a href="https://drive.google.com/drive/folders/1bNC2ZCBULqHAEtGQfc8hlNCIAtZS_ZU6?usp=sharing">
-    <img src="https://img.shields.io/badge/🎬_Demo_Video-EA4335?style=for-the-badge&logo=google-drive&logoColor=white" alt="Demo Video"/>
-  </a>
-  &nbsp;
-  <a href="https://drive.google.com/file/d/1eaZu1KslDCQIQYBzRYQwLof8XGX_RtUY/view">
-    <img src="https://img.shields.io/badge/📋_UX_Workshop_&_Research-7C3AED?style=for-the-badge&logo=googledrive&logoColor=white" alt="UX Workshop & Research"/>
-  </a>
-  &nbsp;
-  <a href="#run-it-on-your-computer">
-    <img src="https://img.shields.io/badge/💻_Run_it_locally-0F766E?style=for-the-badge&logoColor=white" alt="Run it locally"/>
-  </a>
+  <b>Health checks and emergency guidance for crews far from help.</b><br>
+  An offline app for astronauts on long missions, from the ISS to Mars.
 </p>
 
+<p align="center">
+  NASA Space Apps Challenge 2026 · Team NOVA TRIO
+</p>
+
+<p align="center">
+  <a href="https://nabz-drab.vercel.app/"><img src="https://img.shields.io/badge/🌐_Live_Demo-2563EB?style=for-the-badge&logoColor=white" alt="Live Demo"></a>&nbsp;<a href="https://github.com/HamzaKhanBUIC/nabz"><img src="https://img.shields.io/badge/💻_GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>&nbsp;<a href="https://drive.google.com/drive/folders/1bNC2ZCBULqHAEtGQfc8hlNCIAtZS_ZU6?usp=sharing"><img src="https://img.shields.io/badge/🎬_Demo_Video-EA4335?style=for-the-badge&logo=google-drive&logoColor=white" alt="Demo Video"></a>&nbsp;<a href="https://drive.google.com/file/d/1eaZu1KslDCQIQYBzRYQwLof8XGX_RtUY/view"><img src="https://img.shields.io/badge/📋_UX_Workshop_&_Research-7C3AED?style=for-the-badge&logo=googledrive&logoColor=white" alt="UX Workshop & Research"></a>&nbsp;<a href="#run-it-on-your-computer"><img src="https://img.shields.io/badge/💻_Run_it_locally-0F766E?style=for-the-badge&logoColor=white" alt="Run it locally"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml">
     <img src="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml/badge.svg" alt="CI status">
   </a>
 </p>
+
 
 > **Halfway to Mars, a crewmate grabs their chest and collapses.** Earth is up to 22 minutes away, each way. Whoever is closest has to act, and they are an astronaut, not a doctor. Nabz (Arabic and Urdu for "pulse") is the app for that moment, and for the ordinary days before it.
 
