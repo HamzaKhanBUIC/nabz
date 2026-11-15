@@ -1,30 +1,29 @@
 # Wireframe vs API Contract Review
 
-Review of the 9 desktop + responsive wireframe screenshots against [docs/api-contract.md](./api-contract.md), [src/schemas/](./../src/schemas/endpoints.ts), and [docs/blueprint/01-scope.md](./blueprint/01-scope.md).
+Review of the 9 desktop + responsive wireframe screenshots against [docs/api-contract.md](./api-contract.md), [src/schemas/](./../src/schemas/endpoints.ts), and [docs/adr/0002-should-features.md](./adr/0002-should-features.md) (**Must + Should features are live**; Extra/Later features remain out of scope for now).
 
 ---
 
-## 1. Remove / Hide Now (Not in Must or Returns `501 not_built`)
+## 1. Remove / Hide (Not Supported in Backend)
 
 | UI element | Screen(s) | Why |
 |---|---|---|
-| Mood rating (`1–5` scale, `Mood 3 / 5`, Mood toggle/series) | Screens 1, 2, 3, 8 | Mood is not in the backend schema. `POST /api/checkins` uses `z.strictObject` (`{ protocolId, startedAt, trials, sleepHours? }`) and rejects unknown fields with HTTP `400 invalid_input`. |
-| `Coach` nav item, `"Ask the coach"` button, Screen 7 | All screens, 4, 7 | `POST /api/coach/ask` is a reserved Should slot (`S02`) returning `501 not_built`. Hide until S02 is implemented. |
-| `Send to Earth` nav item, `"Send to Earth?"` button, Screen 8 | All screens, 4, 8 | `POST /api/share/preview` and `POST /api/share` are reserved Should slots (`S04`) returning `501 not_built`. Hide until S04 is implemented. |
-| `"Reminder (Should): blood pressure due today"` banner | Screen 1 | `GET /api/today` returns `nextDue: null` and `/api/reminders` returns `501 not_built` (`S05`). Only show when `today.nextDue !== null`. |
-| `"Who is this for? Me / A crewmate"` picker | Screen 6 | Must ships first-person (`for: "self"`) procedures only. `GET /api/emergency/procedures?for=crewmate` returns an empty list until `S01` is built. |
+| Mood rating (`1–5` scale, `Mood 3 / 5`, Mood toggle/series) | Screens 1, 2, 3, 8 | Mood is not in the backend schema. `POST /api/checkins`, `GET /api/trends`, and `POST /api/share/preview` reject unknown fields with HTTP `400 invalid_input`. |
+| Extra / Later features (Voice dictation/commands, wearable auto-sync, crew switcher, Inspiration4 lab blood-count chart, Earth/Moon mission switcher) | Any screen | Deferred to **Later** (`docs/blueprint/01-scope.md`). Do not add UI for these until Must + Should integration is complete. |
 
 ---
 
-## 2. Edit to Match Backend Contract
+## 2. Edit Wireframes to Match Live Must + Should Backend Contract
 
 | Screen | Wireframe currently shows | Required change to match `docs/api-contract.md` |
 |---|---|---|
 | Top bar (all screens) | `Earth delay ~18 min` (static text) | Render `Earth delay {oneWayMinMinutes}–{oneWayMaxMinutes} min` (`3–22 min`) from `GET /api/mission` (`commsDelay`). |
-| Screen 1 (`Today`) & Screen 2 (`Reaction check-in`) | `Start check-in (2 min)` and `12 of 30 seconds` | Read `durationMs` from `GET /api/checkin/protocol` (`180000 ms` = **3 minutes**). Sessions under `150000 ms` or `< 20` stimuli are flagged by QC (`zone: "not_scored"`, card `checkin-retake`). |
+| Screen 1 (`Today`) & Screen 2 (`Reaction check-in`) | `Start check-in (2 min)` and `12 of 30 seconds` | Read `durationMs` from `GET /api/checkin/protocol` (`180000 ms` = **3 minutes**). Sessions under `150000 ms` or `< 20` stimuli are flagged by QC (`zone: "not_scored"`, card `checkin-retake`). Bind the reminder banner at bottom to `GET /api/today` `nextDue` (and allow customization via `GET/PUT /api/reminders`). |
 | Screen 3 (`Normal zone`) | Tabs `Reaction · Sleep · Mood`; `"↓ Slower than usual"` | Replace `Mood` with BP so tabs map to `GET /api/trends?code=...`: `reaction-speed` (`1/s`), `bp-systolic` (`mmHg`), `bp-diastolic` (`mmHg`), `sleep-hours` (`h`). Bind status badge directly to `zone.status` (`level`, `label`, `iconKey`), e.g. `"Below your normal"`, `"Within your normal"`, `"Learning your normal"`, `"Not scored"`. Plot `band.mean`, `band.watchAt`, `band.actAt`. |
-| Screen 4 (`Action card`) | `"Supports decisions, not a diagnosis."`, single `whatToDo` string, no sources | Bind verbatim `card.disclaimer` (`"Decision support, not a diagnosis."`), render `card.whatToDo` as a bullet list (array), and show `card.sources` (`title` + `url`). |
-| Screen 6 (`Emergency`) | `Chest pain`, `Collapsed, not responding`, `Trouble breathing`, `Something else` | Replace tiles with the 5 verified `for: "self"` procedures from `GET /api/emergency/procedures`: `bleeding` (**Bleeding cut**), `burn` (**Thermal burn**), `eye` (**Eye injury or chemical splash**), `allergic-reaction` (**Allergic reaction**), `near-fainting` (**Dizzy or about to faint**). Render `steps[]`, optional `timerSeconds` countdowns (`1200 s` burn cool, `900 s` eye flush), `caution`, `redFlags[]`, `escalation.text`, `sources[]`, and `disclaimer`. |
+| Screen 4 (`Action card`) | `"Supports decisions, not a diagnosis."`, single `whatToDo` string, no sources, no routine action | Bind verbatim `card.disclaimer` (`"Decision support, not a diagnosis."`), render `card.whatToDo` as a bullet list (array), show `card.sources` (`title` + `url`), and show a `"Start routine"` button whenever `card.links.routineId` is set (fetching steps from `GET /api/routines`). |
+| Screen 6 (`Emergency` — **Self & Crewmate live**) | `Chest pain`, `Collapsed, not responding`, `Trouble breathing`, `Something else` | Keep the left `Who is this for? Me / A crewmate` selector (`GET /api/emergency/procedures` for `self` and `?for=crewmate` for `crewmate`). Show the **5 `for: "self"` tiles**: `bleeding` (**Bleeding cut**), `burn` (**Burn**, `1200 s` timer), `eye` (**Eye injury or chemical splash**, `900 s` timer), `allergic-reaction` (**Allergic reaction**), `near-fainting` (**Dizzy or about to faint**); and the **4 `for: "crewmate"` tiles**: `crewmate-collapse` (**Collapsed or unresponsive crewmate**, `10 s` timer), `crewmate-cpr` (**Crewmate CPR in microgravity**, `120 s` timer + `110 bpm` compression metronome), `crewmate-seizure` (**Crewmate having a seizure**, `300 s` + `10 s` timers), `crewmate-low-blood-sugar` (**Suspected low blood sugar**, `900 s` timer). Always render `steps[]`, `caution`, `redFlags[]`, `escalation.text`, `sources[]`, and `disclaimer`. |
+| Screen 7 (`Coach` — **live**) | Chat UI + suggested pills without citations/urgent banner | Keep chat, today's card context, and `suggestedQuestions` (`POST /api/coach/ask`). Render `citations` links beneath grounded replies, show a prominent urgent alert banner whenever `banner` is present (`banner.label`), and keep the disclaimer + medical officer notice. |
+| Screen 8 (`Send to Earth` — **live**) | Toggle `Mood` alongside Reaction, Sleep, BP | Replace `Mood` toggle with `Action cards` (`includeReaction`, `includeSleep`, `includeBp`, `includeCards`, plus optional `days` and `note`). Always preview via `POST /api/share/preview` first and queue only after clicking `"Send summary"` (`POST /api/share` with `confirm: true`). Show `commsDelay.delayNotice`. |
 
 ---
 

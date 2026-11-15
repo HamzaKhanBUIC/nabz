@@ -137,3 +137,16 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
   `PASS npx eslint .`
   `PASS npx vitest run`
   `GATE: PASS`
+
+## 2026-11-15: Review of the Should work, BP baseline fix, CI fixes for the frontend PR
+- Checked Gemini's S01–S05 work on `main` (`55129fd`): gate PASS, fixtures byte-identical, CI green. Crewmate wording matches CHECKS R8 (ER leg wording, compression depth caveat, isolated-surface AED rule).
+- **BP baseline fix.** The baseline left out every two-sided `watch` reading. That trims the tails, shrinks the SD and flagged 40.7% of ordinary BP readings as `watch`. Now nothing leaves the window because of its own z or zone. Only quality flags and the new `excludeFromBaseline` (set for BP readings in the absolute `severe` or `low` category through `isOutsideBpBaselineRange`) keep an entry out. BP `watch` on the fixtures: 40.7% → 21.4%. With a 5–14 session window, a 1.5 SD two-sided threshold is expected to flag about 17–24% (t distribution), so the remaining rate is window size, not bias. Reaction stays at 7.1% `act` on ordinary days.
+- Docs updated: `docs/features/M2-normal-zone.md`, `docs/blueprint/03-data-model.md` (also renamed `BP_Z_FLAG` to the real `BP_Z_WATCH`), ADR 0001 amendment note.
+- **CI fixes for frontend PR #1.** The root eslint now ignores `frontend/`, which has its own config. A new `frontend` CI job runs install, lint and build only when `frontend/package-lock.json` exists. The gitleaks job gets `pull-requests: read`, which fixes the 403 on PR events. Verified locally on the PR head: frontend lint clean, `next build` OK (12 static routes), gitleaks finds no leaks.
+- Frontend PR #1 findings (for Mariam): it uses mock data and calls no backend endpoint. It has its own baseline math (population SD, minimum 3), still has mood, and its reaction test is one random-delay trial, not the 3-minute PVT-B from `/api/checkin/protocol`.
+- Not verified in CHECKS, flag before demo: the 15-minute recheck in `crewmate-low-blood-sugar`, and source ids `aha-bls-2025`, `dglrm-esam-2020-cpr`.
+- Gate output (`python scripts/gate.py`):
+  `PASS npx tsc --noEmit`
+  `PASS npx eslint .`
+  `PASS npx vitest run`
+  `GATE: PASS`
