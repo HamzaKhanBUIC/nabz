@@ -9,6 +9,7 @@
 
 <p align="center">NASA Space Apps Challenge 2026 · Team NOVA TRIO</p>
 
+
 <p align="center">
   <a href="https://nabz-drab.vercel.app/">
     <img src="https://img.shields.io/badge/🌐_Live_Demo-2563EB?style=for-the-badge&logoColor=white" alt="Live Demo"/>
@@ -16,6 +17,10 @@
   &nbsp;
   <a href="https://github.com/HamzaKhanBUIC/nabz">
     <img src="https://img.shields.io/badge/💻_GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+  </a>
+  &nbsp;
+  <a href="https://drive.google.com/drive/folders/1bNC2ZCBULqHAEtGQfc8hlNCIAtZS_ZU6?usp=sharing">
+    <img src="https://img.shields.io/badge/🎬_Demo_Video-EA4335?style=for-the-badge&logo=google-drive&logoColor=white" alt="Demo Video"/>
   </a>
   &nbsp;
   <a href="https://drive.google.com/file/d/1eaZu1KslDCQIQYBzRYQwLof8XGX_RtUY/view">
@@ -27,7 +32,6 @@
   </a>
 </p>
 
-<p align="center">
   <a href="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml">
     <img src="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml/badge.svg" alt="CI status">
   </a>
