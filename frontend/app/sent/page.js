@@ -15,7 +15,7 @@ import { formatDateTime } from "@/lib/utils/format";
 function SentPageInner() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const { outbox, mission } = useStore();
+  const { outbox, mission, environment } = useStore();
 
   const record = outbox.find((item) => item.id === id) || outbox[0] || null;
 
@@ -26,7 +26,7 @@ function SentPageInner() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="t-label-md text-muted">
-            Downlink queue · {getEarthDelayLabel(mission)}
+            Downlink queue · {getEarthDelayLabel(mission, environment)}
           </p>
           <h1 className="t-h1 mt-1 text-primary">
             {record ? "Summary queued for Earth" : "Downlink outbox"}

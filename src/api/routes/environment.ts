@@ -24,11 +24,14 @@ export function activeEnvironment(store: CrewPulseStore, missionState: MissionSt
 /** E03 hazards, E06 environment switch, E04 radiation estimate. */
 export function createEnvironmentRouter(deps: EnvironmentRouterDeps): Router {
   const router = Router();
-  const state = (): EnvironmentState =>
-    EnvironmentState.parse({
-      active: activeEnvironment(deps.store, deps.missionState),
+  const state = (): EnvironmentState => {
+    const active = activeEnvironment(deps.store, deps.missionState);
+    return EnvironmentState.parse({
+      active,
+      sources: deps.store.getSources(active.sourceIds),
       options: deps.store.getEnvironments().map((e) => ({ id: e.id, name: e.name })),
     });
+  };
 
   router.get("/api/hazards", (_req, res) => {
     res.json(HazardList.parse({ hazards: deps.store.getHazards() }));

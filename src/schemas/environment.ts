@@ -77,6 +77,8 @@ export type EnvironmentRef = z.infer<typeof EnvironmentRef>;
 /** Response of GET and PUT /api/environment. */
 export const EnvironmentState = z.object({
   active: Environment,
+  /** The active environment's sourceIds, resolved from content/sources.json. */
+  sources: z.array(SourceRef).min(1),
   options: z.array(EnvironmentRef).length(5),
 });
 export type EnvironmentState = z.infer<typeof EnvironmentState>;

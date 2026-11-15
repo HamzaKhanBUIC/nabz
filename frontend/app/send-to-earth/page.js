@@ -13,7 +13,7 @@ import { getEarthDelayLabel } from "@/lib/data/mission";
 
 export default function SendToEarthPage() {
   const router = useRouter();
-  const { mission, previewShare, sendShare } = useStore();
+  const { mission, environment, previewShare, sendShare } = useStore();
 
   const [selection, setSelection] = useState({
     includeReaction: true,
@@ -81,7 +81,7 @@ export default function SendToEarthPage() {
 
       <div>
         <p className="t-label-md text-muted">
-          Voluntary downlink · {getEarthDelayLabel(mission)}
+          Voluntary downlink · {getEarthDelayLabel(mission, environment)}
         </p>
         <h1 className="t-h1 mt-1 text-primary">Send summary to Earth</h1>
         <p className="mt-1 text-sm text-secondary">

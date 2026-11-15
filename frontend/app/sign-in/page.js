@@ -307,13 +307,22 @@ export default function SignInPage() {
             ) : null}
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <Link
-                href="/real-data"
-                className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-2 hover:underline"
-              >
-                <Icon name="biotech" size={18} />
-                <span>Real astronaut data</span>
-              </Link>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link
+                  href="/real-data"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-2 hover:underline"
+                >
+                  <Icon name="biotech" size={18} />
+                  <span>Real astronaut data</span>
+                </Link>
+                <Link
+                  href="/hazards"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-2 hover:underline"
+                >
+                  <Icon name="health_and_safety" size={18} />
+                  <span>5 hazards</span>
+                </Link>
+              </div>
 
               <Button
                 type="submit"

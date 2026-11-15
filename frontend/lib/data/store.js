@@ -17,6 +17,7 @@ const STORAGE_KEYS = {
   protocol: "crewpulse:cache:protocol",
   bpGuide: "crewpulse:cache:bpGuide",
   routines: "crewpulse:cache:routines",
+  hazards: "crewpulse:cache:hazards",
   emergencySelf: "crewpulse:cache:emergency:self",
   emergencyCrewmate: "crewpulse:cache:emergency:crewmate",
   outbox: "crewpulse:outbox",
@@ -83,6 +84,9 @@ export function StoreProvider({ children }) {
   const [protocol, setProtocol] = useState(null);
   const [bpGuide, setBpGuide] = useState(null);
   const [routines, setRoutines] = useState([]);
+  const [hazards, setHazards] = useState([]);
+  const [environment, setEnvironment] = useState(null);
+  const [radiation, setRadiation] = useState(null);
   const [reminders, setReminders] = useState(null);
   const [emergencySelf, setEmergencySelf] = useState([]);
   const [emergencyCrewmate, setEmergencyCrewmate] = useState([]);
@@ -106,19 +110,29 @@ export function StoreProvider({ children }) {
   }, []);
 
   const refreshDynamicState = useCallback(async () => {
-    const [missionRes, todayRes, remindersRes, ...trendResults] =
-      await Promise.all([
-        api.getMission(),
-        api.getToday(),
-        api.getReminders().catch(() => null),
-        ...TREND_CODES.map((code) => api.getTrends(code, 30)),
-      ]);
+    const [
+      missionRes,
+      todayRes,
+      remindersRes,
+      environmentRes,
+      radiationRes,
+      ...trendResults
+    ] = await Promise.all([
+      api.getMission(),
+      api.getToday(),
+      api.getReminders().catch(() => null),
+      api.getEnvironment().catch(() => null),
+      api.getRadiation().catch(() => null),
+      ...TREND_CODES.map((code) => api.getTrends(code, 30)),
+    ]);
 
     setMission(missionRes);
     setToday(todayRes);
     if (todayRes?.checkin) setLastCheckinResult(todayRes.checkin);
     if (todayRes?.bp) setLastBpResult(todayRes.bp);
     if (remindersRes) setReminders(remindersRes);
+    if (environmentRes) setEnvironment(environmentRes);
+    if (radiationRes) setRadiation(radiationRes);
 
     const nextTrends = {};
     const nextByRange = {};
@@ -134,7 +148,7 @@ export function StoreProvider({ children }) {
     setError(null);
   }, []);
 
-  // Public bootstrap: mission info, protocols, guides, routines, emergency procedures.
+  // Public bootstrap: mission info, protocols, guides, routines, hazards, environment, radiation, emergency procedures.
   useEffect(() => {
     let active = true;
 
@@ -145,6 +159,7 @@ export function StoreProvider({ children }) {
       const cachedProtocol = readCache(STORAGE_KEYS.protocol, null);
       const cachedBpGuide = readCache(STORAGE_KEYS.bpGuide, null);
       const cachedRoutines = readCache(STORAGE_KEYS.routines, []);
+      const cachedHazards = readCache(STORAGE_KEYS.hazards, []);
       const cachedSelf = readCache(STORAGE_KEYS.emergencySelf, []);
       const cachedCrew = readCache(STORAGE_KEYS.emergencyCrewmate, []);
       const cachedEmergencyLog = readCache(STORAGE_KEYS.emergencyLog, []);
@@ -152,21 +167,34 @@ export function StoreProvider({ children }) {
       if (cachedProtocol) setProtocol(cachedProtocol);
       if (cachedBpGuide) setBpGuide(cachedBpGuide);
       if (Array.isArray(cachedRoutines)) setRoutines(cachedRoutines);
+      if (Array.isArray(cachedHazards)) setHazards(cachedHazards);
       if (Array.isArray(cachedSelf)) setEmergencySelf(cachedSelf);
       if (Array.isArray(cachedCrew)) setEmergencyCrewmate(cachedCrew);
       if (Array.isArray(cachedEmergencyLog)) setEmergencyLog(cachedEmergencyLog);
       setHydrated(true);
 
       try {
-        const [missionRes, protoRes, bpGuideRes, routinesRes, selfRes, crewRes] =
-          await Promise.all([
-            api.getMission(),
-            api.getCheckinProtocol(),
-            api.getBpGuide(),
-            api.getRoutines().catch(() => ({ routines: [] })),
-            api.getEmergencyProcedures("self"),
-            api.getEmergencyProcedures("crewmate"),
-          ]);
+        const [
+          missionRes,
+          protoRes,
+          bpGuideRes,
+          routinesRes,
+          selfRes,
+          crewRes,
+          hazardsRes,
+          environmentRes,
+          radiationRes,
+        ] = await Promise.all([
+          api.getMission(),
+          api.getCheckinProtocol(),
+          api.getBpGuide(),
+          api.getRoutines().catch(() => ({ routines: [] })),
+          api.getEmergencyProcedures("self"),
+          api.getEmergencyProcedures("crewmate"),
+          api.getHazards().catch(() => null),
+          api.getEnvironment().catch(() => null),
+          api.getRadiation().catch(() => null),
+        ]);
         if (!active) return;
 
         setMission(missionRes);
@@ -190,6 +218,13 @@ export function StoreProvider({ children }) {
         const crewList = crewRes?.procedures || [];
         setEmergencyCrewmate(crewList);
         writeCache(STORAGE_KEYS.emergencyCrewmate, crewList);
+
+        if (Array.isArray(hazardsRes?.hazards)) {
+          setHazards(hazardsRes.hazards);
+          writeCache(STORAGE_KEYS.hazards, hazardsRes.hazards);
+        }
+        setEnvironment(environmentRes || null);
+        setRadiation(radiationRes || null);
       } catch (err) {
         if (!active) return;
         setBackendOnline(false);
@@ -340,6 +375,47 @@ export function StoreProvider({ children }) {
     return updated;
   }, []);
 
+  const refreshHazards = useCallback(async () => {
+    const res = await api.getHazards();
+    const list = Array.isArray(res?.hazards) ? res.hazards : [];
+    setHazards(list);
+    writeCache(STORAGE_KEYS.hazards, list);
+    return list;
+  }, []);
+
+  const refreshEnvironment = useCallback(async () => {
+    const res = await api.getEnvironment();
+    setEnvironment(res);
+    return res;
+  }, []);
+
+  const refreshRadiation = useCallback(async () => {
+    const res = await api.getRadiation();
+    setRadiation(res);
+    return res;
+  }, []);
+
+  const switchEnvironment = useCallback(
+    async (id) => {
+      const updated = await api.setEnvironment(id);
+      setEnvironment(updated);
+      const [missionRes, radiationRes, todayRes] = await Promise.all([
+        api.getMission().catch(() => null),
+        api.getRadiation().catch(() => null),
+        token ? api.getToday().catch(() => null) : Promise.resolve(null),
+      ]);
+      if (missionRes) setMission(missionRes);
+      if (radiationRes) setRadiation(radiationRes);
+      if (todayRes) {
+        setToday(todayRes);
+        if (todayRes.checkin) setLastCheckinResult(todayRes.checkin);
+        if (todayRes.bp) setLastBpResult(todayRes.bp);
+      }
+      return updated;
+    },
+    [token],
+  );
+
   const recordEmergencyAlert = useCallback((entry) => {
     setEmergencyLog((prev) => {
       const next = [entry, ...prev];
@@ -368,6 +444,9 @@ export function StoreProvider({ children }) {
       bpGuide,
       routines,
       routinesById,
+      hazards,
+      environment,
+      radiation,
       reminders,
       emergencySelf,
       emergencyCrewmate,
@@ -379,6 +458,10 @@ export function StoreProvider({ children }) {
       outbox,
       emergencyLog,
       refreshAll: refreshDynamicState,
+      refreshHazards,
+      refreshEnvironment,
+      refreshRadiation,
+      switchEnvironment,
       loadTrend,
       submitCheckin,
       submitBpMeasurement,
@@ -401,6 +484,9 @@ export function StoreProvider({ children }) {
       bpGuide,
       routines,
       routinesById,
+      hazards,
+      environment,
+      radiation,
       reminders,
       emergencySelf,
       emergencyCrewmate,
@@ -412,6 +498,10 @@ export function StoreProvider({ children }) {
       outbox,
       emergencyLog,
       refreshDynamicState,
+      refreshHazards,
+      refreshEnvironment,
+      refreshRadiation,
+      switchEnvironment,
       loadTrend,
       submitCheckin,
       submitBpMeasurement,

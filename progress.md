@@ -174,3 +174,11 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Gate PASS (16 files, 118 tests); frontend lint and build pass.
 - Held for research: E03 (R11), E06 (R10), E04 (R9). Open: the OSD-569 hemoglobin unit says percent but the values are g/dL.
 - Not pushed: the team sees a demo video first.
+
+## 2026-11-15: E03, E04, E06 built (local only, design/extras)
+- Research R9-R11 checked into CHECKS.md (91d12f0). Hamza chose option A for radiation: published rates, no raw RAD files.
+- Backend (2c5b46c and this commit): `content/hazards.json` (NASA's 5 hazards, sentences quoted from the raw NASA page), `content/environments.json` (5 profiles), hazard and HRP risk tags on every card, `GET /api/hazards`, `GET/PUT /api/environment` (Commander only, returns resolved sources), `GET /api/radiation` (estimate, George 2024 rates, 600 mSv limit, "not tracked" for Remote Earth). Escalation line on act and urgent cards only; same check-in gives the same card in every environment (contract test).
+- Frontend (Antigravity worker, reviewed): `/hazards` (public), `/environment`, dose card on Today and /hazards, hazard chips and "Who to contact" on action cards, header strip, emergency line. Fixed: removed a client-side copy of sources.json (the API now returns sources); corrected an overclaiming intro line.
+- Browser check: hazards page signed out; Sara's severe BP card shows the Gravity fields chip and the Mars transit line; switching to ISS changed the header, card line (flight surgeon), emergency line and dose (81.6 mSv); Remote Earth shows "Not tracked here"; Mateo sees no switch; 375 px with no sideways scroll on 4 pages.
+- Gate PASS (19 files, 135 tests). E06 passes. E03 and E04 held: one verify step each no longer fits (see features.json notes).
+- Local runtime: the old `data/runtime/sara.json` (1 test BP entry, cards without hazard tags) was set aside as `sara.json.corrupt` by the loader.

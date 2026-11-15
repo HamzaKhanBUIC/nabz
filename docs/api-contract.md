@@ -258,7 +258,7 @@ Without a valid token they answer `401 { error: { code: "no_session" } }`. Every
 | Call | Who | Body | Answer |
 |---|---|---|---|
 | `GET /api/hazards` | public | — | `{ hazards: [{ id, name, summary, url, hrpRiskIds, watches }] }`: NASA's 5 hazards |
-| `GET /api/environment` | public | — | `{ active: Environment, options: [{ id, name }] }` |
+| `GET /api/environment` | public | — | `{ active: Environment, sources: [{ id, title, url }], options: [{ id, name }] }` |
 | `PUT /api/environment` | Commander only (others get `403 forbidden`) | `{ id }`: `iss`, `moon`, `mars-transit`, `mars-surface` or `remote-earth` | same as `GET` |
 | `GET /api/radiation` | public | — | `{ environment, missionDay, basis: "published-average", dailyRateMsv, doseToDateMsv, careerLimitMsv: 600, percentOfCareerLimit, daysUntilLimit, note, sources, status }` |
 

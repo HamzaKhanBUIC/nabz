@@ -80,21 +80,17 @@ Each lane ends with the gate, its own `verify` steps from `features.json`, a fro
 
 ## E04: radiation dose tracker
 
-**Data:** MSL RAD files in `data/nasa/rad/`, unmodified, with a README (source, licence, fetch date, what they do and don't contain). Brief R9 picks the files.
+**Decided 2026-11-15 (Hamza, option A after R9):** published rates, no raw RAD files. The raw MSL/RAD cruise data is about 5.5 GB of absorbed-dose tables with no Sv column, too big to ship offline (CHECKS R9).
 
-**Core:** `estimateDose({ dailyRateMsv, missionDay, environment })` is pure and returns the dose to date and the projected mission dose. The rate per environment comes from `content/environments.json` (E06), sourced from R9 and R10.
+**Data:** `RADIATION_RATE_MSV_PER_DAY` in `src/core/constants.ts`, all from George et al. 2024 Table 2 (one source, one solar period): ISS 0.68, lunar surface 0.81, Mars transit 1.58, Mars surface 0.65 mSv/day. The Mars transit note also shows Curiosity's measured 1.84 mSv/day (2011-12). Remote Earth has no verified rate, so it shows "Not tracked here".
 
-**API (public, mission level):** `GET /api/radiation` returns:
-- `{ environment, doseToDateMsv, dailyRateMsv, careerLimitMsv: 600, percentOfCareerLimit, projectedMissionMsv, basis, sources, status }`;
-- `basis` is `"rad-measured"` or `"published-average"`;
-- `status` carries `level`, `label` and `iconKey`. It is `info` unless the dose to date or the projected dose crosses the 600 mSv limit, and the label then states that fact.
+**Core:** `estimateDose(rateKey, missionDay)` is pure. It returns the dose to date (rate × mission day), the percent of the 600 mSv career limit, whole days until the limit at this rate, and a status. **Changed from the first design:** there is no `projectedMissionMsv`, because no sourced mission length exists; `daysUntilLimit` replaces it.
 
-**Screen:** a dose card with a gauge against the career limit, the word "estimate", and the source. It never presents the number as Sara's personal dosimeter reading.
+**API (public, mission level):** `GET /api/radiation` returns `{ environment, missionDay, basis: "published-average", dailyRateMsv, doseToDateMsv, careerLimitMsv: 600, percentOfCareerLimit, daysUntilLimit, note, sources, status }`. `status` is `info` ("Under the career limit") unless the dose reaches 600 mSv (`act`, "At or over the career limit").
 
-**Tests:**
-- hand-computed doses for 2 environments;
-- the limit crossing;
-- a test that checks the data file against its README.
+**Screen:** a dose card with a gauge against the career limit, the word "Estimate", the note and the sources. It never presents the number as Sara's personal dosimeter reading.
+
+**Tests:** hand-computed doses for Mars transit, ISS and Moon; the limit crossing at day 380; "not tracked" for Remote Earth.
 
 ## E05: medical officer view
 
@@ -131,7 +127,7 @@ Each lane ends with the gate, its own `verify` steps from `features.json`, a fro
 | `radiationRateKey` | which E04 rate applies |
 | `escalation` | the short wording the action card and emergency screens show for "who to contact" |
 
-**API:** `GET /api/environment` (public) and `PUT /api/environment { id }` (Commander only). `GET /api/mission` and `GET /api/today` include the active environment.
+**API:** `GET /api/environment` (public) and `PUT /api/environment { id }` (Commander only). `GET /api/mission` includes the active environment; `GET /api/today` carries it through each act or urgent card's `escalation` line, which is added when the API answers and never stored. The active environment lives in `data/runtime/mission-state.json` (default `mars-transit`).
 
 **Core:** `pickEscalation(card, environment)` is pure and selects the wording. It never changes `severity`, `zone` or `ruleId`.
 

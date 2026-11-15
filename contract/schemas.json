@@ -5533,6 +5533,33 @@
             ],
             "additionalProperties": false
           },
+          "sources": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
           "options": {
             "minItems": 5,
             "maxItems": 5,
@@ -5565,6 +5592,7 @@
         },
         "required": [
           "active",
+          "sources",
           "options"
         ],
         "additionalProperties": false
@@ -5724,6 +5752,33 @@
             ],
             "additionalProperties": false
           },
+          "sources": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
           "options": {
             "minItems": 5,
             "maxItems": 5,
@@ -5756,6 +5811,7 @@
         },
         "required": [
           "active",
+          "sources",
           "options"
         ],
         "additionalProperties": false

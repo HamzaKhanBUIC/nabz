@@ -343,6 +343,25 @@ export function getNasaTrend(crew, analyte) {
   });
 }
 
+export function getHazards() {
+  return request("/api/hazards", { handleNoSession: false });
+}
+
+export function getEnvironment() {
+  return request("/api/environment", { handleNoSession: false });
+}
+
+export function setEnvironment(id) {
+  return request("/api/environment", {
+    method: "PUT",
+    body: JSON.stringify({ id }),
+  });
+}
+
+export function getRadiation() {
+  return request("/api/radiation", { handleNoSession: false });
+}
+
 export function iconNameForKey(iconKey) {
   switch (iconKey) {
     case "check":

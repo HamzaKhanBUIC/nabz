@@ -8,30 +8,56 @@ import { useSession } from "@/lib/data/session";
 import { getEarthDelayLabel } from "@/lib/data/mission";
 import { APP_NAME } from "@/lib/data/nav";
 
-function MissionPill({ icon, children, title, tone = "neutral", compact = false }) {
+function MissionPill({
+  icon,
+  children,
+  title,
+  href,
+  tone = "neutral",
+  compact = false,
+  className = "",
+}) {
   const palette =
     tone === "offline"
       ? "border-attention/40 bg-attention/10 text-attention"
       : "border-line bg-surface text-secondary";
+  const interactive = href
+    ? "transition-colors hover:border-line-strong hover:bg-hover hover:text-primary"
+    : "";
+  const classes = `inline-flex min-w-0 max-w-full shrink-0 items-center gap-1.5 rounded-pill border font-medium whitespace-nowrap ${palette} ${interactive} ${
+    compact ? "px-2.5 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
+  } ${className}`;
+
+  const content = (
+    <>
+      <Icon name={icon} size={compact ? 14 : 15} className="shrink-0" />
+      <span className="truncate">{children}</span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} title={title} className={classes}>
+        {content}
+      </Link>
+    );
+  }
+
   return (
-    <span
-      title={title}
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill border font-medium whitespace-nowrap ${palette} ${
-        compact ? "px-2.5 py-0.5 text-[11px]" : "px-3 py-1.5 text-xs"
-      }`}
-    >
-      <Icon name={icon} size={compact ? 14 : 16} />
-      <span>{children}</span>
+    <span title={title} className={classes}>
+      {content}
     </span>
   );
 }
 
 export default function TopBar({ onOpenMenu }) {
-  const { mission, backendOnline } = useStore();
+  const { mission, environment, backendOnline } = useStore();
   const { isAuthenticated, crew, switchCrewMember } = useSession();
   const missionDay = mission?.missionDay ?? 1;
   const missionName = mission?.name || "Mars Transit Sim";
-  const delayLabel = getEarthDelayLabel(mission);
+  const activeEnv = environment?.active || null;
+  const delayLabel = getEarthDelayLabel(mission, environment);
+  const envHref = isAuthenticated ? "/environment" : undefined;
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-xl">
@@ -61,12 +87,6 @@ export default function TopBar({ onOpenMenu }) {
               title={`Mission day ${missionDay}: ${missionName}`}
             >
               {`Day ${missionDay} · ${missionName}`}
-            </MissionPill>
-            <MissionPill
-              icon="schedule"
-              title={`Earth communication delay: ${delayLabel}`}
-            >
-              {delayLabel}
             </MissionPill>
             {isAuthenticated && crew ? (
               <MissionPill
@@ -110,22 +130,73 @@ export default function TopBar({ onOpenMenu }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 border-t border-line/70 px-4 py-2 lg:hidden">
-        <MissionPill compact icon="rocket_launch">
+      <div
+        className="flex flex-wrap items-center gap-1.5 border-t border-line/70 px-4 py-2 sm:gap-2 sm:px-6 lg:px-8"
+        aria-label="Mission environment context"
+      >
+        <MissionPill compact icon="rocket_launch" className="lg:hidden">
           {`Day ${missionDay} · ${missionName}`}
         </MissionPill>
-        <MissionPill compact icon="schedule">
-          {delayLabel}
-        </MissionPill>
+
+        {activeEnv ? (
+          <>
+            <MissionPill
+              compact
+              icon="satellite_alt"
+              href={envHref}
+              title={`Active mission environment: ${activeEnv.name}`}
+            >
+              {activeEnv.name}
+            </MissionPill>
+            {activeEnv.oneWayDelay?.text ? (
+              <MissionPill
+                compact
+                icon="schedule"
+                title={`One-way Earth delay: ${activeEnv.oneWayDelay.text}`}
+              >
+                {activeEnv.oneWayDelay.text}
+              </MissionPill>
+            ) : null}
+            {activeEnv.gravity ? (
+              <MissionPill
+                compact
+                icon="public"
+                title={`Gravity: ${activeEnv.gravity}`}
+                className="hidden sm:inline-flex"
+              >
+                {activeEnv.gravity}
+              </MissionPill>
+            ) : null}
+            {activeEnv.timeToCare ? (
+              <MissionPill
+                compact
+                icon="medical_services"
+                title={`Time to care: ${activeEnv.timeToCare}`}
+                className="hidden sm:inline-flex"
+              >
+                {activeEnv.timeToCare}
+              </MissionPill>
+            ) : null}
+          </>
+        ) : (
+          <MissionPill
+            compact
+            icon="schedule"
+            title={`Earth communication delay: ${delayLabel}`}
+          >
+            {delayLabel}
+          </MissionPill>
+        )}
+
         {isAuthenticated && crew ? (
           <>
-            <MissionPill compact icon="person">
+            <MissionPill compact icon="person" className="lg:hidden">
               {`${crew.name} · ${crew.role}`}
             </MissionPill>
             <button
               type="button"
               onClick={switchCrewMember}
-              className="inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-pill border border-line bg-surface px-2.5 py-0.5 text-[11px] font-medium text-secondary hover:bg-hover hover:text-primary"
+              className="inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-pill border border-line bg-surface px-2.5 py-0.5 text-[11px] font-medium text-secondary hover:bg-hover hover:text-primary lg:hidden"
             >
               <Icon name="swap_horiz" size={14} />
               <span>Switch crew member</span>
@@ -133,7 +204,7 @@ export default function TopBar({ onOpenMenu }) {
           </>
         ) : null}
         {!backendOnline ? (
-          <MissionPill compact icon="cloud_off" tone="offline">
+          <MissionPill compact icon="cloud_off" tone="offline" className="lg:hidden">
             Offline cache
           </MissionPill>
         ) : null}

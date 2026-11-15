@@ -171,8 +171,10 @@ function EmergencyFlowInner() {
     emergencySelf,
     emergencyCrewmate,
     emergencyLog,
+    environment,
     recordEmergencyAlert,
   } = useStore();
+  const activeEnv = environment?.active || null;
 
   const [userTarget, setUserTarget] = useState(null); // self | crewmate | null
   const [userSelectedId, setUserSelectedId] = useState(null);
@@ -264,6 +266,22 @@ function EmergencyFlowInner() {
           </button>
         </div>
       </div>
+
+      {activeEnv?.name && activeEnv?.escalation ? (
+        <div className="flex items-start gap-3 rounded-lg border border-attention/40 bg-attention/10 px-4 py-3 text-sm">
+          <Icon
+            name="contact_phone"
+            size={20}
+            className="mt-0.5 shrink-0 text-attention"
+          />
+          <div className="min-w-0">
+            <p className="t-label-md text-secondary">Who to contact</p>
+            <p className="mt-0.5 font-semibold text-primary">
+              {`${activeEnv.name}: ${activeEnv.escalation}`}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {alertNotice ? (
         <div

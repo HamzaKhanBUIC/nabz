@@ -45,11 +45,25 @@ export const NAV_ITEMS = [
   },
 ];
 
+export const HAZARDS_NAV = {
+  href: "/hazards",
+  label: "5 hazards",
+  icon: "health_and_safety",
+  description: "NASA's five hazards and mission radiation estimate",
+};
+
 export const REAL_DATA_NAV = {
   href: "/real-data",
   label: "Real astronaut data",
   icon: "biotech",
   description: "NASA OSDR OSD-569 Inspiration4 blood trends",
+};
+
+export const ENVIRONMENT_NAV = {
+  href: "/environment",
+  label: "Mission environment",
+  icon: "satellite_alt",
+  description: "Active mission environment, delay, and escalation guidance",
 };
 
 export const PRIVACY_NAV = {
@@ -75,10 +89,12 @@ export const SIGN_IN_NAV = {
 
 export function getSecondaryNavItems({ isAuthenticated, isMedicalOfficer }) {
   if (!isAuthenticated) {
-    return [REAL_DATA_NAV, SIGN_IN_NAV];
+    return [HAZARDS_NAV, REAL_DATA_NAV, SIGN_IN_NAV];
   }
   return [
+    HAZARDS_NAV,
     REAL_DATA_NAV,
+    ENVIRONMENT_NAV,
     PRIVACY_NAV,
     ...(isMedicalOfficer ? [CREW_HEALTH_NAV] : []),
   ];
@@ -101,7 +117,9 @@ export const SECTION_FOR_PATH = {
   "/send-to-earth": "send-to-earth",
   "/sent": "send-to-earth",
   "/emergency": "emergency",
+  "/hazards": "hazards",
   "/real-data": "real-data",
+  "/environment": "environment",
   "/privacy": "privacy",
   "/crew-health": "crew-health",
   "/sign-in": "sign-in",
@@ -118,7 +136,9 @@ export function sectionForPath(pathname) {
     return "send-to-earth";
   }
   if (pathname.startsWith("/emergency")) return "emergency";
+  if (pathname.startsWith("/hazards")) return "hazards";
   if (pathname.startsWith("/real-data")) return "real-data";
+  if (pathname.startsWith("/environment")) return "environment";
   if (pathname.startsWith("/privacy")) return "privacy";
   if (pathname.startsWith("/crew-health")) return "crew-health";
   if (pathname.startsWith("/sign-in")) return "sign-in";

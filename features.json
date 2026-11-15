@@ -287,7 +287,7 @@
         "Browser: hazard chip with label and icon on the action card; 5-hazards section links to NASA pages"
       ],
       "passes": false,
-      "notes": ""
+      "notes": "2026-11-15: built and checked (content test, every card tagged, /hazards page, chips in browser). Held: verify step 1 asks for the R11 mapping marked confirmed, but NASA publishes no card mapping, so CHECKS marks it a design choice. Needs Hamza to approve rewording that step."
     },
     {
       "id": "E04",
@@ -301,7 +301,7 @@
         "Browser: the card says 'estimate' and shows its source"
       ],
       "passes": false,
-      "notes": ""
+      "notes": "2026-11-15: built and checked with option A (published rates, George 2024 Table 2). tests/unit/radiation.test.ts passes; browser shows Estimate and sources. Held: verify step 1 asks for data/nasa/rad/README.md, which option A dropped (no raw RAD files). Needs Hamza to approve rewording that step."
     },
     {
       "id": "E05",
@@ -328,8 +328,8 @@
         "npx vitest run tests/unit/environment.test.ts (same check-in gives the same zone and card id in every environment)",
         "Browser: header context strip and card escalation line change with the environment"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-15: five profiles from CHECKS R5/R10 in content/environments.json; Commander-only switch; escalation line added to act and urgent cards at response time. Same-check-in test is in tests/contract/environment.test.ts (unit escalation tests in tests/unit/environment.test.ts). Browser: header strip, Today card line and emergency line changed with the environment; Mateo sees no switch. Local only."
     }
   ]
 }

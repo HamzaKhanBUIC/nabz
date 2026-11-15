@@ -7,6 +7,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import ClinicalActionCard from "@/components/dashboard/ClinicalActionCard";
 import NormalZoneWidget from "@/components/dashboard/NormalZoneWidget";
 import ReminderCard from "@/components/dashboard/ReminderCard";
+import RadiationDoseCard from "@/components/hazards/RadiationDoseCard";
 import { useStore } from "@/lib/data/store";
 import { useSession } from "@/lib/data/session";
 import { getCommander } from "@/lib/data/mission";
@@ -191,6 +192,8 @@ export default function TodayDashboard() {
         <NormalZoneWidget />
         <ReminderCard />
       </div>
+
+      <RadiationDoseCard />
     </div>
   );
 }

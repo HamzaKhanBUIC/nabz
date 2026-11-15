@@ -8,6 +8,7 @@ import Icon from "@/components/ui/Icon";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { iconNameForKey, statusToBadgeTone } from "@/lib/api";
 import { useStore } from "@/lib/data/store";
+import { hazardIcon } from "@/lib/utils/hazards";
 import RoutineModal from "@/components/routines/RoutineModal";
 
 export default function ClinicalActionCard({
@@ -47,11 +48,19 @@ export default function ClinicalActionCard({
     );
   }
 
-  const badgeTone = statusToBadgeTone(card.status?.level || card.severity);
+  const statusLevel = card.status?.level || card.severity;
+  const badgeTone = statusToBadgeTone(statusLevel);
+  const escalationTone =
+    statusLevel === "urgent"
+      ? "emergency"
+      : statusLevel === "act" || statusLevel === "watch"
+        ? "attention"
+        : "accent";
   const statusIcon = iconNameForKey(card.status?.iconKey);
   const linkedRoutine = card.links?.routineId
     ? routinesById?.[card.links.routineId]
     : null;
+  const hazards = Array.isArray(card.hazards) ? card.hazards : [];
 
   return (
     <>
@@ -68,6 +77,58 @@ export default function ClinicalActionCard({
               <span>{card.status?.label || "Status"}</span>
             </StatusBadge>
           </div>
+
+          {hazards.length > 0 ? (
+            <div
+              className="mt-3 flex flex-wrap items-center gap-2"
+              aria-label="NASA spaceflight hazards"
+            >
+              {hazards.map((hazard) => (
+                <Link
+                  key={hazard.id}
+                  href={`/hazards#${hazard.id}`}
+                  className="inline-flex min-h-8 items-center gap-1.5 rounded-pill border border-line bg-raised px-2.5 py-1 text-xs font-medium text-secondary transition-colors hover:border-line-strong hover:bg-hover hover:text-primary"
+                >
+                  <Icon
+                    name={hazardIcon(hazard.id)}
+                    size={14}
+                    className="text-accent"
+                  />
+                  <span>{hazard.name}</span>
+                </Link>
+              ))}
+            </div>
+          ) : null}
+
+          {card.escalation ? (
+            <div
+              className={`mt-4 flex items-start gap-3 rounded-lg border px-4 py-3 ${
+                escalationTone === "emergency"
+                  ? "border-emergency/40 bg-emergency/10"
+                  : escalationTone === "attention"
+                    ? "border-attention/40 bg-attention/10"
+                    : "border-accent/30 bg-accent/10"
+              }`}
+            >
+              <Icon
+                name="contact_phone"
+                size={20}
+                className={`mt-0.5 shrink-0 ${
+                  escalationTone === "emergency"
+                    ? "text-emergency"
+                    : escalationTone === "attention"
+                      ? "text-attention"
+                      : "text-accent"
+                }`}
+              />
+              <div className="min-w-0">
+                <p className="t-label-md text-secondary">Who to contact</p>
+                <p className="mt-0.5 text-sm font-semibold text-primary">
+                  {card.escalation}
+                </p>
+              </div>
+            </div>
+          ) : null}
 
           <div className={`mt-5 grid gap-3.5 sm:gap-4 ${compact ? "md:grid-cols-1" : "md:grid-cols-3"}`}>
             <div className="rounded-md border border-line bg-raised p-4">
