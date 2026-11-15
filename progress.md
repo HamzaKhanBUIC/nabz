@@ -182,3 +182,4 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Browser check: hazards page signed out; Sara's severe BP card shows the Gravity fields chip and the Mars transit line; switching to ISS changed the header, card line (flight surgeon), emergency line and dose (81.6 mSv); Remote Earth shows "Not tracked here"; Mateo sees no switch; 375 px with no sideways scroll on 4 pages.
 - Gate PASS (19 files, 135 tests). E06 passes. E03 and E04 held: one verify step each no longer fits (see features.json notes).
 - Local runtime: the old `data/runtime/sara.json` (1 test BP entry, cards without hazard tags) was set aside as `sara.json.corrupt` by the loader.
+- E03 and E04 verify steps reworded with Hamza's OK (E04 description too) to match the R11 design-choice note and the published-rates decision; both now pass.

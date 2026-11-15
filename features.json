@@ -282,26 +282,26 @@
       "design": "docs/features/E-extras.md",
       "owner": "Antigravity lane",
       "verify": [
-        "research/CHECKS.md has the R11 mapping marked confirmed",
-        "npx vitest run tests/unit/content.test.ts (every card has at least one known hazard id)",
-        "Browser: hazard chip with label and icon on the action card; 5-hazards section links to NASA pages"
+        "research/CHECKS.md (R11) confirms NASA's five hazards and the HRP risk IDs. NASA publishes no link between our cards and its hazards, so CHECKS lists our card tags as a design choice.",
+        "npx vitest run tests/unit/content.test.ts (every card names at least one known hazard)",
+        "Browser: each action card shows its hazard as a chip with a name and an icon, and the 5 hazards page links to NASA's page for each hazard"
       ],
-      "passes": false,
-      "notes": "2026-11-15: built and checked (content test, every card tagged, /hazards page, chips in browser). Held: verify step 1 asks for the R11 mapping marked confirmed, but NASA publishes no card mapping, so CHECKS marks it a design choice. Needs Hamza to approve rewording that step."
+      "passes": true,
+      "notes": "2026-11-15: verify steps reworded with Hamza's OK to match CHECKS R11. Content test passes; browser showed hazard chips on cards and the 5 hazards page with NASA links. Local only until the team approves."
     },
     {
       "id": "E04",
       "priority": "P3",
-      "description": "A radiation card estimates the mission dose to date from real Curiosity RAD measurements (or the published average if no clean file exists), against NASA's 600 mSv career limit.",
+      "description": "A radiation card estimates the mission dose so far from published daily rates (George et al. 2024), against NASA's 600 mSv career limit. On Mars transit it also shows the rate Curiosity measured on its way to Mars.",
       "design": "docs/features/E-extras.md",
       "owner": "Antigravity lane",
       "verify": [
-        "research/CHECKS.md has the R9 values marked confirmed; data/nasa/rad/README.md names source and fetch date",
+        "research/CHECKS.md (R9) confirms the daily rates from George et al. 2024, Table 2, and the 600 mSv career limit. We use these published rates instead of raw RAD files (decided 2026-11-15), so there is no data/nasa/rad folder to check.",
         "npx vitest run tests/unit/radiation.test.ts (hand-computed doses, limit crossing)",
-        "Browser: the card says 'estimate' and shows its source"
+        "Browser: the card says \"Estimate\" and shows its sources"
       ],
-      "passes": false,
-      "notes": "2026-11-15: built and checked with option A (published rates, George 2024 Table 2). tests/unit/radiation.test.ts passes; browser shows Estimate and sources. Held: verify step 1 asks for data/nasa/rad/README.md, which option A dropped (no raw RAD files). Needs Hamza to approve rewording that step."
+      "passes": true,
+      "notes": "2026-11-15: verify steps and description reworded with Hamza's OK after choosing published rates. tests/unit/radiation.test.ts passes; browser showed \"Estimate\", sources, and \"Not tracked here\" for Remote Earth. Local only until the team approves."
     },
     {
       "id": "E05",
