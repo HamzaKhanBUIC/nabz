@@ -6,7 +6,7 @@
 2. **Rules run on the server**, in a pure `src/core` folder that imports nothing from Node.
 3. **Plain typed functions and a priority table** choose the action card. No rules-engine library.
 4. **The browser times the taps and sends raw trials.** The server validates and scores everything.
-5. **Baseline is within-person:** mean and SD of the last 14 valid check-ins that were not in zone `act`; at least 5 needed.
+5. **Baseline is within-person:** mean and SD of the last 14 valid check-ins; at least 5 needed. (Amended 2026-11-15: entries are no longer left out for being in zone `act`; see `docs/features/M2-normal-zone.md`.)
 6. **zod schemas are the contract.** `contract/examples/*.json` and `docs/api-contract.md` are checked against them by tests.
 7. **Must is designed in full. Should gets slots** (fields, 501 endpoints, `src/slots/` interfaces). Later is a list.
 8. **Simulated daily signals + one real NASA file.** Reaction, blood pressure, sleep and heart rate are simulated from published ISS values. The real Inspiration4 blood counts (OSD-569) run through the same baseline engine.

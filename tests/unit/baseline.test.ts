@@ -83,7 +83,7 @@ describe("F04 personal baseline, zone classification, and trend builder (M2)", (
     expect(foldHistory([...seed, entry(6, 3.505)])[5]!.zone).toBe("in_zone");
   });
 
-  it("excludes flagged entries, keeps valid one-sided entries, and excludes two-sided watch outliers", () => {
+  it("excludes flagged and caller-excluded entries, and never excludes an entry for its own zone", () => {
     const seed = [
       entry(1, 3.8),
       entry(2, 3.8),
@@ -110,22 +110,26 @@ describe("F04 personal baseline, zone classification, and trend builder (M2)", (
     expect(scored[7]!.baseline.mean).toBeCloseTo(3.9167, 4);
     expect(scored[7]!.zone).toBe("in_zone");
 
-    // Two-sided (blood pressure): off-normal watch outliers stay out of later windows.
-    const bpEntries = [
-      entry(1, 116),
-      entry(2, 118),
-      entry(3, 120),
-      entry(4, 120),
-      entry(5, 121),
-      entry(6, 186), // spike: |z| = 33.5 -> watch, excluded from window
-      entry(7, 119), // sees unchanged window: n = 5, mean = 119, sd = 2
-    ];
-    const bpScored = foldHistory(bpEntries, { direction: "two_sided" });
-    expect(bpScored[5]!.zone).toBe("watch");
-    expect(bpScored[6]!.baseline.n).toBe(5);
-    expect(bpScored[6]!.baseline.mean).toBe(119);
-    expect(bpScored[6]!.baseline.sd).toBe(2);
-    expect(bpScored[6]!.zone).toBe("in_zone");
+    // Two-sided (blood pressure). A reading the caller marks as abnormal by an absolute
+    // threshold is scored but stays out of later windows.
+    const bpSeed = [entry(1, 116), entry(2, 118), entry(3, 120), entry(4, 120), entry(5, 121)];
+    const withSevere = foldHistory(
+      [...bpSeed, { ...entry(6, 186), excludeFromBaseline: true }, entry(7, 119)],
+      { direction: "two_sided" },
+    );
+    expect(withSevere[5]!.zone).toBe("watch");
+    expect(withSevere[6]!.baseline.n).toBe(5);
+    expect(withSevere[6]!.baseline.mean).toBe(119);
+    expect(withSevere[6]!.baseline.sd).toBe(2);
+    expect(withSevere[6]!.zone).toBe("in_zone");
+
+    // An ordinary reading that merely lands in `watch` (123 is z = +2.0) stays in the
+    // window. Leaving it out would trim the tails and shrink the SD over time.
+    const withWatch = foldHistory([...bpSeed, entry(6, 123), entry(7, 119)], { direction: "two_sided" });
+    expect(withWatch[5]!.zone).toBe("watch");
+    expect(withWatch[5]!.z).toBe(2);
+    expect(withWatch[6]!.baseline.n).toBe(6);
+    expect(withWatch[6]!.baseline.mean).toBeCloseTo(119.6667, 4);
   });
 
   it("stays in building when all baseline values are equal (sd === 0)", () => {

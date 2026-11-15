@@ -118,6 +118,15 @@ export function categorizeBp(reading: Pick<BpReading, "systolic" | "diastolic">)
 }
 
 /**
+ * True when a reading is abnormal by an absolute threshold (severe or low category).
+ * Such readings are scored but never become part of the personal baseline.
+ */
+export function isOutsideBpBaselineRange(reading: Pick<BpReading, "systolic" | "diastolic">): boolean {
+  const category = categorizeBp(reading);
+  return category === "severe" || category === "low";
+}
+
+/**
  * Counts consecutive distinct mission days ending at `current` whose latest
  * measurement met or exceeded stage 2 (>= 140 systolic or >= 90 diastolic).
  */
@@ -190,6 +199,7 @@ export function evaluateBp(
     missionDay,
     effectiveDateTime: input.takenAt,
     value: average.systolic,
+    excludeFromBaseline: isOutsideBpBaselineRange(average),
   };
   const folded = foldHistory(
     [
@@ -197,6 +207,7 @@ export function evaluateBp(
         missionDay: h.missionDay,
         effectiveDateTime: h.effectiveDateTime,
         value: h.average.systolic,
+        excludeFromBaseline: isOutsideBpBaselineRange(h.average),
       })),
       newBpEntry,
     ],

@@ -9,6 +9,7 @@ import {
   DEFAULT_REMINDER_SCHEDULE,
   evaluateBp,
   foldHistory,
+  isOutsideBpBaselineRange,
   getProtocol,
   nextDue,
   pickMostSevereCard,
@@ -410,6 +411,7 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
             missionDay: b.missionDay,
             effectiveDateTime: b.effectiveDateTime,
             value: isSys ? b.average.systolic : b.average.diastolic,
+            excludeFromBaseline: isOutsideBpBaselineRange(b.average),
           })),
           { direction: isSys ? "two_sided" : "none" },
         );
