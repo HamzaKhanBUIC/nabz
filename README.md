@@ -15,6 +15,14 @@
   </a>
 </p>
 
+<br/>
+
+[🌐 Live Demo](https://nabz-drab.vercel.app/)
+&nbsp;&nbsp;•&nbsp;&nbsp;
+[💻 GitHub](https://github.com/HamzaKhanBUIC/nabz)
+
+<br/>
+
 ## What Nabz does
 
 In the default scenario, Commander Sara is on day 120 of a Mars transit where signals to Earth take 3 to 22 minutes each way. Each day she runs a 3-minute reaction and sleep check-in or logs a guided blood pressure measurement. Deterministic rules compare each reading with her own baseline and return an action card with published sources. Emergency procedures open without sign-in, and every core feature works with the network off.
