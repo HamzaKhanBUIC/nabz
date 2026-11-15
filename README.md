@@ -9,6 +9,8 @@
 
 <p align="center">NASA Space Apps Challenge 2026 · Team NOVA TRIO</p>
 
+<p align="center"><b>Try it live: <a href="https://nabz-drab.vercel.app">nabz-drab.vercel.app</a></b><br>Sign in as Sara with code 4120. Emergency guides open without signing in.</p>
+
 <p align="center">
   <a href="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml">
     <img src="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml/badge.svg" alt="CI status">
