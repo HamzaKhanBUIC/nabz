@@ -83,11 +83,11 @@ Close notifications first (Focus mode), and zoom the browser to 110% so text is 
 
 ## 7. Note to send with the video
 
-> Hi team, here's a 3-minute demo of the six extras I built on a local branch. Nothing is pushed yet. I'd like your OK before I merge.
+> Hi team, here's a short demo of the proposed changes on my local branch `design/extras`. Nothing is pushed or merged. These are proposals only: if we don't agree, I discard the branch and main stays as it is.
 >
 > **Before (what's on main now):** daily check-in with the reaction test, blood pressure entry, action cards picked by rules, emergency steps without a sign-in, all offline with synthetic data.
 >
-> **After (this branch):**
+> **After (this branch), six features:**
 > 1. Sign-in with a crew code per person, so each person's data is private.
 > 2. A Real data page with NASA's OSD-569 blood counts from the Inspiration4 crew.
 > 3. Every action card names the NASA hazard it relates to, plus a page listing the five hazards.
@@ -95,4 +95,10 @@ Close notifications first (Focus mode), and zoom the browser to 110% so text is 
 > 5. Crew health for the Medical Officer, only for crewmates who chose to share.
 > 6. Mission environments (ISS, Moon, Mars transit, Mars surface, remote Earth station). The Commander switches it, and contact lines and the dose change. The medical thresholds never do.
 >
-> Every number has a source in research/CHECKS.md, and all tests pass. Reply with OK, or tell me what to change.
+> **Plus a design update to the whole app:**
+> - The header is one line: mission day, where the crew is, Earth delay and gravity. The crew member is in a small account button.
+> - Today starts with "Today's checks": the check-in and blood pressure, each marked Done, Not scored, Due now or Not due, with one button for the next step.
+> - Calmer look: neutral dark colours instead of navy, one font, no glows or decorative boxes. Colour is kept for health status and data.
+> - The sign-in page says CrewPulse is a Space Apps project, not affiliated with or endorsed by NASA. We don't use any NASA logo (NASA's brand rules forbid it).
+>
+> Nothing else is added beyond this list. Every number has a source in research/CHECKS.md, and all tests pass. Please reply with OK for all of it, OK for some (say which), or no.
