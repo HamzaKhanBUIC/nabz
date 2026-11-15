@@ -301,7 +301,10 @@ export default function SignInPage() {
 
             {IS_DEMO_BUILD ? (
               <p className="rounded-md border border-line bg-raised px-3.5 py-2.5 text-xs text-secondary">
-                Demo build: crew codes are listed in the project README.
+                Demo codes: Sara <span className="font-semibold text-primary tabular-nums">4120</span>
+                {" · "}Mateo <span className="font-semibold text-primary tabular-nums">7316</span>
+                {" · "}Elena <span className="font-semibold text-primary tabular-nums">2468</span>
+                {" · "}Kenji <span className="font-semibold text-primary tabular-nums">9053</span>
               </p>
             ) : null}
 
