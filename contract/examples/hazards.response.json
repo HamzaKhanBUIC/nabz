@@ -1,0 +1,55 @@
+{
+  "hazards": [
+    {
+      "id": "space-radiation",
+      "name": "Space radiation",
+      "summary": "Radiation is not only stealthy, but considered one of the most hazardous aspects of spaceflight.",
+      "url": "https://www.nasa.gov/hrp/hazard-space-radiation/",
+      "hrpRiskIds": [
+        96
+      ],
+      "watches": "An estimated mission dose against NASA's 600 mSv career limit."
+    },
+    {
+      "id": "isolation-confinement",
+      "name": "Isolation and confinement",
+      "summary": "Behavioral responses occur among groups of people far from Earth who are isolated and confined in a small space over a long period of time.",
+      "url": "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
+      "hrpRiskIds": [
+        99,
+        100
+      ],
+      "watches": "Reaction speed and sleep against your own normal."
+    },
+    {
+      "id": "distance-from-earth",
+      "name": "Distance from Earth",
+      "summary": "Planning and self-sufficiency will be key to successful deep space missions.",
+      "url": "https://www.nasa.gov/hrp/hazard-distance-from-earth/",
+      "hrpRiskIds": [
+        175
+      ],
+      "watches": "Steps you can follow without waiting for Earth."
+    },
+    {
+      "id": "gravity-fields",
+      "name": "Gravity fields",
+      "summary": "On Mars, astronauts would need to live and work in three-eighths of Earth’s gravitational pull for up to two years.",
+      "url": "https://www.nasa.gov/hrp/hazard-gravity-fields/",
+      "hrpRiskIds": [
+        179
+      ],
+      "watches": "Blood pressure, including low readings and fainting signs."
+    },
+    {
+      "id": "hostile-closed-environments",
+      "name": "Hostile and closed environments",
+      "summary": "A spacecraft is not only a home, it’s also a machine.",
+      "url": "https://www.nasa.gov/hrp/hazard-hostile-closed-environments/",
+      "hrpRiskIds": [
+        95
+      ],
+      "watches": "Emergency guides for burns and chemical splashes."
+    }
+  ]
+}

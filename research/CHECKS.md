@@ -130,6 +130,56 @@ Status: **verified, one correction.** Nothing here goes into Must code; it feeds
 - Not checked: model file sizes and VRAM figures, Vosk / whisper.cpp / Kokoro / Piper sizes and licences, the voice-guided-CPR studies (#19), and Speechmatics latency and language counts. Re-check whichever one we actually pick before it goes into the design.
 - R7 says Mars is 3–22 min one way, which matches R5. The "40 minutes" in the problem statement is the round trip.
 
+## R9: radiation data (for E04)
+
+Status: **verified for the values the tracker needs; one source swap recommended**
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| Daily dose equivalent, one source and one solar period (Dec 2022): ISS 0.68, lunar surface 0.81, low lunar orbit 1.55, Mars surface 0.65, Mars transit 1.58 mSv/day; Artemis I Orion GCR 0.96–1.24 mSv/day | confirmed (Table 2 caption: "Average dose equivalent rate … for the December 2022 time frame for various locations") | George et al. 2024, *Nature* 634:48–52, [PMC11446838](https://pmc.ncbi.nlm.nih.gov/articles/PMC11446838/) |
+| Chang'e-4 lunar surface: 1369 μSv/day, ⟨Q⟩ = 4.3 ± 0.7, 13.2 μGy/h in silicon (2019, solar minimum) | confirmed | Zhang et al. 2020, *Sci Adv*, [PMC7518862](https://pmc.ncbi.nlm.nih.gov/articles/PMC7518862/) |
+| Mars surface 0.64 mSv/day (Hassler 2014) | **unconfirmed**: abstract has no number, full text paywalled. Use George 2024's 0.65 instead. | [Europe PMC record](https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:24324275%20AND%20SRC:MED&resultType=core&format=json) |
+| MSL/RAD cruise files on PDS: 218 daily `.TXT` files, `RAD_RDR_2011_340_…C010` to `RAD_RDR_2012_196_…C231`, 17–55 MB each | confirmed (directory listing) | [PDS PPI CRUISE/](https://pds-ppi.igpp.ucla.edu/data/MSL-M-RAD-3-RDR-V1.0/DATA/CRUISE/) |
+| Those files give absorbed dose (µGy/h) only, no Sv column | not re-opened (R9 cites the SIS); consistent with RAD papers converting with ⟨Q⟩ | — |
+| Cruise SEPs: 5 events, 24.7 mSv total, 19.5 mSv on Mar 7–15 2012 | not checked; needed only if the tracker models solar storms | Guo et al. 2015 (R9 #9) |
+| Career limit < 600 mSv [V1 4030]; cruise 1.84 ± 0.33 mSv/day | already confirmed (R1/R5 rows 5 and 12) | |
+
+**Mars transit has two valid numbers.** Zeitlin 2013 measured **1.84** mSv/day during the 2011–12 cruise. George 2024 gives **1.58** for the Dec 2022 solar period, the same period as its other rows. Mixing the two would compare environments across different solar periods. **Recommended:** take every environment's rate from George 2024 Table 2 and show 1.84 as "measured by Curiosity in 2011–12" on the Mars transit card.
+
+**No compact real-data file.** The raw cruise data is about 5.5 GB of absorbed-dose tables, too big to ship. E04 can't run "from raw RAD files" offline as first planned without a heavy preprocessing step. That decision belongs to Hamza (see `docs/features/E-extras.md`).
+
+**Gap:** no rate for Remote Earth (Concordia). R9 didn't cover Earth-surface or high-altitude polar dose.
+
+## R10: environment values (for E06)
+
+Status: **verified, one correction**
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| Evacuation: LEO 1.5–36 h with real-time comms and strong resupply; cislunar 72–144 h, near-real-time comms, limited resupply; Mars none, no real-time comms, no resupply | confirmed (slide 11 text extracted from the PDF) | Thompson 2021, [Exploration CMO of the Future](https://ntrs.nasa.gov/api/citations/20210020201/downloads/Exploration%20CMO%20of%20the%20Future_Thompson.pptx.pdf) |
+| Mars rovers lack line-of-sight to Earth for about 12 h per day | confirmed (the page says "rovers") | [NASA Mars Relay Network](https://science.nasa.gov/mars/mars-relay-network/) |
+| Concordia: "during the nine months of isolation, we cannot be evacuated, even for emergencies" | confirmed | [ESA Concordia blog, 2018](https://blogs.esa.int/concordia/2018/01/18/concordia-hospital-peak-remote-medicine/); [ESA: Outside in Antarctica](https://www.esa.int/media/outside-in-antarctica) ("almost nine months of complete isolation per year") |
+| Concordia: "Satellite phones and internet are the only means of communication" | confirmed | [ESA: Concordia communication](https://www.esa.int/media/concordia-communication) |
+| Concordia care led by the station doctor **plus** the ESA-sponsored doctor as "24/7 SAR lead" | **corrected**: the ESA-sponsored doctor calls herself "merely an observer for all things medical". Care comes from the station's doctors, who consult teams at home. Screen text: "Alert the station doctor now." | same ESA blog |
+| Flight Surgeons "24/7" | not found in R5's sources (R10 flagged it). Don't put "24/7" on screen. | — |
+| Moon 4–12 s operational delay, 1/6 g; Mars 0.38 g, sol 24 h 39 min | not re-opened; standard NASA fact-sheet values, display only | R10 #4, #7, #10, #11 |
+
+The escalation lines in R10 are proposals. Each environment's action wording is decided in the E06 design pass. Thresholds never change by environment (ADR 0003).
+
+## R11: hazards and HRP risks (for E03)
+
+Status: **verified; the card mapping is a design choice, not a NASA mapping**
+
+| Claim | Verdict | Source checked |
+|---|---|---|
+| NASA's five hazards: Space Radiation, Isolation and Confinement, Distance from Earth, Gravity Fields, Hostile/Closed Environments | confirmed | [NASA HRP: 5 Hazards](https://www.nasa.gov/hrp/hazards/) |
+| Risk 96 "Risk of Radiation Carcinogenesis", status Active | confirmed | [HRR i=96](https://humanresearchroadmap.nasa.gov/Risks/risk.aspx?i=96) |
+| Risk 97 (acute radiation syndromes from SPEs) merged into the Medical Conditions risk, "IRP Revision L, July 2020" | confirmed; risks 98 → 179 and 102 → 99 follow the same notice pattern but weren't opened | [HRR i=97](https://humanresearchroadmap.nasa.gov/Risks/risk.aspx?i=97) |
+| Sleep risk (100) DAG has all five hazards as exposure nodes | confirmed by reading the raw DAG code (the web summariser misread it) | [sleep-risk-dag-code](https://www.nasa.gov/wp-content/uploads/2025/09/sleep-risk-dag-code-sa-07566.txt) |
+| Risk IDs 95, 99, 100, 175, 179 | already confirmed (R1/R5 row 3) | |
+
+**Design note:** NASA publishes no card-to-risk mapping, so R11's mapping is our proposal and must be labelled `// design choice`. Most risks touch all five hazards, so tagging a card with every hazard says nothing. E03 should show each card's **primary** hazard only.
+
 ## Summary
 
 | R | Status | Corrections |
@@ -142,3 +192,6 @@ Status: **verified, one correction.** Nothing here goes into Must code; it feeds
 | R6 simulation | verified | PVT-B gap 1–4 s, not 0–4 s |
 | R7 AI coach + voice | verified | Speechmatics $0.15–0.40/hr is the best-case discounted rate; list is $0.30–0.80/hr (still 625+ h for $500) |
 | R8 crewmate emergency | verified | ER leg position wording; toxic-air steps defer to spacecraft procedure |
+| R9 radiation data | verified for the tracker | use George 2024 Table 2 for all environments (Mars transit 1.58 Dec 2022; 1.84 is the 2011–12 measurement); Hassler 0.64 unconfirmed; no shippable raw RAD file; no Remote Earth rate |
+| R10 environments | verified | Concordia care is led by the station doctor; the ESA doctor is an observer; no "24/7" Flight Surgeon claim |
+| R11 hazards and risks | verified | card mapping is a design choice; show the primary hazard only |

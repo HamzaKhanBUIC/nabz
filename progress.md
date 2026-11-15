@@ -159,3 +159,40 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Fixed production CSS compilation by changing `frontend/package.json` `"build"` from `next build --webpack` to `next build` so `@tailwindcss/turbopack` compiles Tailwind v4 utilities (`frontend/.next/static/chunks/*.css`).
 - Verified offline `npm run lint`, `npm run build` (12 static routes), `python scripts/gate.py` (`GATE: PASS`), and live browser visual styling + 64-trial check-in (`POST /api/checkins` 204, scored `Below your normal` at `3.71 resp/s` / `273 ms` median RT, action card `Slower than your personal normal`, 0 console/network errors); removed temporary `data/runtime/sara.json`.
 - Completed frontend polish pass: bundled offline `@fontsource-variable` fonts with `localFont`, tuned fluid type scale and `--ease-smooth`/`--ease-spring` transitions, fixed mobile flex-wrap/1-char vertical wrapping (`MetricCard`, `MetricTile`, `TopBar`, `ReminderCard`, `Card`, `ClinicalActionCard`, `coach/page.js`) and `lg:` sidebar alignment, removed prose em/en dashes and robotic copy, and verified with `lint`, `next build`, `gate.py`, `gitleaks`, `semgrep`, and `npm audit`.
+
+
+## 2026-11-15: Extras design pass (E00, proposed)
+- Judge-style review: the entry qualifies for Global Awards (NASA data or resource used), but real NASA data barely shows on screen, NASA's 5 hazards are never named on screen, radiation isn't covered, and there is one user and one environment.
+- Hamza chose six extras and four architecture options: server-checked crew sessions; Inspiration4 data on its own public screen; an environment switch (from R5) that changes guidance only; radiation from real Curiosity RAD data.
+- Written: `docs/adr/0003-extras.md` (status proposed), `docs/features/E-extras.md` (build order and lanes), research briefs R9 (radiation data), R10 (re-check R5 environment values, Remote Earth), R11 (card → HRP risk → hazard mapping). `features.json` gains E00–E06 (`passes: false`). `01-scope.md` gains an Extras section; `AGENTS.md` gives `frontend/` an owner.
+- Next: Hamza approves ADR 0003 → research lanes R9–R11 in parallel → E01 (Claude) → E02/E03/E05 in parallel → E06 → E04.
+
+## 2026-11-15: E01, E02, E05 built (local only, design/extras)
+- Backend (494f03c): crew sign-in with scrypt-hashed codes, per-person stores, OSD-569 catalog and trend endpoints, consent and Medical Officer overview. Every session endpoint is checked for 401 by a contract test driven from ENDPOINTS.
+- Frontend (Antigravity worker, reviewed): `/sign-in`, a shared route guard, `/real-data` (public), `/privacy`, `/crew-health` (Medical officer only), and name and role in the header. Two chart captions corrected: the band comes from all earlier samples, not only pre-launch ones.
+- Browser check with both apps running: wrong code, lockout countdown, Sara and Mateo see different data, Mateo gets the 403 page, Sara turns sharing on, Elena sees her summary, the access log records Elena's view, emergency and real-data work signed out, 375 px width with no sideways scroll.
+- Gate PASS (16 files, 118 tests); frontend lint and build pass.
+- Held for research: E03 (R11), E06 (R10), E04 (R9). Open: the OSD-569 hemoglobin unit says percent but the values are g/dL.
+- Not pushed: the team sees a demo video first.
+
+## 2026-11-15: E03, E04, E06 built (local only, design/extras)
+- Research R9-R11 checked into CHECKS.md (91d12f0). Hamza chose option A for radiation: published rates, no raw RAD files.
+- Backend (2c5b46c and this commit): `content/hazards.json` (NASA's 5 hazards, sentences quoted from the raw NASA page), `content/environments.json` (5 profiles), hazard and HRP risk tags on every card, `GET /api/hazards`, `GET/PUT /api/environment` (Commander only, returns resolved sources), `GET /api/radiation` (estimate, George 2024 rates, 600 mSv limit, "not tracked" for Remote Earth). Escalation line on act and urgent cards only; same check-in gives the same card in every environment (contract test).
+- Frontend (Antigravity worker, reviewed): `/hazards` (public), `/environment`, dose card on Today and /hazards, hazard chips and "Who to contact" on action cards, header strip, emergency line. Fixed: removed a client-side copy of sources.json (the API now returns sources); corrected an overclaiming intro line.
+- Browser check: hazards page signed out; Sara's severe BP card shows the Gravity fields chip and the Mars transit line; switching to ISS changed the header, card line (flight surgeon), emergency line and dose (81.6 mSv); Remote Earth shows "Not tracked here"; Mateo sees no switch; 375 px with no sideways scroll on 4 pages.
+- Gate PASS (19 files, 135 tests). E06 passes. E03 and E04 held: one verify step each no longer fits (see features.json notes).
+- Local runtime: the old `data/runtime/sara.json` (1 test BP entry, cards without hazard tags) was set aside as `sara.json.corrupt` by the loader.
+- E03 and E04 verify steps reworded with Hamza's OK (E04 description too) to match the R11 design-choice note and the published-rates decision; both now pass.
+
+## 2026-11-15: ADR 0003 accepted, demo guide
+- Hamza accepted ADR 0003. Added an Amendments section for what changed in the build (E04 published rates, days until limit, `estimateDose` in `environment.ts`, Remote Earth not tracked, escalation added at response time). E00 passes; E00 to E06 all pass.
+- `docs/demo/extras-demo.md`: run and reset steps, crew codes, a test checklist, a 3-minute shot list with narration, Windows recording tips, and a before/after note for the team.
+- Next: Hamza tests, records the video and sends it to the team. Push or merge only after their OK.
+
+## 2026-11-15: frontend restyle, anti-slop pass (local only)
+- Header: one row. Mission day and environment as one link with labelled facts ("Earth delay 3 to 22 min · Microgravity"); the crew member moved into an account menu on phone and tablet. Phone header went from three rows of pills to one line.
+- Today: a "Today's checks" list replaces four equal tiles. It shows done, not scored or due for the check-in and blood pressure (from today.checkin.qcFlags, today.bp and the reminders API) with one primary button on the next step. The three readings sit in one divided strip; a failed check-in says "Not scored" under its number.
+- Theme: navy darks replaced by neutral near-black (#0c0d0f / #15171a); blue kept for data only; primary button is an ink pill; one typeface (Inter, as on nasa.gov); no resting shadows, glows, blur, tracked capitals, kickers over titles, icons in tinted squares or nested boxes. Light theme green and amber darkened to pass 4.5:1 as text.
+- NASA brand guidelines checked: no NASA insignia, logotype, seal or look-alike, and no wording that implies endorsement. NASA appears only as a source credit.
+- Checks: tasteskill lint 10 FAIL / 72 WARN before, 0 FAIL / 12 WARN after (remaining: overlay shadows, clock zero-padding, missing-value dashes); inspector on the production build 0 FAIL on sign-in, hazards, emergency; frontend lint and next build pass; gate PASS. Browser check at 375, 900 and 1280 px, dark and light.
+- Sign-in page: added "CrewPulse is a NASA Space Apps Challenge 2026 project built with public NASA data. It is not affiliated with or endorsed by NASA." under the card (Hamza approved). 7.15:1 contrast; no sideways scroll at 375 px.

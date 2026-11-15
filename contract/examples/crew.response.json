@@ -1,0 +1,24 @@
+{
+  "crew": [
+    {
+      "id": "sara",
+      "name": "Sara",
+      "role": "Commander"
+    },
+    {
+      "id": "mateo",
+      "name": "Mateo",
+      "role": "Pilot"
+    },
+    {
+      "id": "elena",
+      "name": "Elena",
+      "role": "Medical officer"
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji",
+      "role": "Engineer"
+    }
+  ]
+}

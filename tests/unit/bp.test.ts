@@ -6,6 +6,7 @@ import {
   BpMeasurement,
   Card,
   CardTemplateFile,
+  HazardFile,
   SourceFile,
 } from "../../src/schemas";
 import {
@@ -23,7 +24,8 @@ function loadCatalog(): CardCatalog {
   const sourcesRaw = JSON.parse(readFileSync(path.join(root, "content/sources.json"), "utf8"));
   const { templates } = CardTemplateFile.parse(cardsRaw);
   const { sources } = SourceFile.parse(sourcesRaw);
-  return { templates, sources };
+  const { hazards } = HazardFile.parse(JSON.parse(readFileSync(path.join(root, "content/hazards.json"), "utf8")));
+  return { templates, sources, hazards: hazards.map((h) => ({ id: h.id, name: h.name })) };
 }
 
 function historyFromSystolics(

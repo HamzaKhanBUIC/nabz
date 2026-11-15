@@ -6,9 +6,14 @@ import {
   CARD_PLACEHOLDERS,
   CardTemplateFile,
   DISCLAIMER,
+  EnvironmentFile,
+  EnvironmentId,
+  HazardFile,
+  HazardId,
   ProcedureFile,
   SourceFile,
 } from "../../src/schemas";
+import { RADIATION_RATE_MSV_PER_DAY } from "../../src/core";
 
 const CONTENT_DIR = resolve(process.cwd(), "content");
 const readJson = (relPath: string): unknown => JSON.parse(readFileSync(resolve(CONTENT_DIR, relPath), "utf8"));
@@ -139,5 +144,32 @@ describe("F07 verified content JSON files", () => {
     const retestJson = JSON.stringify(retestCard);
     expect(retestJson).toContain("about 5 minutes");
     expect(retestJson).not.toMatch(/\b1\s*minute\b/i);
+  });
+
+  it("E03: hazards.json holds NASA's five hazards and every card names at least one known hazard", () => {
+    const { hazards } = HazardFile.parse(readJson("hazards.json"));
+    expect(hazards.map((h) => h.id).sort()).toEqual([...HazardId.options].sort());
+    for (const h of hazards) expect(h.url.startsWith("https://www.nasa.gov/hrp/")).toBe(true);
+    const known = new Set<string>(hazards.map((h) => h.id));
+    for (const tpl of CardTemplateFile.parse(readJson("cards.json")).templates) {
+      expect(tpl.hazardIds.length, tpl.id).toBeGreaterThan(0);
+      for (const id of tpl.hazardIds) expect(known.has(id), `${tpl.id} -> ${id}`).toBe(true);
+    }
+  });
+
+  it("E06: environments.json covers the five profiles with sourced values only", () => {
+    const { environments } = EnvironmentFile.parse(readJson("environments.json"));
+    const sourceIds = new Set(SourceFile.parse(readJson("sources.json")).sources.map((s) => s.id));
+    expect(environments.map((e) => e.id)).toEqual([...EnvironmentId.options]);
+    for (const env of environments) {
+      for (const sid of env.sourceIds) expect(sourceIds.has(sid), `${env.id} -> ${sid}`).toBe(true);
+      // A rate key must point at a verified constant (CHECKS R9); remote-earth has none.
+      if (env.radiationRateKey !== null) expect(RADIATION_RATE_MSV_PER_DAY[env.radiationRateKey]).toBeGreaterThan(0);
+      expect(env.escalation.split(/\s+/).length, env.id).toBeLessThanOrEqual(12);
+      const text = JSON.stringify(env);
+      expect(text, env.id).not.toMatch(/[–—]/);
+      expect(text, env.id).not.toMatch(/24\/7/); // CHECKS R10: not sourced
+    }
+    expect(environments.find((e) => e.id === "remote-earth")!.radiationRateKey).toBeNull();
   });
 });

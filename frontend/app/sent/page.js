@@ -9,13 +9,12 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { useStore } from "@/lib/data/store";
-import { getEarthDelayLabel } from "@/lib/data/mission";
 import { formatDateTime } from "@/lib/utils/format";
 
 function SentPageInner() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const { outbox, mission } = useStore();
+  const { outbox, mission, environment } = useStore();
 
   const record = outbox.find((item) => item.id === id) || outbox[0] || null;
 
@@ -25,9 +24,6 @@ function SentPageInner() {
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="t-label-md text-muted">
-            Downlink queue · {getEarthDelayLabel(mission)}
-          </p>
           <h1 className="t-h1 mt-1 text-primary">
             {record ? "Summary queued for Earth" : "Downlink outbox"}
           </h1>
@@ -59,7 +55,7 @@ function SentPageInner() {
               {record.package?.commsDelay?.delayNotice}
             </p>
 
-            <pre className="max-h-[280px] overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-4 font-mono text-xs leading-6 text-primary">
+            <pre className="max-h-[280px] overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-4 tabular-nums text-xs leading-6 text-primary">
               {record.package?.summaryText}
             </pre>
 
@@ -86,7 +82,7 @@ function SentPageInner() {
                   key={item.id}
                   className="flex flex-wrap items-center justify-between gap-2 rounded border border-line bg-raised px-3 py-2"
                 >
-                  <span className="font-mono text-primary">{item.id}</span>
+                  <span className="tabular-nums text-primary">{item.id}</span>
                   <span className="text-muted">
                     Day {item.package?.missionDay} · {formatDateTime(item.queuedAt)}
                   </span>

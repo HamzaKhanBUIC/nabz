@@ -11,3 +11,7 @@ export * from "./reminders";
 export * from "./routine";
 export * from "./share";
 export * from "./trend";
+export * from "./crew";
+export * from "./nasa";
+export * from "./session";
+export * from "./environment";

@@ -23,6 +23,7 @@ import {
   type ShareSleepRecord,
 } from "../core";
 import type {
+  AccessLogEntry,
   BpGuide,
   BpInput,
   BpMeasurement,
@@ -30,6 +31,10 @@ import type {
   CheckinResponse,
   CoachAskInput,
   CoachAskResponse,
+  ConsentResponse,
+  CrewHealthSummary,
+  Environment,
+  Hazard,
   Mission,
   Procedure,
   ProcedureBundle,
@@ -42,6 +47,7 @@ import type {
   SharePreviewInput,
   ShareQueuedPackage,
   ShareSendInput,
+  SourceRef,
   Today,
   Trend,
   TrendQuery,
@@ -67,8 +73,11 @@ export interface CreateStoreOptions {
   coachProvider?: CoachProvider;
 }
 
+/** The mission as the store knows it; the API adds the active environment (E06). */
+export type MissionCore = Omit<Mission, "environment">;
+
 export interface CrewPulseStore {
-  getMission(): Mission;
+  getMission(): MissionCore;
   getToday(): Today;
   getProtocol(): Protocol;
   createCheckin(input: CheckinInput): CheckinResponse;
@@ -83,7 +92,21 @@ export interface CrewPulseStore {
   previewShare(input: SharePreviewInput): SharePackagePreview;
   createSharePackage(input: ShareSendInput): ShareQueuedPackage;
   askCoach(input: CoachAskInput): Promise<CoachAskResponse | null>;
+  /** E05 */
+  getConsent(): ConsentResponse;
+  setConsent(share: boolean): ConsentResponse;
+  recordAccess(entry: AccessLogEntry): void;
+  getHealthSummary(): CrewHealthSummary;
+  /** E03 */
+  getHazards(): Hazard[];
+  /** E06 */
+  getEnvironments(): Environment[];
+  /** Resolves verified source IDs from content/sources.json; throws on an unknown ID. */
+  getSources(ids: readonly string[]): SourceRef[];
 }
+
+/** E05 design choice: keep the newest 200 access-log entries per person. */
+const ACCESS_LOG_MAX = 200;
 
 function resolveTrendSource(sources: readonly ("simulated" | "live")[]): Trend["source"] {
   let hasSim = false;
@@ -255,7 +278,23 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
   };
 
   return {
-    getMission(): Mission {
+    getHazards(): Hazard[] {
+      return content.hazards;
+    },
+
+    getEnvironments(): Environment[] {
+      return content.environments;
+    },
+
+    getSources(ids: readonly string[]): SourceRef[] {
+      return ids.map((id) => {
+        const ref = content.sourceMap.get(id);
+        if (!ref) throw new Error(`Unknown source "${id}".`);
+        return ref;
+      });
+    },
+
+    getMission(): MissionCore {
       return {
         name: missionFile.name,
         profile: missionFile.profile,
@@ -486,6 +525,44 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
       };
     },
 
+    getConsent(): ConsentResponse {
+      const runtime = loadRuntime();
+      return {
+        shareWithMedicalOfficer: runtime.consent?.shareWithMedicalOfficer ?? false,
+        accessLog: runtime.accessLog ?? [],
+      };
+    },
+
+    setConsent(share: boolean): ConsentResponse {
+      const runtime = loadRuntime();
+      runtime.consent = { shareWithMedicalOfficer: share };
+      saveRuntimeFile(runtimeDir, subjectId, runtime);
+      return { shareWithMedicalOfficer: share, accessLog: runtime.accessLog ?? [] };
+    },
+
+    recordAccess(entry: AccessLogEntry): void {
+      const runtime = loadRuntime();
+      runtime.accessLog = [...(runtime.accessLog ?? []), entry].slice(-ACCESS_LOG_MAX);
+      saveRuntimeFile(runtimeDir, subjectId, runtime);
+    },
+
+    getHealthSummary(): CrewHealthSummary {
+      const todayDay = getCurrentMissionDay();
+      const runtime = loadRuntime();
+      const { primaryCard } = getTodayCards(runtime, todayDay);
+      const due = nextDue(buildReminderContext(runtime), runtime.reminders ?? DEFAULT_REMINDER_SCHEDULE);
+      const lastCheckin = getAllCheckins().at(-1) ?? null;
+      const lastBp = getAllBp().at(-1) ?? null;
+      return {
+        missionDay: todayDay,
+        lastCheckinDay: lastCheckin?.missionDay ?? null,
+        reaction: lastCheckin?.zone.status ?? null,
+        bpCategory: lastBp?.category ?? null,
+        primaryCard: primaryCard ? { id: primaryCard.id, title: primaryCard.title, severity: primaryCard.severity } : null,
+        nextDue: due,
+      };
+    },
+
     getReminders(): RemindersResponse {
       const runtime = loadRuntime();
       const schedule = runtime.reminders ?? DEFAULT_REMINDER_SCHEDULE;
@@ -567,7 +644,7 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
         hasActiveCard = true;
       }
 
-      const card = targetCard ?? buildEmptyDayFallbackCard(content.catalog.sources);
+      const card = targetCard ?? buildEmptyDayFallbackCard(content.catalog.sources, content.catalog.hazards);
       const linkedRoutine = card.links?.routineId
         ? content.routines.find((r) => r.id === card.links?.routineId)
         : undefined;

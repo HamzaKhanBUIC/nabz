@@ -3,6 +3,7 @@ import { BpMeasurement } from "./bp";
 import { Card } from "./card";
 import { CheckinResponse } from "./checkin";
 import { IsoDateTime } from "./common";
+import { EnvironmentRef } from "./environment";
 
 export const CrewMember = z.strictObject({
   id: z.string().min(1),
@@ -39,6 +40,8 @@ export const Mission = z.object({
     oneWayMaxMinutes: z.number().positive(),
   }),
   crew: z.array(CrewMember).min(1),
+  /** E06: the active environment (GET /api/environment has the full profile). */
+  environment: EnvironmentRef,
 });
 export type Mission = z.infer<typeof Mission>;
 

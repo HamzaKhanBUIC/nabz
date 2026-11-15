@@ -1,0 +1,36 @@
+{
+  "environment": {
+    "id": "mars-transit",
+    "name": "Mars transit"
+  },
+  "missionDay": 120,
+  "basis": "published-average",
+  "dailyRateMsv": 1.58,
+  "doseToDateMsv": 189.6,
+  "careerLimitMsv": 600,
+  "percentOfCareerLimit": 31.6,
+  "daysUntilLimit": 259,
+  "note": "Estimate from a published average, not a dosimeter reading. Curiosity measured 1.84 mSv/day on its 2011-12 cruise to Mars.",
+  "sources": [
+    {
+      "id": "george-2024-artemis",
+      "title": "Space radiation measurements during the Artemis I lunar mission (George et al., Nature, 2024)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11446838/"
+    },
+    {
+      "id": "zeitlin-2013-msl",
+      "title": "Measurements of energetic particle radiation in transit to Mars on the Mars Science Laboratory (Zeitlin et al., Science, 2013)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23723233/"
+    },
+    {
+      "id": "nasa-std-3001",
+      "title": "NASA Space Flight Human-System Standard Volume 1: Crew Health (NASA-STD-3001)",
+      "url": "https://www.nasa.gov/humans-in-space/human-spaceflight-standards-nasa-std-3001/"
+    }
+  ],
+  "status": {
+    "level": "info",
+    "label": "Under the career limit",
+    "iconKey": "info"
+  }
+}

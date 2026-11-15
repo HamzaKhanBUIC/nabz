@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "
 import path from "node:path";
 import { z } from "zod";
 import {
+  AccessLogEntry,
   BpMeasurement,
   CheckinResponse,
   ReminderSchedule,
@@ -14,6 +15,10 @@ const RuntimeFileSchema = z.strictObject({
   bp: z.array(BpMeasurement),
   reminders: ReminderSchedule.optional(),
   outbox: z.array(ShareQueuedPackage).optional(),
+  /** E05: sharing with the Medical Officer (off when missing). */
+  consent: z.strictObject({ shareWithMedicalOfficer: z.boolean() }).optional(),
+  /** E05: who read this person's summary, newest last. */
+  accessLog: z.array(AccessLogEntry).optional(),
 });
 
 export type RuntimeData = z.infer<typeof RuntimeFileSchema>;

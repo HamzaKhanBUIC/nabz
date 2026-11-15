@@ -74,7 +74,19 @@
     "disclaimer": "Decision support, not a diagnosis.",
     "links": {
       "measurement": "bp"
-    }
+    },
+    "hazards": [
+      {
+        "id": "gravity-fields",
+        "name": "Gravity fields"
+      }
+    ],
+    "hrpRiskIds": [
+      179,
+      95,
+      175
+    ],
+    "escalation": "Act now with the crew medical officer; tell Earth after."
   },
   "source": "live"
 }

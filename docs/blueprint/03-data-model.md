@@ -118,6 +118,11 @@ Design choices (no published value; each is one named constant so it can change 
 | `CPR_METRONOME_BPM` | 110 | Midpoint of verified 100–120/min chest compression target (CHECKS R8) |
 | `DEFAULT_CHECKIN_REMINDER_UTC` | "08:00" | Daily morning check-in reminder default (design choice, S05) |
 | `DEFAULT_BP_REMINDER_UTC` / `DEFAULT_BP_INTERVAL_DAYS` | "08:30" / 3 | Periodic BP check default (design choice, S05; R3 notes periodic checks) |
+| `ESCALATION_LEVELS` | act, urgent | E06: only these cards show the environment's "who to contact" line |
+| Card hazard and HRP risk tags (`content/cards.json`) | per card | E03: NASA publishes no card-to-risk mapping; each card shows its primary hazard (CHECKS R11) |
+| Radiation dose to date | rate × mission day | E04: assumes the whole mission so far at the active environment's published rate; labelled an estimate, never a dosimeter reading. No prior-mission dose |
+| Remote Earth radiation | none | E04: R9 gives no rate for Concordia, so the tracker says "not tracked" there |
+| `data/runtime/mission-state.json` | `{ environmentId }` | E06: mission-level active environment; default `mars-transit` |
 
 ## Storage
 

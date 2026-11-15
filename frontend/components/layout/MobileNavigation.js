@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Icon from "@/components/ui/Icon";
-import { NAV_ITEMS, SECTION_FOR_PATH, sectionForPath } from "@/lib/data/nav";
+import { APP_NAME, NAV_ITEMS, SECTION_FOR_PATH, sectionForPath } from "@/lib/data/nav";
 import { NavList, UserRow } from "@/components/layout/Sidebar";
 
 const DRAWER_EASE = [0.22, 1, 0.36, 1];
@@ -25,7 +25,7 @@ export function BottomTabBar({ enabled = true }) {
   return (
     <nav
       aria-label="Primary mobile"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/92 backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface lg:hidden"
       style={{
         paddingBottom: "max(0.25rem, env(safe-area-inset-bottom, 0px))",
       }}
@@ -40,13 +40,13 @@ export function BottomTabBar({ enabled = true }) {
                 aria-current={active ? "page" : undefined}
                 className={`group flex min-h-13 min-w-[44px] flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-center transition-[transform,color] duration-150 ease-[var(--ease-smooth)] active:scale-95 ${
                   active
-                    ? "text-accent"
-                    : "text-secondary hover:text-primary"
+                    ? "text-primary"
+                    : "text-muted hover:text-primary"
                 }`}
               >
                 <span
                   className={`flex h-7 w-10 items-center justify-center rounded-pill transition-colors duration-150 ${
-                    active ? "bg-accent/15" : "bg-transparent group-hover:bg-hover"
+                    active ? "bg-raised" : "bg-transparent group-hover:bg-hover"
                   }`}
                 >
                   <Icon name={item.icon} filled={active} size={20} />
@@ -93,7 +93,7 @@ export function MobileDrawer({ open, onClose }) {
             animate={{ opacity: 1 }}
             exit={reduceMotion ? undefined : { opacity: 0 }}
             transition={{ duration: 0.2, ease: DRAWER_EASE }}
-            className="absolute inset-0 bg-[#070b14]/75 backdrop-blur-xs"
+            className="absolute inset-0 bg-black/70"
           />
           <motion.div
             role="dialog"
@@ -109,7 +109,10 @@ export function MobileDrawer({ open, onClose }) {
             className="absolute inset-y-0 left-0 flex w-72 max-w-[85dvw] flex-col overscroll-contain border-r border-line bg-surface shadow-2xl"
           >
             <div className="flex min-h-16 items-center justify-between border-b border-line px-4 py-2">
-              <span className="t-h3 text-primary">Menu</span>
+              <span className="flex items-center gap-2.5">
+                <Icon name="pulse_alert" size={28} className="shrink-0 text-accent" />
+                <span className="t-h3 text-primary">{APP_NAME}</span>
+              </span>
               <button
                 type="button"
                 onClick={onClose}

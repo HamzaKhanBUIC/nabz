@@ -24,7 +24,7 @@ export default function ChatMessage({ message }) {
   if (isUser) {
     return (
       <div className="animate-message-in flex justify-end">
-        <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-accent px-4 py-3 text-sm text-on-status shadow-sm sm:max-w-[80%]">
+        <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-accent px-4 py-3 text-sm text-on-status sm:max-w-[80%]">
           <p className="whitespace-pre-wrap leading-6">{message.content}</p>
           {message.createdAt ? (
             <p className="mt-1 text-right text-[11px] opacity-85">
@@ -42,7 +42,7 @@ export default function ChatMessage({ message }) {
         <Icon name="smart_toy" size={18} />
       </span>
 
-      <div className="max-w-[88%] space-y-2.5 rounded-2xl rounded-tl-sm border border-line bg-surface p-4 text-sm text-primary shadow-card">
+      <div className="max-w-[88%] space-y-2.5 rounded-2xl rounded-tl-sm border border-line bg-surface p-4 text-sm text-primary">
         {message.banner ? (
           <div
             role="alert"
@@ -54,7 +54,7 @@ export default function ChatMessage({ message }) {
             </span>
             <Link
               href="/emergency"
-              className="rounded bg-emergency px-2.5 py-1 text-white transition-colors hover:bg-emergency-hover"
+              className="rounded bg-emergency-solid px-2.5 py-1 text-white transition-colors hover:bg-emergency-hover"
             >
               Open Emergency
             </Link>
@@ -92,7 +92,7 @@ export default function ChatMessage({ message }) {
               </StatusBadge>
             ) : null}
             {message.provider ? (
-              <span className="font-mono uppercase">{message.provider}</span>
+              <span className="tabular-nums">{message.provider}</span>
             ) : null}
           </div>
           {message.disclaimer ? <span>{message.disclaimer}</span> : null}

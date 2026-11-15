@@ -66,17 +66,17 @@ export default function ReportPreview({ preview, loading = false }) {
         </div>
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <p className="text-xs font-semibold text-muted">
             Plain-text Earth summary
           </p>
-          <pre className="mt-2 max-h-[260px] overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-4 font-mono text-xs leading-6 text-primary">
+          <pre className="mt-2 max-h-[260px] overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-4 tabular-nums text-xs leading-6 text-primary">
             {preview.summaryText}
           </pre>
         </div>
 
         {Array.isArray(preview.entries) && preview.entries.length > 0 ? (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+            <p className="text-xs font-semibold text-muted">
               Included records ({preview.entries.length})
             </p>
             <ul className="mt-2 max-h-[200px] space-y-1.5 overflow-y-auto text-xs">

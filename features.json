@@ -231,6 +231,105 @@
       ],
       "passes": true,
       "notes": "ADR 0002 + pure reminder state machine in src/core/reminders.ts; wired into Today.nextDue and GET/PUT /api/reminders with runtime persistence; verified in should.test.ts."
+    },
+    {
+      "id": "E00",
+      "priority": "P3",
+      "description": "Extras design pass: ADR 0003, feature design E-extras.md, research briefs R9-R11, approved by Hamza before any build.",
+      "design": "docs/adr/0003-extras.md",
+      "owner": "Claude",
+      "verify": [
+        "docs/adr/0003-extras.md and docs/features/E-extras.md exist",
+        "research/briefs/R9, R10, R11 exist",
+        "Hamza approves ADR 0003 (status changes from proposed to accepted)"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: Hamza accepted ADR 0003; amendments record the published-rates decision for E04."
+    },
+    {
+      "id": "E01",
+      "priority": "P3",
+      "description": "Each crew member signs in with name and code; the server checks the code and gives each person their own data. Emergency stays usable without signing in.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Claude",
+      "verify": [
+        "npx vitest run tests/contract/session.test.ts",
+        "Personal endpoints return 401 without a token; Mateo's token never returns Sara's data",
+        "Emergency, BP guide, protocol and mission work without a token",
+        "Existing contract and golden tests pass through the login helper with unchanged numbers"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: scrypt-hashed codes, 12 h bearer sessions, 5 wrong codes lock that crew id for 60 s. tests/contract/session.test.ts passes; browser: wrong code, lockout countdown, Sara and Mateo see different data, emergency works signed out. Local only on design/extras until the team approves."
+    },
+    {
+      "id": "E02",
+      "priority": "P3",
+      "description": "A 'Real astronaut data' screen shows the Inspiration4 crew's real NASA blood counts (OSD-569) run through the same personal-baseline engine as Sara.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "npx vitest run tests/contract/nasa.test.ts",
+        "GET /api/nasa/osd-569/trend values match the CSV for a hand-checked crew member and measure",
+        "Browser: the screen shows the pre-launch band, post-flight points, lab range and the OSD-569 source line"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: /real-data is public. C001 hemoglobin hand-checked against the CSV (14.1, 14.9, 14.7, 14.7, 14.3, 15.7, 14.1). Open issue for Hamza: OSD-569 labels hemoglobin as percent but values are g/dL; shown as given."
+    },
+    {
+      "id": "E03",
+      "priority": "P3",
+      "description": "Every action card names the NASA hazard and HRP risk it relates to, and a '5 hazards' section shows what CrewPulse watches for each.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "research/CHECKS.md (R11) confirms NASA's five hazards and the HRP risk IDs. NASA publishes no link between our cards and its hazards, so CHECKS lists our card tags as a design choice.",
+        "npx vitest run tests/unit/content.test.ts (every card names at least one known hazard)",
+        "Browser: each action card shows its hazard as a chip with a name and an icon, and the 5 hazards page links to NASA's page for each hazard"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: verify steps reworded with Hamza's OK to match CHECKS R11. Content test passes; browser showed hazard chips on cards and the 5 hazards page with NASA links. Local only until the team approves."
+    },
+    {
+      "id": "E04",
+      "priority": "P3",
+      "description": "A radiation card estimates the mission dose so far from published daily rates (George et al. 2024), against NASA's 600 mSv career limit. On Mars transit it also shows the rate Curiosity measured on its way to Mars.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "research/CHECKS.md (R9) confirms the daily rates from George et al. 2024, Table 2, and the 600 mSv career limit. We use these published rates instead of raw RAD files (decided 2026-11-15), so there is no data/nasa/rad folder to check.",
+        "npx vitest run tests/unit/radiation.test.ts (hand-computed doses, limit crossing)",
+        "Browser: the card says \"Estimate\" and shows its sources"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: verify steps and description reworded with Hamza's OK after choosing published rates. tests/unit/radiation.test.ts passes; browser showed \"Estimate\", sources, and \"Not tracked here\" for Remote Earth. Local only until the team approves."
+    },
+    {
+      "id": "E05",
+      "priority": "P3",
+      "description": "The crew Medical Officer sees a summary card for each crewmate who has turned sharing on; each person sees who viewed their summary and when.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Claude",
+      "verify": [
+        "npx vitest run tests/contract/officer.test.ts",
+        "Non-officers get 403; crewmates with consent off show no data; no raw trials or readings in the response",
+        "Each overview read adds an access-log entry for every shown crewmate"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: consent off by default; Elena (Medical officer) sees only shared crewmates; others get 403; overview parsed through an allow-list schema; access log checked in the browser and by API. Local only on design/extras until the team approves."
+    },
+    {
+      "id": "E06",
+      "priority": "P3",
+      "description": "An environment switch (ISS, Moon, Mars transit, Mars surface, and Remote Earth if sourced) changes delay, time to care, who leads care and escalation wording, never health thresholds.",
+      "design": "docs/features/E-extras.md",
+      "owner": "Antigravity lane",
+      "verify": [
+        "research/CHECKS.md has the R10 values marked confirmed",
+        "npx vitest run tests/unit/environment.test.ts (same check-in gives the same zone and card id in every environment)",
+        "Browser: header context strip and card escalation line change with the environment"
+      ],
+      "passes": true,
+      "notes": "2026-11-15: five profiles from CHECKS R5/R10 in content/environments.json; Commander-only switch; escalation line added to act and urgent cards at response time. Same-check-in test is in tests/contract/environment.test.ts (unit escalation tests in tests/unit/environment.test.ts). Browser: header strip, Today card line and emergency line changed with the environment; Mateo sees no switch. Local only."
     }
   ]
 }

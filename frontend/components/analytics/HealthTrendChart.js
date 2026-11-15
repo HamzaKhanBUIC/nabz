@@ -21,7 +21,7 @@ function TrendTooltip({ active, payload, unit, code }) {
     <div className="rounded-md border border-line-strong bg-surface px-3 py-2 text-xs shadow-lg">
       <p className="font-semibold text-primary">Mission day {pt.missionDay}</p>
       <p className="mt-1 text-secondary">
-        Value: <span className="font-mono font-semibold text-primary">{formatMetricValue(code, pt.value)} {unit}</span>
+        Value: <span className="tabular-nums font-semibold text-primary">{formatMetricValue(code, pt.value)} {unit}</span>
       </p>
       <p className="text-muted">
         Z-score: {pt.z != null ? Number(pt.z).toFixed(2) : "—"} · {zoneToLabel(pt.zone)}
@@ -128,8 +128,8 @@ export default function HealthTrendChart({
                 dataKey="value"
                 stroke={metric.color}
                 strokeWidth={2.5}
-                dot={{ r: 3.5, fill: metric.color }}
-                activeDot={{ r: 6 }}
+                dot={false}
+                activeDot={{ r: 4 }}
                 isAnimationActive={false}
               />
             </LineChart>

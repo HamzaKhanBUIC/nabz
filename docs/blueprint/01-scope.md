@@ -32,6 +32,17 @@ Each gets a short design pass (one ADR + its features.json entries) right before
 | Send to Earth | `POST /api/share/preview`, `POST /api/share` (501); every stored entry has a stable `id` |
 | Check-up reminder | `GET/PUT /api/reminders` (501); `nextDue` in `GET /api/today` |
 
+## Extras (P3, chosen 2026-11-15; design in `docs/adr/0003-extras.md` and `docs/features/E-extras.md`)
+
+- E01 crew sign-in with name and code, one data set per person (emergency stays public)
+- E02 real astronaut data screen (OSD-569, Inspiration4)
+- E03 NASA hazards and HRP risks on every action card
+- E04 radiation dose estimate from Curiosity RAD data against the 600 mSv career limit
+- E05 medical officer view, with each person's consent
+- E06 environment switch: ISS, Moon, Mars transit, Mars surface, Remote Earth if sourced (guidance changes, thresholds never do)
+
+These promote two Later items below: the crew view becomes E05, and Station / Moon profiles become E06.
+
 ## Later (pitch notes only; no code, no slots)
 
 - Wearable sensors feeding the same baseline engine

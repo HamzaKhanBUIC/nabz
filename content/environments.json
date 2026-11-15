@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "environments": [
+    {
+      "id": "iss",
+      "name": "Space station (ISS)",
+      "oneWayDelay": {
+        "text": "Under 1 s",
+        "minSeconds": 0,
+        "maxSeconds": 1
+      },
+      "blackoutNote": null,
+      "timeToCare": "Evacuation in 1.5 to 36 h",
+      "careLead": "Flight surgeon in Mission Control",
+      "gravity": "Microgravity",
+      "dayLengthHours": 24,
+      "radiationRateKey": "iss",
+      "escalation": "Contact the flight surgeon in Mission Control now.",
+      "sourceIds": [
+        "nasa-iss-tdrs",
+        "thompson-2021-cmo",
+        "george-2024-artemis"
+      ]
+    },
+    {
+      "id": "moon",
+      "name": "Moon",
+      "oneWayDelay": {
+        "text": "About 1.3 s",
+        "minSeconds": 1.3,
+        "maxSeconds": 1.3
+      },
+      "blackoutNote": "No direct link to Earth from the far side and parts of the South Pole.",
+      "timeToCare": "Return to Earth in 72 to 144 h",
+      "careLead": "Crew, with the flight surgeon when linked",
+      "gravity": "1/6 g",
+      "dayLengthHours": 24,
+      "radiationRateKey": "lunar-surface",
+      "escalation": "Call the flight surgeon if linked; if not, act now.",
+      "sourceIds": [
+        "ntrs-1993-lunar-comms",
+        "nasa-lcrns",
+        "thompson-2021-cmo",
+        "nssdc-moon",
+        "george-2024-artemis"
+      ]
+    },
+    {
+      "id": "mars-transit",
+      "name": "Mars transit",
+      "oneWayDelay": {
+        "text": "3 to 22 min",
+        "minSeconds": 180,
+        "maxSeconds": 1320
+      },
+      "blackoutNote": "About 2 to 3 weeks of disrupted contact at solar conjunction, every 26 months or so.",
+      "timeToCare": "No evacuation",
+      "careLead": "Crew medical officer on board",
+      "gravity": "Microgravity",
+      "dayLengthHours": 24,
+      "radiationRateKey": "mars-transit",
+      "escalation": "Act now with the crew medical officer; tell Earth after.",
+      "sourceIds": [
+        "ascend-2022-mars-comms",
+        "nasa-mars-conjunction",
+        "thompson-2021-cmo",
+        "george-2024-artemis",
+        "zeitlin-2013-msl"
+      ]
+    },
+    {
+      "id": "mars-surface",
+      "name": "Mars surface",
+      "oneWayDelay": {
+        "text": "3 to 22 min",
+        "minSeconds": 180,
+        "maxSeconds": 1320
+      },
+      "blackoutNote": "No line of sight to Earth for about 12 h a day, plus solar conjunction.",
+      "timeToCare": "No evacuation",
+      "careLead": "Crew medical officer on board",
+      "gravity": "0.38 g",
+      "dayLengthHours": 24.66,
+      "radiationRateKey": "mars-surface",
+      "escalation": "Act now with the crew medical officer; queue a message for Earth.",
+      "sourceIds": [
+        "ascend-2022-mars-comms",
+        "nasa-mars-relay",
+        "thompson-2021-cmo",
+        "nssdc-mars",
+        "george-2024-artemis"
+      ]
+    },
+    {
+      "id": "remote-earth",
+      "name": "Remote Earth station (Concordia, winter)",
+      "oneWayDelay": {
+        "text": "Satellite link only",
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "blackoutNote": "Satellite phone and internet are the only links.",
+      "timeToCare": "No evacuation for about 9 months of winter",
+      "careLead": "Station doctor",
+      "gravity": "1 g",
+      "dayLengthHours": 24,
+      "radiationRateKey": null,
+      "escalation": "Alert the station doctor now.",
+      "sourceIds": [
+        "esa-concordia-hospital",
+        "esa-concordia-communication"
+      ]
+    }
+  ]
+}

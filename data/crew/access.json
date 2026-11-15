@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "crewId": "sara",
+      "salt": "bcaa2716fa0bace144af69cfc37c5568",
+      "hash": "6152acacfc92635c83ed635648075e653a754bb78115e731c368a624cb6d2e28",
+      "params": {
+        "N": 16384,
+        "r": 8,
+        "p": 1,
+        "keyLength": 32
+      }
+    },
+    {
+      "crewId": "mateo",
+      "salt": "9efe9c90343e2d2af24ced4623665132",
+      "hash": "6c9c204beedb04db8ade2982fba799e0f664c1703f43aa7985b4c4aa4d779507",
+      "params": {
+        "N": 16384,
+        "r": 8,
+        "p": 1,
+        "keyLength": 32
+      }
+    },
+    {
+      "crewId": "elena",
+      "salt": "76aee3ef4274fedc3734ee4308d06c0c",
+      "hash": "9fcaeaa42707b77946abe6985dc44e6f4ec0f5135cb55565b78d63c8d85284f1",
+      "params": {
+        "N": 16384,
+        "r": 8,
+        "p": 1,
+        "keyLength": 32
+      }
+    },
+    {
+      "crewId": "kenji",
+      "salt": "78748deb52bb17b41ebb4fff189b2c92",
+      "hash": "2ed651d7923e8f088a37ee9c897f7bd7d7898d659003a285c16fdbb6ac2a4e20",
+      "params": {
+        "N": 16384,
+        "r": 8,
+        "p": 1,
+        "keyLength": 32
+      }
+    }
+  ]
+}

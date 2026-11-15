@@ -6,14 +6,18 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
+import { usePathname } from "next/navigation";
 import * as api from "@/lib/api";
+import { isPublicRoute, useSession } from "@/lib/data/session";
 
 const STORAGE_KEYS = {
   protocol: "crewpulse:cache:protocol",
   bpGuide: "crewpulse:cache:bpGuide",
   routines: "crewpulse:cache:routines",
+  hazards: "crewpulse:cache:hazards",
   emergencySelf: "crewpulse:cache:emergency:self",
   emergencyCrewmate: "crewpulse:cache:emergency:crewmate",
   outbox: "crewpulse:outbox",
@@ -38,7 +42,7 @@ const FALLBACK_MISSION = {
 };
 
 function readCache(key, fallback = null) {
-  if (typeof window === "undefined") return fallback;
+  if (typeof window === "undefined" || !key) return fallback;
   try {
     const raw = window.localStorage.getItem(key);
     return raw ? JSON.parse(raw) : fallback;
@@ -48,7 +52,7 @@ function readCache(key, fallback = null) {
 }
 
 function writeCache(key, value) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !key) return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
@@ -56,9 +60,20 @@ function writeCache(key, value) {
   }
 }
 
+function outboxStorageKey(crewId) {
+  return crewId ? `${STORAGE_KEYS.outbox}:${crewId}` : null;
+}
+
+function coachStorageKey(crewId) {
+  return crewId ? `${STORAGE_KEYS.coachMessages}:${crewId}` : null;
+}
+
 const StoreContext = createContext(null);
 
 export function StoreProvider({ children }) {
+  const pathname = usePathname();
+  const { hydrated: sessionHydrated, token, crew } = useSession();
+
   const [hydrated, setHydrated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [backendOnline, setBackendOnline] = useState(true);
@@ -69,6 +84,9 @@ export function StoreProvider({ children }) {
   const [protocol, setProtocol] = useState(null);
   const [bpGuide, setBpGuide] = useState(null);
   const [routines, setRoutines] = useState([]);
+  const [hazards, setHazards] = useState([]);
+  const [environment, setEnvironment] = useState(null);
+  const [radiation, setRadiation] = useState(null);
   const [reminders, setReminders] = useState(null);
   const [emergencySelf, setEmergencySelf] = useState([]);
   const [emergencyCrewmate, setEmergencyCrewmate] = useState([]);
@@ -81,6 +99,9 @@ export function StoreProvider({ children }) {
   const [outbox, setOutbox] = useState([]);
   const [emergencyLog, setEmergencyLog] = useState([]);
 
+  const loadedTokenRef = useRef(null);
+  const loadedCrewCacheRef = useRef(null);
+
   const loadTrend = useCallback(async (code, days = 30) => {
     const trend = await api.getTrends(code, days);
     setTrends((prev) => ({ ...prev, [code]: trend }));
@@ -89,19 +110,29 @@ export function StoreProvider({ children }) {
   }, []);
 
   const refreshDynamicState = useCallback(async () => {
-    const [missionRes, todayRes, remindersRes, ...trendResults] =
-      await Promise.all([
-        api.getMission(),
-        api.getToday(),
-        api.getReminders().catch(() => null),
-        ...TREND_CODES.map((code) => api.getTrends(code, 30)),
-      ]);
+    const [
+      missionRes,
+      todayRes,
+      remindersRes,
+      environmentRes,
+      radiationRes,
+      ...trendResults
+    ] = await Promise.all([
+      api.getMission(),
+      api.getToday(),
+      api.getReminders().catch(() => null),
+      api.getEnvironment().catch(() => null),
+      api.getRadiation().catch(() => null),
+      ...TREND_CODES.map((code) => api.getTrends(code, 30)),
+    ]);
 
     setMission(missionRes);
     setToday(todayRes);
     if (todayRes?.checkin) setLastCheckinResult(todayRes.checkin);
     if (todayRes?.bp) setLastBpResult(todayRes.bp);
     if (remindersRes) setReminders(remindersRes);
+    if (environmentRes) setEnvironment(environmentRes);
+    if (radiationRes) setRadiation(radiationRes);
 
     const nextTrends = {};
     const nextByRange = {};
@@ -111,49 +142,64 @@ export function StoreProvider({ children }) {
         nextByRange[`${code}:30`] = trendResults[idx];
       }
     });
-    setTrends((prev) => ({ ...prev, ...nextTrends }));
-    setTrendsByRange((prev) => ({ ...prev, ...nextByRange }));
+    setTrends(nextTrends);
+    setTrendsByRange(nextByRange);
     setBackendOnline(true);
     setError(null);
   }, []);
 
+  // Public bootstrap: mission info, protocols, guides, routines, hazards, environment, radiation, emergency procedures.
   useEffect(() => {
     let active = true;
 
-    async function bootstrap() {
+    async function bootstrapPublic() {
       await Promise.resolve();
       if (!active) return;
 
       const cachedProtocol = readCache(STORAGE_KEYS.protocol, null);
       const cachedBpGuide = readCache(STORAGE_KEYS.bpGuide, null);
       const cachedRoutines = readCache(STORAGE_KEYS.routines, []);
+      const cachedHazards = readCache(STORAGE_KEYS.hazards, []);
       const cachedSelf = readCache(STORAGE_KEYS.emergencySelf, []);
       const cachedCrew = readCache(STORAGE_KEYS.emergencyCrewmate, []);
-      const cachedOutbox = readCache(STORAGE_KEYS.outbox, []);
       const cachedEmergencyLog = readCache(STORAGE_KEYS.emergencyLog, []);
-      const cachedCoach = readCache(STORAGE_KEYS.coachMessages, []);
 
       if (cachedProtocol) setProtocol(cachedProtocol);
       if (cachedBpGuide) setBpGuide(cachedBpGuide);
       if (Array.isArray(cachedRoutines)) setRoutines(cachedRoutines);
+      if (Array.isArray(cachedHazards)) setHazards(cachedHazards);
       if (Array.isArray(cachedSelf)) setEmergencySelf(cachedSelf);
       if (Array.isArray(cachedCrew)) setEmergencyCrewmate(cachedCrew);
-      if (Array.isArray(cachedOutbox)) setOutbox(cachedOutbox);
       if (Array.isArray(cachedEmergencyLog)) setEmergencyLog(cachedEmergencyLog);
-      if (Array.isArray(cachedCoach)) setCoachMessages(cachedCoach);
       setHydrated(true);
 
       try {
-        await refreshDynamicState();
-        const [protoRes, bpGuideRes, routinesRes, selfRes, crewRes] =
-          await Promise.all([
-            api.getCheckinProtocol(),
-            api.getBpGuide(),
-            api.getRoutines().catch(() => ({ routines: [] })),
-            api.getEmergencyProcedures("self"),
-            api.getEmergencyProcedures("crewmate"),
-          ]);
+        const [
+          missionRes,
+          protoRes,
+          bpGuideRes,
+          routinesRes,
+          selfRes,
+          crewRes,
+          hazardsRes,
+          environmentRes,
+          radiationRes,
+        ] = await Promise.all([
+          api.getMission(),
+          api.getCheckinProtocol(),
+          api.getBpGuide(),
+          api.getRoutines().catch(() => ({ routines: [] })),
+          api.getEmergencyProcedures("self"),
+          api.getEmergencyProcedures("crewmate"),
+          api.getHazards().catch(() => null),
+          api.getEnvironment().catch(() => null),
+          api.getRadiation().catch(() => null),
+        ]);
         if (!active) return;
+
+        setMission(missionRes);
+        setBackendOnline(true);
+        setError(null);
 
         setProtocol(protoRes);
         writeCache(STORAGE_KEYS.protocol, protoRes);
@@ -172,6 +218,80 @@ export function StoreProvider({ children }) {
         const crewList = crewRes?.procedures || [];
         setEmergencyCrewmate(crewList);
         writeCache(STORAGE_KEYS.emergencyCrewmate, crewList);
+
+        if (Array.isArray(hazardsRes?.hazards)) {
+          setHazards(hazardsRes.hazards);
+          writeCache(STORAGE_KEYS.hazards, hazardsRes.hazards);
+        }
+        setEnvironment(environmentRes || null);
+        setRadiation(radiationRes || null);
+      } catch (err) {
+        if (!active) return;
+        setBackendOnline(false);
+        setError(err?.message || "Unable to reach CrewPulse backend.");
+      }
+    }
+
+    bootstrapPublic();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Per-crew private state: only loaded when authenticated and on a protected route.
+  useEffect(() => {
+    if (!sessionHydrated) return undefined;
+    let active = true;
+
+    async function syncPersonalState() {
+      await Promise.resolve();
+      if (!active) return;
+
+      if (!token) {
+        loadedTokenRef.current = null;
+        loadedCrewCacheRef.current = null;
+        setToday(null);
+        setReminders(null);
+        setTrends({});
+        setTrendsByRange({});
+        setLastCheckinResult(null);
+        setLastBpResult(null);
+        setCoachMessages([]);
+        setOutbox([]);
+        setLoading(false);
+        return;
+      }
+
+      const crewId = crew?.id || "default";
+      if (loadedCrewCacheRef.current !== crewId) {
+        loadedCrewCacheRef.current = crewId;
+        const cachedOutbox = readCache(outboxStorageKey(crewId), []);
+        const cachedCoach = readCache(coachStorageKey(crewId), []);
+        setOutbox(Array.isArray(cachedOutbox) ? cachedOutbox : []);
+        setCoachMessages(Array.isArray(cachedCoach) ? cachedCoach : []);
+      }
+
+      if (isPublicRoute(pathname)) {
+        setLoading(false);
+        return;
+      }
+
+      if (loadedTokenRef.current === token) {
+        setLoading(false);
+        return;
+      }
+
+      loadedTokenRef.current = token;
+      setToday(null);
+      setReminders(null);
+      setTrends({});
+      setTrendsByRange({});
+      setLastCheckinResult(null);
+      setLastBpResult(null);
+      setLoading(true);
+
+      try {
+        await refreshDynamicState();
       } catch (err) {
         if (!active) return;
         setBackendOnline(false);
@@ -181,11 +301,11 @@ export function StoreProvider({ children }) {
       }
     }
 
-    bootstrap();
+    syncPersonalState();
     return () => {
       active = false;
     };
-  }, [refreshDynamicState]);
+  }, [sessionHydrated, token, crew?.id, pathname, refreshDynamicState]);
 
   const submitCheckin = useCallback(
     async (payload) => {
@@ -211,32 +331,41 @@ export function StoreProvider({ children }) {
     return api.askCoach({ question, cardId });
   }, []);
 
-  const addCoachMessage = useCallback((message) => {
-    setCoachMessages((prev) => {
-      const next = [...prev, message];
-      writeCache(STORAGE_KEYS.coachMessages, next);
-      return next;
-    });
-  }, []);
+  const addCoachMessage = useCallback(
+    (message) => {
+      const crewId = crew?.id || "default";
+      setCoachMessages((prev) => {
+        const next = [...prev, message];
+        writeCache(coachStorageKey(crewId), next);
+        return next;
+      });
+    },
+    [crew?.id],
+  );
 
   const clearCoachMessages = useCallback(() => {
+    const crewId = crew?.id || "default";
     setCoachMessages([]);
-    writeCache(STORAGE_KEYS.coachMessages, []);
-  }, []);
+    writeCache(coachStorageKey(crewId), []);
+  }, [crew?.id]);
 
   const previewShare = useCallback(async (payload) => {
     return api.previewShare(payload);
   }, []);
 
-  const sendShare = useCallback(async (payload) => {
-    const queued = await api.sendShare(payload);
-    setOutbox((prev) => {
-      const next = [queued, ...prev];
-      writeCache(STORAGE_KEYS.outbox, next);
-      return next;
-    });
-    return queued;
-  }, []);
+  const sendShare = useCallback(
+    async (payload) => {
+      const queued = await api.sendShare(payload);
+      const crewId = crew?.id || "default";
+      setOutbox((prev) => {
+        const next = [queued, ...prev];
+        writeCache(outboxStorageKey(crewId), next);
+        return next;
+      });
+      return queued;
+    },
+    [crew?.id],
+  );
 
   const saveReminders = useCallback(async (schedule) => {
     const updated = await api.updateReminders(schedule);
@@ -245,6 +374,47 @@ export function StoreProvider({ children }) {
     if (todayRes) setToday(todayRes);
     return updated;
   }, []);
+
+  const refreshHazards = useCallback(async () => {
+    const res = await api.getHazards();
+    const list = Array.isArray(res?.hazards) ? res.hazards : [];
+    setHazards(list);
+    writeCache(STORAGE_KEYS.hazards, list);
+    return list;
+  }, []);
+
+  const refreshEnvironment = useCallback(async () => {
+    const res = await api.getEnvironment();
+    setEnvironment(res);
+    return res;
+  }, []);
+
+  const refreshRadiation = useCallback(async () => {
+    const res = await api.getRadiation();
+    setRadiation(res);
+    return res;
+  }, []);
+
+  const switchEnvironment = useCallback(
+    async (id) => {
+      const updated = await api.setEnvironment(id);
+      setEnvironment(updated);
+      const [missionRes, radiationRes, todayRes] = await Promise.all([
+        api.getMission().catch(() => null),
+        api.getRadiation().catch(() => null),
+        token ? api.getToday().catch(() => null) : Promise.resolve(null),
+      ]);
+      if (missionRes) setMission(missionRes);
+      if (radiationRes) setRadiation(radiationRes);
+      if (todayRes) {
+        setToday(todayRes);
+        if (todayRes.checkin) setLastCheckinResult(todayRes.checkin);
+        if (todayRes.bp) setLastBpResult(todayRes.bp);
+      }
+      return updated;
+    },
+    [token],
+  );
 
   const recordEmergencyAlert = useCallback((entry) => {
     setEmergencyLog((prev) => {
@@ -274,6 +444,9 @@ export function StoreProvider({ children }) {
       bpGuide,
       routines,
       routinesById,
+      hazards,
+      environment,
+      radiation,
       reminders,
       emergencySelf,
       emergencyCrewmate,
@@ -285,6 +458,10 @@ export function StoreProvider({ children }) {
       outbox,
       emergencyLog,
       refreshAll: refreshDynamicState,
+      refreshHazards,
+      refreshEnvironment,
+      refreshRadiation,
+      switchEnvironment,
       loadTrend,
       submitCheckin,
       submitBpMeasurement,
@@ -307,6 +484,9 @@ export function StoreProvider({ children }) {
       bpGuide,
       routines,
       routinesById,
+      hazards,
+      environment,
+      radiation,
       reminders,
       emergencySelf,
       emergencyCrewmate,
@@ -318,6 +498,10 @@ export function StoreProvider({ children }) {
       outbox,
       emergencyLog,
       refreshDynamicState,
+      refreshHazards,
+      refreshEnvironment,
+      refreshRadiation,
+      switchEnvironment,
       loadTrend,
       submitCheckin,
       submitBpMeasurement,

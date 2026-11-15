@@ -3,6 +3,7 @@ import type {
   Card,
   CardTemplate,
   Facts,
+  HazardRef,
   Level,
   LowSymptom,
   SevereSymptom,
@@ -22,6 +23,8 @@ import {
 export interface CardCatalog {
   templates: readonly CardTemplate[];
   sources: readonly SourceRef[];
+  /** E03: id and name of NASA's five hazards. */
+  hazards: readonly HazardRef[];
 }
 
 export interface ReactionRuleInput {
@@ -108,6 +111,11 @@ export function validateCardCatalog(catalog: CardCatalog): void {
         );
       }
     }
+    for (const hazardId of template.hazardIds) {
+      if (!catalog.hazards.some((h) => h.id === hazardId)) {
+        throw new Error(`Card template "${template.id}" references unknown hazard "${hazardId}".`);
+      }
+    }
   }
 }
 
@@ -160,6 +168,14 @@ function materializeCard(match: RuleMatch, catalog: CardCatalog): Card {
     sources: resolvedSources,
     disclaimer: CARD_DISCLAIMER,
     ...(template.links ? { links: { ...template.links } } : {}),
+    hazards: template.hazardIds.map((hazardId) => {
+      const hazard = catalog.hazards.find((h) => h.id === hazardId);
+      if (!hazard) {
+        throw new Error(`Card template "${template.id}" references unknown hazard "${hazardId}".`);
+      }
+      return { id: hazard.id, name: hazard.name };
+    }),
+    hrpRiskIds: [...template.hrpRiskIds],
   };
 }
 

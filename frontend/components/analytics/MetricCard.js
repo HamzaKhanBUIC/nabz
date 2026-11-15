@@ -24,9 +24,9 @@ export default function MetricCard({
       type="button"
       onClick={() => onSelect?.(metricKey)}
       aria-pressed={active}
-      className={`interactive-surface flex w-full cursor-pointer flex-col justify-between rounded-lg border p-4 sm:p-5 text-left shadow-card ${
+      className={`interactive-surface flex w-full cursor-pointer flex-col justify-between rounded-lg border p-4 sm:p-5 text-left ${
         active
-          ? "border-accent bg-raised shadow-md shadow-accent/10"
+          ? "border-accent bg-raised"
           : "border-line bg-surface hover:border-line-strong hover:bg-hover"
       }`}
     >
@@ -41,7 +41,7 @@ export default function MetricCard({
         </StatusBadge>
       </div>
 
-      <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 font-mono text-2xl font-semibold tabular-nums text-primary">
+      <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 tabular-nums text-2xl font-semibold tabular-nums text-primary">
         <span className="whitespace-nowrap">
           {latest ? formatMetricValue(metricKey, latest.value) : "—"}
         </span>

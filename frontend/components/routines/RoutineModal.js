@@ -71,7 +71,7 @@ function StepTimer({ seconds }) {
     <div className="mt-2.5 flex flex-wrap items-center gap-2">
       <span
         aria-live="polite"
-        className="inline-flex min-h-8 items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 font-mono text-xs font-semibold text-primary tabular-nums"
+        className="inline-flex min-h-8 items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 tabular-nums text-xs font-semibold text-primary tabular-nums"
       >
         <Icon name="timer" size={14} className="text-accent" />
         {remaining === 0 ? "Done" : formatClock(remaining)}

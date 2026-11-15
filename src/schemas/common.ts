@@ -36,10 +36,12 @@ export const Disclaimer = z.literal(DISCLAIMER);
 
 export const ErrorBody = z.object({
   error: z.object({
-    code: z.enum(["invalid_input", "not_found", "not_built", "internal"]),
+    code: z.enum(["invalid_input", "not_found", "not_built", "internal", "no_session", "forbidden", "invalid_code", "locked"]),
     message: z.string().min(1),
     issues: z.array(z.unknown()).optional(),
     feature: z.string().optional(),
+    /** Set with code "locked": seconds until this crew id may try again. */
+    retryAfterSeconds: z.number().int().positive().optional(),
   }),
 });
 export type ErrorBody = z.infer<typeof ErrorBody>;

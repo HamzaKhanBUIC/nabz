@@ -95,7 +95,7 @@ function ChatInterfaceInner() {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg border border-line bg-canvas shadow-card">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-line bg-canvas">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:px-5">
         <div className="flex items-center gap-2">
           <Icon name="smart_toy" size={20} className="text-accent" />
@@ -139,7 +139,7 @@ function ChatInterfaceInner() {
 
       <div className="h-[min(56dvh,460px)] space-y-4 overflow-y-auto p-4 sm:p-5">
         {coachMessages.length === 0 ? (
-          <div className="rounded-lg border border-line bg-surface p-5 text-sm text-secondary shadow-card">
+          <div className="rounded-lg border border-line bg-surface p-5 text-sm text-secondary">
             <p className="font-semibold text-primary">
               Ask about today&apos;s readings or advice
             </p>

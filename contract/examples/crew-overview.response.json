@@ -1,0 +1,37 @@
+{
+  "missionDay": 120,
+  "crew": [
+    {
+      "id": "sara",
+      "name": "Sara",
+      "role": "Commander",
+      "shared": true,
+      "summary": {
+        "missionDay": 120,
+        "lastCheckinDay": 119,
+        "reaction": {
+          "level": "in_zone",
+          "label": "Within your normal",
+          "iconKey": "check"
+        },
+        "bpCategory": "elevated",
+        "primaryCard": null,
+        "nextDue": "2026-11-15T08:00:00+00:00"
+      }
+    },
+    {
+      "id": "mateo",
+      "name": "Mateo",
+      "role": "Pilot",
+      "shared": false,
+      "summary": null
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji",
+      "role": "Engineer",
+      "shared": false,
+      "summary": null
+    }
+  ]
+}

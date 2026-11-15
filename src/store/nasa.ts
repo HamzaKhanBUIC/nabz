@@ -1,7 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { buildTrend, foldHistory, type BaselineEntryInput } from "../core";
-import type { Trend } from "../schemas";
+import {
+  NasaCatalog,
+  NasaCrewId,
+  type NasaAnalyte,
+  type NasaTimepoint,
+  type Trend,
+} from "../schemas";
 
 export interface NasaAnalyteMeasurement {
   value: number;
@@ -21,7 +27,7 @@ export interface NasaSample {
 
 const INSPIRATION4_LAUNCH_DATE = "2021-09-16";
 
-const UNIT_LABEL_MAP: Record<string, string> = {
+export const UNIT_LABEL_MAP: Record<string, string> = {
   percent: "%",
   cells_per_microliter: "cells/uL",
   picogram: "pg",
@@ -30,6 +36,16 @@ const UNIT_LABEL_MAP: Record<string, string> = {
   thousand_per_microliter: "10^3/uL",
   million_per_microliter: "10^6/uL",
 };
+
+const ANALYTE_ACRONYMS = new Set(["mch", "mchc", "mcv", "mpv", "rdw"]);
+
+function formatAnalyteLabel(key: string): string {
+  if (ANALYTE_ACRONYMS.has(key)) {
+    return key.toUpperCase();
+  }
+  const spaced = key.replace(/_/g, " ");
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
 
 function parseRelativeDay(timepoint: string): number {
   const match = /^([LR])([+-]?\d+)$/.exec(timepoint);
@@ -194,5 +210,45 @@ export function buildNasaBloodTrend(
     subjectId,
     source: "nasa-osd-569",
     referenceRange,
+  });
+}
+
+/** Builds the public OSD-569 catalog of crew IDs, analytes, and chronological timepoints. */
+export function buildNasaCatalog(samples: readonly NasaSample[]): NasaCatalog {
+  const crewSet = new Set<NasaCrewId>();
+  const analyteUnits = new Map<string, string>();
+  const timepointDays = new Map<string, number>();
+
+  for (const sample of samples) {
+    crewSet.add(NasaCrewId.parse(sample.subjectId));
+    timepointDays.set(sample.timepoint, sample.relativeDay);
+    for (const [key, measurement] of Object.entries(sample.analytes)) {
+      if (!analyteUnits.has(key)) {
+        analyteUnits.set(key, measurement.unit);
+      }
+    }
+  }
+
+  const crew = [...crewSet].sort((a, b) => a.localeCompare(b));
+  const analytes: NasaAnalyte[] = [...analyteUnits.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, unit]) => ({
+      key,
+      label: formatAnalyteLabel(key),
+      unit,
+    }));
+  const timepoints: NasaTimepoint[] = [...timepointDays.entries()]
+    .map(([label, relativeDay]) => ({ label, relativeDay }))
+    .sort((a, b) => a.relativeDay - b.relativeDay);
+
+  return NasaCatalog.parse({
+    study: "OSD-569",
+    title: "SpaceX Inspiration4 crew: complete blood count (whole blood)",
+    url: "https://osdr.nasa.gov/bio/repo/data/studies/OSD-569",
+    citation:
+      "NASA Open Science Data Repository, study OSD-569 (SpaceX Inspiration4), file LSDS-7_Complete_Blood_Count_CBC_TRANSFORMED.csv",
+    crew,
+    analytes,
+    timepoints,
   });
 }

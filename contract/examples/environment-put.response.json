@@ -1,0 +1,74 @@
+{
+  "active": {
+    "id": "moon",
+    "name": "Moon",
+    "oneWayDelay": {
+      "text": "About 1.3 s",
+      "minSeconds": 1.3,
+      "maxSeconds": 1.3
+    },
+    "blackoutNote": "No direct link to Earth from the far side and parts of the South Pole.",
+    "timeToCare": "Return to Earth in 72 to 144 h",
+    "careLead": "Crew, with the flight surgeon when linked",
+    "gravity": "1/6 g",
+    "dayLengthHours": 24,
+    "radiationRateKey": "lunar-surface",
+    "escalation": "Call the flight surgeon if linked; if not, act now.",
+    "sourceIds": [
+      "ntrs-1993-lunar-comms",
+      "nasa-lcrns",
+      "thompson-2021-cmo",
+      "nssdc-moon",
+      "george-2024-artemis"
+    ]
+  },
+  "sources": [
+    {
+      "id": "ntrs-1993-lunar-comms",
+      "title": "Considerations for lunar colony communications systems (NASA NTRS 19930018794)",
+      "url": "https://ntrs.nasa.gov/api/citations/19930018794/downloads/19930018794.pdf"
+    },
+    {
+      "id": "nasa-lcrns",
+      "title": "Lunar Communications Relay and Navigation Systems (NASA)",
+      "url": "https://www.nasa.gov/goddard/esc/lcrns/"
+    },
+    {
+      "id": "thompson-2021-cmo",
+      "title": "The Exploration Crew Medical Officer of the Future (Thompson, NASA, 2021)",
+      "url": "https://ntrs.nasa.gov/api/citations/20210020201/downloads/Exploration%20CMO%20of%20the%20Future_Thompson.pptx.pdf"
+    },
+    {
+      "id": "nssdc-moon",
+      "title": "Moon Fact Sheet (NASA NSSDC)",
+      "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"
+    },
+    {
+      "id": "george-2024-artemis",
+      "title": "Space radiation measurements during the Artemis I lunar mission (George et al., Nature, 2024)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11446838/"
+    }
+  ],
+  "options": [
+    {
+      "id": "iss",
+      "name": "Space station (ISS)"
+    },
+    {
+      "id": "moon",
+      "name": "Moon"
+    },
+    {
+      "id": "mars-transit",
+      "name": "Mars transit"
+    },
+    {
+      "id": "mars-surface",
+      "name": "Mars surface"
+    },
+    {
+      "id": "remote-earth",
+      "name": "Remote Earth station (Concordia, winter)"
+    }
+  ]
+}

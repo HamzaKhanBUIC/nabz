@@ -47,7 +47,6 @@ export default function MeasurePage() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">Guided checks</p>
         <h1 className="t-h1 mt-1 text-primary">Take a measurement</h1>
         <p className="mt-1 text-sm text-secondary">
           Step-by-step cuff protocol with rest timers, AHA categories, and symptom checks.
@@ -98,7 +97,7 @@ export default function MeasurePage() {
                     className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-raised px-4 py-3"
                   >
                     <div>
-                      <p className="font-mono text-sm font-semibold text-primary">
+                      <p className="tabular-nums text-sm font-semibold text-primary">
                         {entry.systolic}/{entry.diastolic} mmHg
                       </p>
                       <p className="text-xs text-muted">

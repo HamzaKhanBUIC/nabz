@@ -9,7 +9,7 @@ export default function ChartTooltip({ active, payload, label, unit = "", format
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <div className="rounded-lg border border-line bg-surface px-3 py-2 shadow-card">
+    <div className="rounded-lg border border-line bg-surface px-3 py-2">
       {label ? <p className="mb-1 text-[11px] text-muted">{label}</p> : null}
       <div className="flex flex-col gap-1">
         {payload.map((entry) => {
@@ -21,11 +21,11 @@ export default function ChartTooltip({ active, payload, label, unit = "", format
             <div key={entry.dataKey || entry.name} className="flex items-center gap-2">
               <span
                 className="h-2 w-2 shrink-0 rounded-full"
-                style={{ backgroundColor: entry.color || entry.stroke || "#4d8dff" }}
+                style={{ backgroundColor: entry.color || entry.stroke || "var(--color-accent)" }}
                 aria-hidden="true"
               />
               <span className="text-xs text-navy">{entry.name}</span>
-              <span className="ml-auto font-mono text-xs font-medium text-navy">
+              <span className="ml-auto tabular-nums text-xs font-medium text-navy">
                 {display}
                 {unit}
               </span>

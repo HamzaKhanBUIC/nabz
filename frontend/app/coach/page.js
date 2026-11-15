@@ -22,7 +22,6 @@ export default function CoachPage() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">Offline handbook Q&amp;A</p>
         <h1 className="t-h1 mt-1 text-primary">CrewPulse coach</h1>
         <p className="mt-1 text-sm text-secondary">{coachDisclaimer}</p>
       </div>
@@ -59,7 +58,7 @@ export default function CoachPage() {
                         <p className="text-xs font-medium text-secondary">
                           {metric.shortLabel}
                         </p>
-                        <p className="font-mono text-sm font-semibold text-primary">
+                        <p className="tabular-nums text-sm font-semibold text-primary">
                           {latest
                             ? `${formatMetricValue(code, latest.value)} ${metric.unit}`
                             : "—"}
