@@ -57,7 +57,7 @@ export default function NormalZoneWidget({ className = "", code = "reaction-spee
         subtitle={
           latest
             ? `Latest ${metric.shortLabel.toLowerCase()}: ${formatMetricValue(code, latest.value)} ${metric.unit} (Day ${latest.missionDay})`
-            : "28-day personal baseline"
+            : "Built from your last 14 valid check-ins"
         }
         action={
           <StatusBadge tone={status.badgeTone} dot={false}>

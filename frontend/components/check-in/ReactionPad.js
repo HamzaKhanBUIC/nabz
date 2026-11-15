@@ -8,6 +8,10 @@ function randomIsi(minMs, maxMs) {
   return Math.round(minMs + Math.random() * (maxMs - minMs));
 }
 
+// The sample button submits made-up trials as a real check-in, so it only appears
+// when the frontend is built with NEXT_PUBLIC_DEMO=1 (for fast live demos).
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO === "1";
+
 function buildRealisticSampleTrials(protocol) {
   const minIsi = protocol?.isiMinMs ?? 1000;
   const maxIsi = protocol?.isiMaxMs ?? 4000;
@@ -274,16 +278,18 @@ export default function ReactionPad({
           >
             Finish & score ({trials.length})
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            data-pad-control="true"
-            disabled={submitting}
-            onClick={() => finishSession(buildRealisticSampleTrials(protocol))}
-          >
-            Complete 3-min sample (64 trials)
-          </Button>
+          {DEMO_MODE ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              data-pad-control="true"
+              disabled={submitting}
+              onClick={() => finishSession(buildRealisticSampleTrials(protocol))}
+            >
+              Demo: submit sample session (not real taps)
+            </Button>
+          ) : null}
           {onCancel ? (
             <Button
               type="button"
