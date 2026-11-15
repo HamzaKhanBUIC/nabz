@@ -10,8 +10,8 @@
 <p align="center">NASA Space Apps Challenge 2026 · Team NOVA TRIO</p>
 
 <p align="center">
-  <a href="https://github.com/HamzaKhanBUIC/space-apps-2026-astronaut-health/actions/workflows/ci.yml">
-    <img src="https://github.com/HamzaKhanBUIC/space-apps-2026-astronaut-health/actions/workflows/ci.yml/badge.svg" alt="CI status">
+  <a href="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml">
+    <img src="https://github.com/HamzaKhanBUIC/nabz/actions/workflows/ci.yml/badge.svg" alt="CI status">
   </a>
 </p>
 
