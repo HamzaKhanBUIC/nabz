@@ -269,6 +269,14 @@ function Story() {
                   loading={k < 2 ? "eager" : "lazy"}
                 />
               ))}
+              {/* Same ring as the hero, so Earth is findable in the last beat. */}
+              <span
+                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 transition-opacity duration-500"
+                style={{ left: `${DOT_X}%`, top: `${DOT_Y}%`, opacity: b.img === "PIA17936" ? 1 : 0 }}
+                aria-hidden
+              >
+                <span className="block h-10 w-10 rounded-full border-2 border-[#4D8DFF] welcome-ping" />
+              </span>
             </div>
           </div>
           <ol className="mt-6 flex gap-2" aria-hidden>
