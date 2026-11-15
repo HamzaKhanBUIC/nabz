@@ -519,3 +519,19 @@ dialog::backdrop {
     transition-duration: 100ms;
   }
 }
+
+/* Welcome page: the ring around Earth in the hero, and the CPR beat at 110 per minute (60/110 s). */
+@keyframes welcome-ping {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.welcome-ping { animation: welcome-ping 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+@keyframes welcome-cpr {
+  0%, 100% { transform: scale(1); }
+  18% { transform: scale(1.08); }
+  40% { transform: scale(1); }
+}
+.welcome-cpr { animation: welcome-cpr 0.5455s ease-out infinite; transform-origin: center; }
+@media (prefers-reduced-motion: reduce) {
+  .welcome-ping, .welcome-cpr { animation: none; }
+}
