@@ -15,13 +15,25 @@
   </a>
 </p>
 
-<br/>
-
-[🌐 Live Demo](https://nabz-drab.vercel.app/)
-&nbsp;&nbsp;•&nbsp;&nbsp;
-[💻 GitHub](https://github.com/HamzaKhanBUIC/nabz)
 
 <br/>
+
+<p align="center">
+  <a href="https://nabz-drab.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐_Live_Demo-2563EB?style=for-the-badge&logoColor=white" alt="Live Demo"/>
+  </a>
+  &nbsp;
+  <a href="https://github.com/HamzaKhanBUIC/nabz">
+    <img src="https://img.shields.io/badge/💻_GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+  </a>
+  &nbsp;
+  <a href="https://drive.google.com/file/d/1eaZu1KslDCQIQYBzRYQwLof8XGX_RtUY/view">
+    <img src="https://img.shields.io/badge/📋_UX_Workshop_&_Research-7C3AED?style=for-the-badge&logo=googledrive&logoColor=white" alt="UX Workshop & Research"/>
+  </a>
+</p>
+
+<br/>
+
 
 ## What Nabz does
 
