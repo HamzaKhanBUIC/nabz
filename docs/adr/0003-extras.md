@@ -1,6 +1,6 @@
 # ADR 0003: Extras design pass (`E01`–`E06`) (2026-11-15)
 
-Status: **proposed**, waiting for Hamza's approval. Nothing below is built.
+Status: **accepted** by Hamza on 2026-11-15. All six extras are built on the local branch `design/extras`; see Amendments for what changed during the build.
 
 ## Context
 
@@ -68,3 +68,12 @@ Hamza chose six additions and four architecture options (2026-11-15). This ADR r
 - `src/core/` stays pure. New pure code: `radiation.ts` and a small `environment.ts` for choosing wording.
 - New data under `data/nasa/` follows the existing rule: unmodified files, with source and fetch date.
 - Two new NASA data sources in the submission's "NASA Data" field: OSD-569 shown on screen, and MSL RAD.
+
+## Amendments (2026-11-15, during the build)
+
+- **E04 uses published rates, not raw RAD files.** The MSL/RAD cruise data is about 5.5 GB of absorbed-dose tables with no Sv column (CHECKS R9), too big to ship offline. Hamza chose published daily rates from George et al. 2024, Table 2, one source for all environments. The Mars transit card also shows Curiosity's measured 1.84 mSv/day (Zeitlin et al. 2013). There is no `data/nasa/rad/` folder.
+- **E04 shows days until the career limit instead of a projected mission dose,** because no sourced mission length exists.
+- **`estimateDose` lives in `src/core/environment.ts`** next to the escalation rule, not in a separate `radiation.ts`.
+- **Remote Earth has no radiation rate.** R9 found none for Concordia, so the card says "Not tracked here".
+- **The escalation line is added when the API answers and never stored,** so switching environment changes it on existing cards too.
+

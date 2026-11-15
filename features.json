@@ -243,8 +243,8 @@
         "research/briefs/R9, R10, R11 exist",
         "Hamza approves ADR 0003 (status changes from proposed to accepted)"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-15: Hamza accepted ADR 0003; amendments record the published-rates decision for E04."
     },
     {
       "id": "E01",

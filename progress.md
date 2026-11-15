@@ -183,3 +183,8 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Gate PASS (19 files, 135 tests). E06 passes. E03 and E04 held: one verify step each no longer fits (see features.json notes).
 - Local runtime: the old `data/runtime/sara.json` (1 test BP entry, cards without hazard tags) was set aside as `sara.json.corrupt` by the loader.
 - E03 and E04 verify steps reworded with Hamza's OK (E04 description too) to match the R11 design-choice note and the published-rates decision; both now pass.
+
+## 2026-11-15: ADR 0003 accepted, demo guide
+- Hamza accepted ADR 0003. Added an Amendments section for what changed in the build (E04 published rates, days until limit, `estimateDose` in `environment.ts`, Remote Earth not tracked, escalation added at response time). E00 passes; E00 to E06 all pass.
+- `docs/demo/extras-demo.md`: run and reset steps, crew codes, a test checklist, a 3-minute shot list with narration, Windows recording tips, and a before/after note for the team.
+- Next: Hamza tests, records the video and sends it to the team. Push or merge only after their OK.
