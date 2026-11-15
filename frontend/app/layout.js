@@ -54,11 +54,11 @@ export default function RootLayout({ children }) {
         {/* Applies the stored theme before first paint — no flash. */}
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
         <ThemeProvider>
-          <StoreProvider>
-            <SessionProvider>
+          <SessionProvider>
+            <StoreProvider>
               <AppShell>{children}</AppShell>
-            </SessionProvider>
-          </StoreProvider>
+            </StoreProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

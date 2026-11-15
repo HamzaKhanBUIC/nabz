@@ -99,3 +99,63 @@ export function pointStatus(point, band) {
     iconName: iconNameForKey(iconKey),
   };
 }
+
+export const BP_CATEGORY_LABELS = {
+  low: "Low",
+  normal: "Normal",
+  elevated: "Elevated",
+  stage1: "Stage 1",
+  stage2: "Stage 2",
+  severe: "Severe",
+};
+
+export function formatBpCategory(category) {
+  if (!category) return "No reading yet";
+  return BP_CATEGORY_LABELS[category] || String(category);
+}
+
+export function severityStatus(level) {
+  switch (level) {
+    case "in_zone":
+      return {
+        level: "in_zone",
+        badgeTone: statusToBadgeTone("in_zone"),
+        label: "Normal",
+        iconKey: "check",
+        iconName: iconNameForKey("check"),
+      };
+    case "watch":
+      return {
+        level: "watch",
+        badgeTone: statusToBadgeTone("watch"),
+        label: "Watch",
+        iconKey: "eye",
+        iconName: iconNameForKey("eye"),
+      };
+    case "act":
+      return {
+        level: "act",
+        badgeTone: statusToBadgeTone("act"),
+        label: "Act",
+        iconKey: "alert",
+        iconName: iconNameForKey("alert"),
+      };
+    case "urgent":
+      return {
+        level: "urgent",
+        badgeTone: statusToBadgeTone("urgent"),
+        label: "Urgent",
+        iconKey: "siren",
+        iconName: iconNameForKey("siren"),
+      };
+    case "info":
+    default:
+      return {
+        level: "info",
+        badgeTone: statusToBadgeTone("info"),
+        label: "Info",
+        iconKey: "info",
+        iconName: iconNameForKey("info"),
+      };
+  }
+}

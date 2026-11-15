@@ -4,6 +4,7 @@ import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useStore } from "@/lib/data/store";
+import { useSession } from "@/lib/data/session";
 import { getEarthDelayLabel } from "@/lib/data/mission";
 import { APP_NAME } from "@/lib/data/nav";
 
@@ -27,6 +28,7 @@ function MissionPill({ icon, children, title, tone = "neutral", compact = false 
 
 export default function TopBar({ onOpenMenu }) {
   const { mission, backendOnline } = useStore();
+  const { isAuthenticated, crew, switchCrewMember } = useSession();
   const missionDay = mission?.missionDay ?? 1;
   const missionName = mission?.name || "Mars Transit Sim";
   const delayLabel = getEarthDelayLabel(mission);
@@ -44,7 +46,7 @@ export default function TopBar({ onOpenMenu }) {
             <Icon name="menu" size={22} />
           </button>
 
-          <Link href="/" className="flex min-w-0 items-center gap-2.5 group">
+          <Link href={isAuthenticated ? "/" : "/real-data"} className="flex min-w-0 items-center gap-2.5 group">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent text-on-status shadow-xs transition-transform duration-200 ease-[var(--ease-smooth)] group-hover:scale-[1.03]">
               <Icon name="pulse_alert" size={20} />
             </span>
@@ -66,6 +68,24 @@ export default function TopBar({ onOpenMenu }) {
             >
               {delayLabel}
             </MissionPill>
+            {isAuthenticated && crew ? (
+              <MissionPill
+                icon="person"
+                title={`Signed in as ${crew.name} (${crew.role})`}
+              >
+                {`${crew.name} · ${crew.role}`}
+              </MissionPill>
+            ) : null}
+            {isAuthenticated && crew ? (
+              <button
+                type="button"
+                onClick={switchCrewMember}
+                className="hidden xl:inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-1 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary"
+              >
+                <Icon name="swap_horiz" size={16} />
+                <span>Switch crew member</span>
+              </button>
+            ) : null}
             {!backendOnline ? (
               <MissionPill
                 icon="cloud_off"
@@ -97,6 +117,21 @@ export default function TopBar({ onOpenMenu }) {
         <MissionPill compact icon="schedule">
           {delayLabel}
         </MissionPill>
+        {isAuthenticated && crew ? (
+          <>
+            <MissionPill compact icon="person">
+              {`${crew.name} · ${crew.role}`}
+            </MissionPill>
+            <button
+              type="button"
+              onClick={switchCrewMember}
+              className="inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-pill border border-line bg-surface px-2.5 py-0.5 text-[11px] font-medium text-secondary hover:bg-hover hover:text-primary"
+            >
+              <Icon name="swap_horiz" size={14} />
+              <span>Switch crew member</span>
+            </button>
+          </>
+        ) : null}
         {!backendOnline ? (
           <MissionPill compact icon="cloud_off" tone="offline">
             Offline cache

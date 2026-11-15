@@ -45,6 +45,45 @@ export const NAV_ITEMS = [
   },
 ];
 
+export const REAL_DATA_NAV = {
+  href: "/real-data",
+  label: "Real astronaut data",
+  icon: "biotech",
+  description: "NASA OSDR OSD-569 Inspiration4 blood trends",
+};
+
+export const PRIVACY_NAV = {
+  href: "/privacy",
+  label: "Privacy",
+  icon: "lock",
+  description: "Medical Officer sharing control and access log",
+};
+
+export const CREW_HEALTH_NAV = {
+  href: "/crew-health",
+  label: "Crew health",
+  icon: "groups",
+  description: "Medical Officer crew overview",
+};
+
+export const SIGN_IN_NAV = {
+  href: "/sign-in",
+  label: "Sign in",
+  icon: "login",
+  description: "Sign in with your crew name and code",
+};
+
+export function getSecondaryNavItems({ isAuthenticated, isMedicalOfficer }) {
+  if (!isAuthenticated) {
+    return [REAL_DATA_NAV, SIGN_IN_NAV];
+  }
+  return [
+    REAL_DATA_NAV,
+    PRIVACY_NAV,
+    ...(isMedicalOfficer ? [CREW_HEALTH_NAV] : []),
+  ];
+}
+
 export const EMERGENCY_NAV = {
   href: "/emergency",
   label: "Emergency",
@@ -62,6 +101,10 @@ export const SECTION_FOR_PATH = {
   "/send-to-earth": "send-to-earth",
   "/sent": "send-to-earth",
   "/emergency": "emergency",
+  "/real-data": "real-data",
+  "/privacy": "privacy",
+  "/crew-health": "crew-health",
+  "/sign-in": "sign-in",
 };
 
 export function sectionForPath(pathname) {
@@ -75,5 +118,9 @@ export function sectionForPath(pathname) {
     return "send-to-earth";
   }
   if (pathname.startsWith("/emergency")) return "emergency";
+  if (pathname.startsWith("/real-data")) return "real-data";
+  if (pathname.startsWith("/privacy")) return "privacy";
+  if (pathname.startsWith("/crew-health")) return "crew-health";
+  if (pathname.startsWith("/sign-in")) return "sign-in";
   return "today";
 }

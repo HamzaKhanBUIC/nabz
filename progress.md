@@ -166,3 +166,11 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Hamza chose six extras and four architecture options: server-checked crew sessions; Inspiration4 data on its own public screen; an environment switch (from R5) that changes guidance only; radiation from real Curiosity RAD data.
 - Written: `docs/adr/0003-extras.md` (status proposed), `docs/features/E-extras.md` (build order and lanes), research briefs R9 (radiation data), R10 (re-check R5 environment values, Remote Earth), R11 (card → HRP risk → hazard mapping). `features.json` gains E00–E06 (`passes: false`). `01-scope.md` gains an Extras section; `AGENTS.md` gives `frontend/` an owner.
 - Next: Hamza approves ADR 0003 → research lanes R9–R11 in parallel → E01 (Claude) → E02/E03/E05 in parallel → E06 → E04.
+
+## 2026-11-15: E01, E02, E05 built (local only, design/extras)
+- Backend (494f03c): crew sign-in with scrypt-hashed codes, per-person stores, OSD-569 catalog and trend endpoints, consent and Medical Officer overview. Every session endpoint is checked for 401 by a contract test driven from ENDPOINTS.
+- Frontend (Antigravity worker, reviewed): `/sign-in`, a shared route guard, `/real-data` (public), `/privacy`, `/crew-health` (Medical officer only), and name and role in the header. Two chart captions corrected: the band comes from all earlier samples, not only pre-launch ones.
+- Browser check with both apps running: wrong code, lockout countdown, Sara and Mateo see different data, Mateo gets the 403 page, Sara turns sharing on, Elena sees her summary, the access log records Elena's view, emergency and real-data work signed out, 375 px width with no sideways scroll.
+- Gate PASS (16 files, 118 tests); frontend lint and build pass.
+- Held for research: E03 (R11), E06 (R10), E04 (R9). Open: the OSD-569 hemoglobin unit says percent but the values are g/dL.
+- Not pushed: the team sees a demo video first.

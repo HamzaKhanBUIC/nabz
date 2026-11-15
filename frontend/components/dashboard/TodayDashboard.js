@@ -8,6 +8,7 @@ import ClinicalActionCard from "@/components/dashboard/ClinicalActionCard";
 import NormalZoneWidget from "@/components/dashboard/NormalZoneWidget";
 import ReminderCard from "@/components/dashboard/ReminderCard";
 import { useStore } from "@/lib/data/store";
+import { useSession } from "@/lib/data/session";
 import { getCommander } from "@/lib/data/mission";
 import { getOverallStatus } from "@/lib/data/selectors";
 import { formatMetricValue } from "@/lib/utils/health";
@@ -16,8 +17,9 @@ import { formatTime, greetingFor } from "@/lib/utils/format";
 
 export default function TodayDashboard() {
   const { mission, today, loading, backendOnline, error } = useStore();
+  const { crew } = useSession();
   const now = useClientTime(60_000);
-  const commander = getCommander(mission);
+  const activeCrew = crew || getCommander(mission);
   const overall = getOverallStatus(today);
 
   const greeting = now ? greetingFor(now) : "Mission brief";
@@ -55,7 +57,7 @@ export default function TodayDashboard() {
             Day {today?.missionDay ?? mission?.missionDay ?? 1} · {mission?.name || "Mars Transit Sim"}
           </p>
           <h1 className="t-h1 mt-1 text-primary">
-            {greeting}, {commander.name}
+            {greeting}, {activeCrew.name}
           </h1>
           <p className="t-body-md mt-1 text-secondary">
             Reaction speed, sleep, and blood pressure against your personal normal.
@@ -63,6 +65,13 @@ export default function TodayDashboard() {
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-3">
+          <Link
+            href="/real-data"
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-pill border border-line bg-surface px-3 py-1.5 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary"
+          >
+            <Icon name="biotech" size={16} className="text-accent" />
+            <span>Real astronaut data</span>
+          </Link>
           <StatusBadge tone={overall.badgeTone} dot={false} className="py-1.5 text-sm">
             <Icon name={overall.iconName} size={16} />
             <span>{loading && !today ? "Syncing..." : overall.label}</span>

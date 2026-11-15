@@ -258,8 +258,8 @@
         "Emergency, BP guide, protocol and mission work without a token",
         "Existing contract and golden tests pass through the login helper with unchanged numbers"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-15: scrypt-hashed codes, 12 h bearer sessions, 5 wrong codes lock that crew id for 60 s. tests/contract/session.test.ts passes; browser: wrong code, lockout countdown, Sara and Mateo see different data, emergency works signed out. Local only on design/extras until the team approves."
     },
     {
       "id": "E02",
@@ -272,8 +272,8 @@
         "GET /api/nasa/osd-569/trend values match the CSV for a hand-checked crew member and measure",
         "Browser: the screen shows the pre-launch band, post-flight points, lab range and the OSD-569 source line"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-15: /real-data is public. C001 hemoglobin hand-checked against the CSV (14.1, 14.9, 14.7, 14.7, 14.3, 15.7, 14.1). Open issue for Hamza: OSD-569 labels hemoglobin as percent but values are g/dL; shown as given."
     },
     {
       "id": "E03",
@@ -314,8 +314,8 @@
         "Non-officers get 403; crewmates with consent off show no data; no raw trials or readings in the response",
         "Each overview read adds an access-log entry for every shown crewmate"
       ],
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-15: consent off by default; Elena (Medical officer) sees only shared crewmates; others get 403; overview parsed through an allow-list schema; access log checked in the browser and by API. Local only on design/extras until the team approves."
     },
     {
       "id": "E06",

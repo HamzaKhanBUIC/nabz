@@ -6,36 +6,167 @@
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8787";
 
+const TOKEN_STORAGE_KEY = "crewpulse:token";
+const CREW_STORAGE_KEY = "crewpulse:crew";
+const SESSION_EVENT = "crewpulse:session";
+
+let unauthorizedHandler = null;
+
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = typeof handler === "function" ? handler : null;
+  return () => {
+    if (unauthorizedHandler === handler) {
+      unauthorizedHandler = null;
+    }
+  };
+}
+
+function emitSessionChange() {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new Event(SESSION_EVENT));
+  } catch {
+    // ignore event dispatch failures
+  }
+}
+
+export function subscribeSessionChange(listener) {
+  if (typeof window === "undefined") return () => {};
+  const onEvent = () => listener();
+  window.addEventListener(SESSION_EVENT, onEvent);
+  window.addEventListener("storage", onEvent);
+  return () => {
+    window.removeEventListener(SESSION_EVENT, onEvent);
+    window.removeEventListener("storage", onEvent);
+  };
+}
+
+export function getToken() {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(TOKEN_STORAGE_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setToken(token) {
+  if (typeof window === "undefined") return;
+  try {
+    if (token) {
+      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, String(token));
+    } else {
+      window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+  } catch {
+    // ignore sessionStorage errors
+  }
+  emitSessionChange();
+}
+
+export function getStoredCrew() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(CREW_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed.id === "string" && typeof parsed.name === "string") {
+      return {
+        id: parsed.id,
+        name: parsed.name,
+        role: typeof parsed.role === "string" ? parsed.role : "",
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredCrew(crew) {
+  if (typeof window === "undefined") return;
+  try {
+    if (crew && typeof crew.id === "string") {
+      window.sessionStorage.setItem(
+        CREW_STORAGE_KEY,
+        JSON.stringify({
+          id: crew.id,
+          name: crew.name,
+          role: crew.role,
+        }),
+      );
+    } else {
+      window.sessionStorage.removeItem(CREW_STORAGE_KEY);
+    }
+  } catch {
+    // ignore sessionStorage errors
+  }
+  emitSessionChange();
+}
+
+export function clearToken() {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    window.sessionStorage.removeItem(CREW_STORAGE_KEY);
+  } catch {
+    // ignore sessionStorage errors
+  }
+  emitSessionChange();
+}
+
 export class ApiError extends Error {
-  constructor(message, { status = 500, code = "HTTP_ERROR", issues = [] } = {}) {
+  constructor(
+    message,
+    { status = 500, code = "HTTP_ERROR", issues = [], retryAfterSeconds = null } = {},
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.issues = issues;
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
+
+function handleNoSessionRedirect() {
+  clearToken();
+  if (typeof window === "undefined") return;
+  if (window.location.pathname === "/sign-in") return;
+  if (unauthorizedHandler) {
+    unauthorizedHandler();
+  } else {
+    window.location.replace("/sign-in");
   }
 }
 
 async function request(path, options = {}) {
-  const { headers, ...rest } = options;
+  const { headers, handleNoSession = true, ...rest } = options;
+  const token = getToken();
   const response = await fetch(`${API_BASE}${path}`, {
     cache: "no-store",
     ...rest,
     headers: {
       ...(rest.body ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(headers || {}),
     },
   });
 
   let data = null;
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
+  if (response.status !== 204) {
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
   }
 
   if (!response.ok) {
     const err = data?.error;
+    if (response.status === 401 && err?.code === "no_session" && handleNoSession) {
+      handleNoSessionRedirect();
+    }
     const issueMsg =
       Array.isArray(err?.issues) && err.issues.length > 0
         ? ` (${err.issues.map((i) => `${i.path || "input"}: ${i.message}`).join("; ")})`
@@ -46,6 +177,7 @@ async function request(path, options = {}) {
         status: response.status,
         code: err?.code || "HTTP_ERROR",
         issues: err?.issues || [],
+        retryAfterSeconds: err?.retryAfterSeconds ?? null,
       },
     );
   }
@@ -137,6 +269,77 @@ export function updateReminders(schedule) {
   return request("/api/reminders", {
     method: "PUT",
     body: JSON.stringify(schedule),
+  });
+}
+
+export function listCrew() {
+  return request("/api/crew", { handleNoSession: false });
+}
+
+export async function signIn(crewId, code) {
+  const data = await request("/api/session", {
+    method: "POST",
+    body: JSON.stringify({ crewId, code }),
+    handleNoSession: false,
+  });
+  if (data?.token) {
+    setToken(data.token);
+  }
+  if (data?.crew) {
+    setStoredCrew(data.crew);
+  }
+  return data;
+}
+
+export async function getSession(options = {}) {
+  const data = await request("/api/session", options);
+  if (data?.crew) {
+    setStoredCrew(data.crew);
+  }
+  return data;
+}
+
+export async function signOut() {
+  try {
+    if (getToken()) {
+      await request("/api/session", {
+        method: "DELETE",
+        handleNoSession: false,
+      });
+    }
+  } catch {
+    // Always clear the local session even if the server already expired or is offline.
+  } finally {
+    clearToken();
+  }
+}
+
+export function getConsent() {
+  return request("/api/consent");
+}
+
+export function setConsent(share) {
+  return request("/api/consent", {
+    method: "PUT",
+    body: JSON.stringify({ shareWithMedicalOfficer: Boolean(share) }),
+  });
+}
+
+export function getCrewOverview() {
+  return request("/api/crew/overview");
+}
+
+export function getNasaCatalog() {
+  return request("/api/nasa/osd-569", { handleNoSession: false });
+}
+
+export function getNasaTrend(crew, analyte) {
+  const qs = new URLSearchParams({
+    crew: String(crew),
+    analyte: String(analyte),
+  });
+  return request(`/api/nasa/osd-569/trend?${qs.toString()}`, {
+    handleNoSession: false,
   });
 }
 
