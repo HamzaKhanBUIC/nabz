@@ -216,3 +216,13 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Kept on purpose: the NASA disclaimer footer on sign-in (waiting on Hamza), card sources (folded, not deleted), CHECKS.md step wording instead of the Figma draft text.
 - Checks: gate PASS, frontend lint, browser walkthrough of every changed page at 1440x900 and 375 px (no sideways scroll).
 - Follow-up: Send to Earth has a closed "See exactly what will be sent" toggle that shows the exact outgoing text, so consent is informed without bringing back the clutter. Light-theme text tokens darkened (attention #8a5700, accent #1b66c4, emergency #c62828), the Environment "Current" pill is solid, and the body-map selected button uses accent tokens. Contrast check: 0 failures across 510 text elements on 10 pages in light and dark. CI on PR #7 green (6 checks, including the production build).
+
+## 2026-11-15: free hosting for judging
+- Live: https://nabz-drab.vercel.app (site, Vercel Hobby) with the API on Render's free web service (https://nabz-api-m9ov.onrender.com). Vercel forwards `/api/*` to Render, so the browser only talks to one origin.
+- Code: `src/server.ts` reads `HOST` (default `127.0.0.1`; Render sets `0.0.0.0`). `frontend/next.config.mjs` adds the `/api` rewrite and same-origin API calls when `API_PROXY_TARGET` is set. Setup steps in `deploy/README.md` (PR #8).
+- Sign-in page lists the four demo crew codes in demo builds, because judges can't read the private repo's README (PR #9).
+- Vercel project root directory is `frontend`; merges into main redeploy both the site (Vercel) and the API (Render). Render runs Node 24 with `HOST=0.0.0.0` and health check `/api/health`.
+- UptimeRobot checks the API every 5 minutes so the free service doesn't sleep. Render's 750 free hours are shared with the other free services in the workspace, so only nabz-api has a pinger.
+- Limits: crew data added on the live site resets when Render restarts or redeploys; the seeded fixtures stay.
+- Tried first: Oracle Always Free (Singapore out of capacity), Hugging Face Docker Space (now needs PRO). `deploy/huggingface/` keeps the single-container Dockerfile for any Docker host.
+- Checks: gate PASS; split setup tested locally (proxy health, sign-in 201 with a foreign Origin, no `localhost:8787` in browser code); live pages and `/api/health` 200, emergency flow and crew roster in the browser; PR #8 and #9 CI green.
