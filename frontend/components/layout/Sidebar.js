@@ -143,7 +143,7 @@ export default function Sidebar({ className = "" }) {
 
   return (
     <aside
-      className={`hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:justify-between lg:border-r lg:border-line lg:bg-canvas lg:p-5 ${className}`}
+      className={`hidden lg:sticky lg:top-[65px] lg:flex lg:h-[calc(100dvh-65px)] lg:w-64 lg:shrink-0 lg:flex-col lg:justify-between lg:overflow-y-auto lg:border-r lg:border-line lg:bg-canvas lg:p-5 ${className}`}
     >
       <div>
         <NavList />

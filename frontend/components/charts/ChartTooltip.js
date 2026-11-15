@@ -10,7 +10,7 @@ export default function ChartTooltip({ active, payload, label, unit = "", format
 
   return (
     <div className="rounded-lg border border-line bg-surface px-3 py-2">
-      {label ? <p className="mb-1 text-[11px] text-muted">{label}</p> : null}
+      {label ? <p className="mb-1 text-xs text-muted">{label}</p> : null}
       <div className="flex flex-col gap-1">
         {payload.map((entry) => {
           const rawValue = entry.value;
@@ -30,7 +30,7 @@ export default function ChartTooltip({ active, payload, label, unit = "", format
                 {unit}
               </span>
               {source === "demo" ? (
-                <span className="rounded border border-accent/30 bg-accent-subtle px-1 text-[9px] font-medium text-accent">
+                <span className="rounded border border-accent/30 bg-accent-subtle px-1 text-xs font-medium text-accent">
                   Demo
                 </span>
               ) : null}

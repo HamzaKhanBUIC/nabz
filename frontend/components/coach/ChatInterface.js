@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useId, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import ChatMessage, { TypingIndicator } from "@/components/coach/ChatMessage";
 import { useStore } from "@/lib/data/store";
@@ -27,22 +26,18 @@ function ChatInterfaceInner() {
     clearCoachMessages,
   } = useStore();
 
-  const [customCardId, setCustomCardId] = useState("");
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTIONS);
   const listEndRef = useRef(null);
-  const contextSelectId = useId();
   const questionInputId = useId();
 
-  const selectedCardId = customCardId || queryCardId || today?.card?.id || "";
+  const selectedCardId = queryCardId || today?.card?.id || "";
 
   useEffect(() => {
     listEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [coachMessages.length, sending]);
-
-  const activeCards = today?.cards || (today?.card ? [today.card] : []);
 
   async function submitQuestion(text) {
     const trimmed = text.trim();
@@ -95,56 +90,15 @@ function ChatInterfaceInner() {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg border border-line bg-canvas">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:px-5">
-        <div className="flex items-center gap-2">
-          <Icon name="smart_toy" size={20} className="text-accent" />
-          <span className="text-sm font-semibold text-primary">
-            Offline health coach
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {activeCards.length > 0 ? (
-            <div className="flex items-center gap-2">
-              <label htmlFor={contextSelectId} className="text-xs text-muted">
-                Context card:
-              </label>
-              <select
-                id={contextSelectId}
-                value={selectedCardId}
-                onChange={(e) => setCustomCardId(e.target.value)}
-                className="max-w-[220px] rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs text-primary transition-colors focus:border-accent focus:outline-none"
-              >
-                {activeCards.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : null}
-
-          {coachMessages.length > 0 ? (
-            <button
-              type="button"
-              onClick={clearCoachMessages}
-              className="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary"
-            >
-              Clear thread
-            </button>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="h-[min(56dvh,460px)] space-y-4 overflow-y-auto p-4 sm:p-5">
+    <div className="flex w-full max-w-3xl flex-1 flex-col">
+      <div className="flex-1 space-y-4 pb-4">
         {coachMessages.length === 0 ? (
           <div className="rounded-lg border border-line bg-surface p-5 text-sm text-secondary">
             <p className="font-semibold text-primary">
               Ask about today&apos;s readings or advice
             </p>
             <p className="mt-1.5 text-xs leading-5 text-muted">
-              Uses your open action card and mission medical notes. Works offline and flags urgent symptoms right away.
+              Uses your latest result and mission medical notes. Flags urgent symptoms right away.
             </p>
           </div>
         ) : (
@@ -155,7 +109,7 @@ function ChatInterfaceInner() {
         <div ref={listEndRef} />
       </div>
 
-      <div className="space-y-3 border-t border-line bg-surface p-4 sm:p-5">
+      <div className="space-y-3 bg-canvas pt-2 pb-2 lg:sticky lg:bottom-0 lg:pb-6">
         <div className="flex flex-wrap gap-2">
           {suggestions.map((q) => (
             <button
@@ -163,7 +117,7 @@ function ChatInterfaceInner() {
               type="button"
               onClick={() => submitQuestion(q)}
               disabled={sending}
-              className="min-h-8 rounded-pill border border-line bg-raised px-3.5 py-1.5 text-xs font-medium text-secondary transition-[transform,background-color,border-color,color] duration-150 hover:border-line-strong hover:bg-hover hover:text-primary active:scale-[0.98] disabled:opacity-50"
+              className="min-h-10 rounded-pill border border-line bg-surface px-4 py-2 text-sm font-medium text-primary transition-[transform,background-color,border-color] duration-150 hover:border-line-strong hover:bg-hover active:scale-95 disabled:opacity-60"
             >
               {q}
             </button>
@@ -181,10 +135,10 @@ function ChatInterfaceInner() {
             e.preventDefault();
             submitQuestion(input);
           }}
-          className="flex flex-wrap gap-2"
+          className="flex items-center gap-2 rounded-lg border border-line bg-surface py-2 pr-2 pl-4 focus-within:border-accent"
         >
           <label htmlFor={questionInputId} className="sr-only">
-            Ask a question
+            Ask your coach
           </label>
           <input
             id={questionInputId}
@@ -198,16 +152,31 @@ function ChatInterfaceInner() {
                 e.preventDefault();
               }
             }}
-            placeholder="Ask why your card appeared, what to watch, or when to recheck..."
-            className="min-w-[200px] flex-1 rounded-md border border-line bg-canvas px-4 py-3 text-sm text-primary placeholder:text-muted transition-colors focus:border-accent focus:outline-none"
+            placeholder="Ask your coach..."
+            className="min-w-0 flex-1 bg-transparent py-2 text-base text-primary placeholder:text-muted focus:outline-none"
           />
-          <Button type="submit" variant="primary" disabled={sending} className="w-full sm:w-auto">
-            <Icon name="send" size={18} />
-            {sending ? "Checking..." : "Ask coach"}
-          </Button>
+          <button
+            type="submit"
+            disabled={sending}
+            aria-label={sending ? "Checking" : "Send"}
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-on-status transition-transform duration-150 hover:brightness-110 active:scale-95 disabled:opacity-60"
+          >
+            <Icon name={sending ? "hourglass_top" : "send"} size={20} />
+          </button>
         </form>
 
-        <p className="text-[11px] text-muted">{coachDisclaimer}</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs text-muted">{coachDisclaimer}</p>
+          {coachMessages.length > 0 ? (
+            <button
+              type="button"
+              onClick={clearCoachMessages}
+              className="text-xs font-medium text-secondary underline-offset-2 hover:text-primary hover:underline"
+            >
+              Clear chat
+            </button>
+          ) : null}
+        </div>
       </div>
     </div>
   );

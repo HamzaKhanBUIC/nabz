@@ -52,7 +52,7 @@ export function BottomTabBar({ enabled = true }) {
                 >
                   <Icon name={item.icon} filled={active} size={20} />
                 </span>
-                <span className="w-full truncate text-[11px] font-medium leading-4">
+                <span className="w-full truncate text-xs font-medium leading-4">
                   {item.mobileLabel || item.label}
                 </span>
               </Link>

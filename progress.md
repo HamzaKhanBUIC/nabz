@@ -206,3 +206,12 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - Team asked for two more measurements with blood pressure. Claude checked MedlinePlus, NHLBI and FDA pages and added R12 to `research/CHECKS.md`.
 - `src/core/vitals.ts` checks the averaged cuff pulse (60-100 bpm normal) and an optional SpO2 (95% normal, 92% contact, 88% act now). The BP card is unchanged.
 - API accepts `spo2` and returns `vitals`; the BP result screen shows a "Pulse and oxygen" panel. 21 new tests; gate passes; browser-checked on an isolated API.
+
+## 2026-11-15: UX/UI designer review (Nabz post-dev review)
+- Applied Ameni's review across the frontend: sign-in cleanup (label "Enter your code", placeholder "Enter 4 digits", no Real data / hazards links), solid red Close in emergency mode, sticky full-height sidebar, Today in two columns without "Today's focus", 12 px minimum font size.
+- Check-in: 3-minute progress bar and "Taps so far" (the test already ends by itself at 3:00). Result: the four tiles are gone; the action card shows the title and what to do, with sources behind a "Sources" toggle and the disclaimer kept.
+- Normal zone and metric labels in plain words (taps/s, no z-score, no "PVT-B mean reciprocal speed"). Measure in two columns. Coach is a full-height chat with chips and a send button.
+- Send to Earth: nothing ticked by default; share list on the left and To / note / Send / Not now on the right. Sent screen: sent time, arrival window (sent time + the environment's one-way delay) and a four-step timeline.
+- Environment: Sources block and "Signed in as" line removed. Emergency: 4-step stepper (who, what, do this now, help is on the way) with verified step wording unchanged.
+- Kept on purpose: the NASA disclaimer footer on sign-in (waiting on Hamza), card sources (folded, not deleted), CHECKS.md step wording instead of the Figma draft text.
+- Checks: gate PASS, frontend lint, browser walkthrough of every changed page at 1440x900 and 375 px (no sideways scroll).

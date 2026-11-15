@@ -247,10 +247,15 @@ export default function ReactionPad({
   const remainSecs = Math.ceil(remainingMs / 1000);
   const mm = Math.floor(remainSecs / 60);
   const ss = remainSecs % 60;
+  const elapsedPct = Math.min(
+    100,
+    Math.max(0, Math.round(((durationMs - remainingMs) / durationMs) * 100)),
+  );
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface px-4 py-3.5 sm:px-5">
+      <div className="rounded-lg border border-line bg-surface px-4 py-3.5 sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <div>
             <p className="text-xs text-muted">Time left</p>
@@ -260,7 +265,7 @@ export default function ReactionPad({
           </div>
           <div className="h-8 w-px bg-line" />
           <div>
-            <p className="text-xs text-muted">Trials logged</p>
+            <p className="text-xs text-muted">Taps so far</p>
             <p className="tabular-nums text-lg font-semibold text-primary tabular-nums">
               {trials.length}
             </p>
@@ -303,6 +308,23 @@ export default function ReactionPad({
             </Button>
           ) : null}
         </div>
+      </div>
+      <div
+        className="mt-3 h-2 w-full overflow-hidden rounded-full bg-line"
+        role="progressbar"
+        aria-label="Test progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={elapsedPct}
+      >
+        <div
+          className="h-full rounded-full bg-accent transition-[width] duration-300"
+          style={{ width: `${elapsedPct}%` }}
+        />
+      </div>
+      <p className="mt-1.5 text-xs text-muted">
+        {elapsedPct}% done · the test ends by itself at 3:00 and shows your result
+      </p>
       </div>
 
       <button

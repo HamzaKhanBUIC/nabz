@@ -15,6 +15,7 @@ export default function ClinicalActionCard({
   card,
   heading = "Today's focus",
   compact = false,
+  simple = false,
 }) {
   const { routinesById } = useStore();
   const [activeRoutine, setActiveRoutine] = useState(null);
@@ -78,7 +79,7 @@ export default function ClinicalActionCard({
             </StatusBadge>
           </div>
 
-          {hazards.length > 0 ? (
+          {!simple && hazards.length > 0 ? (
             <div
               className="mt-3 flex flex-wrap items-center gap-2"
               aria-label="NASA spaceflight hazards"
@@ -130,6 +131,19 @@ export default function ClinicalActionCard({
             </div>
           ) : null}
 
+          {simple ? (
+            <div className="mt-5 border-t border-line pt-5">
+              <p className="text-sm font-medium text-muted">What to do</p>
+              <ul className="mt-2 space-y-2 text-sm leading-6 text-primary">
+                {card.whatToDo.map((step, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Icon name="arrow_right" size={18} className="mt-1 shrink-0 text-accent" />
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
           <div className={`mt-5 grid gap-x-8 gap-y-5 border-t border-line pt-5 ${compact ? "md:grid-cols-1" : "md:grid-cols-3"}`}>
             <div>
               <p className="text-sm font-medium text-muted">
@@ -163,6 +177,8 @@ export default function ClinicalActionCard({
               </ul>
             </div>
           </div>
+
+          )}
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {linkedRoutine ? (
@@ -207,7 +223,28 @@ export default function ClinicalActionCard({
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4 text-xs text-muted">
             <span className="font-medium">{card.disclaimer}</span>
-            {Array.isArray(card.sources) && card.sources.length > 0 ? (
+            {simple && Array.isArray(card.sources) && card.sources.length > 0 ? (
+              <details className="w-full sm:w-auto">
+                <summary className="cursor-pointer font-medium text-secondary hover:text-primary">
+                  Sources ({card.sources.length})
+                </summary>
+                <ul className="mt-2 space-y-1">
+                  {card.sources.map((src) => (
+                    <li key={src.id}>
+                      <a
+                        href={src.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-accent underline-offset-2 hover:underline"
+                      >
+                        {src.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
+            {!simple && Array.isArray(card.sources) && card.sources.length > 0 ? (
               <div className="flex flex-wrap items-center gap-3">
                 <span>Sources:</span>
                 {card.sources.map((src) => (

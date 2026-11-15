@@ -27,7 +27,7 @@ export default function ChatMessage({ message }) {
         <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-accent px-4 py-3 text-sm text-on-status sm:max-w-[80%]">
           <p className="whitespace-pre-wrap leading-6">{message.content}</p>
           {message.createdAt ? (
-            <p className="mt-1 text-right text-[11px] opacity-85">
+            <p className="mt-1 text-right text-xs opacity-85">
               {formatTime(message.createdAt)}
             </p>
           ) : null}
@@ -80,13 +80,13 @@ export default function ChatMessage({ message }) {
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
           <div className="flex items-center gap-2">
             {message.grounded !== undefined ? (
               <StatusBadge
                 tone={message.grounded ? "ok" : "warn"}
                 dot={false}
-                className="px-2 py-0.5 text-[10px]"
+                className="px-2 py-0.5 text-xs"
               >
                 {message.grounded ? "Verified source" : "Outside handbook"}
               </StatusBadge>

@@ -145,7 +145,7 @@ export default function TopBar({ onOpenMenu }) {
         </button>
 
         <Link
-          href={isAuthenticated ? "/" : "/real-data"}
+          href={isAuthenticated ? "/" : "/sign-in"}
           aria-label={`${APP_NAME} home`}
           className="group hidden shrink-0 items-center sm:flex lg:w-[15.375rem]"
         >

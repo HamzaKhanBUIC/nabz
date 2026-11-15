@@ -198,7 +198,7 @@ export default function SignInPage() {
           ) : (
             <fieldset className="space-y-2.5">
               <legend className="t-label-md text-secondary">
-                1. Pick your name
+                Pick your name
               </legend>
               <div className="grid gap-3 sm:grid-cols-2">
                 {crewList.map((member) => {
@@ -250,9 +250,7 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor={codeInputId} className="t-label-md block text-secondary">
-                {selectedCrew
-                  ? `2. Enter code for ${selectedCrew.name}`
-                  : "2. Enter your 4 to 8 digit code"}
+                {selectedCrew ? `Enter ${selectedCrew.name}'s code` : "Enter your code"}
               </label>
 
               <div className="flex items-stretch gap-2">
@@ -265,7 +263,7 @@ export default function SignInPage() {
                   pattern="[0-9]{4,8}"
                   maxLength={8}
                   autoComplete="one-time-code"
-                  placeholder="4 to 8 digits"
+                  placeholder="Enter 4 digits"
                   value={code}
                   disabled={!selectedCrew || loadingCrew}
                   onChange={(e) => {
@@ -307,24 +305,7 @@ export default function SignInPage() {
               </p>
             ) : null}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <div className="flex flex-wrap items-center gap-4">
-                <Link
-                  href="/real-data"
-                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-2 hover:underline"
-                >
-                  <Icon name="biotech" size={18} />
-                  <span>Real astronaut data</span>
-                </Link>
-                <Link
-                  href="/hazards"
-                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-2 hover:underline"
-                >
-                  <Icon name="health_and_safety" size={18} />
-                  <span>5 hazards</span>
-                </Link>
-              </div>
-
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
               <Button
                 type="submit"
                 variant="primary"

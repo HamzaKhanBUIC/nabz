@@ -47,8 +47,6 @@ export default function EnvironmentPage() {
   const options = Array.isArray(environment?.options) ? environment.options : [];
   const isCommander = crew?.role === "Commander";
   const selectedId = draftId ?? activeEnv?.id ?? "";
-  // The API resolves the active environment's sources (content/sources.json); the client keeps no copy.
-  const resolvedSources = Array.isArray(environment?.sources) ? environment.sources : [];
 
   async function handleRetry() {
     setRetrying(true);
@@ -196,30 +194,6 @@ export default function EnvironmentPage() {
                 </div>
               ) : null}
 
-              {resolvedSources.length > 0 ? (
-                <div className="border-t border-line pt-4 text-xs text-muted">
-                  <p className="t-label-md mb-2 text-secondary">Sources</p>
-                  <ul className="space-y-1.5">
-                    {resolvedSources.map((src) => (
-                      <li key={src.id}>
-                        {src.url ? (
-                          <a
-                            href={src.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-accent underline-offset-2 hover:underline"
-                          >
-                            <span>{src.title}</span>
-                            <Icon name="open_in_new" size={13} />
-                          </a>
-                        ) : (
-                          <span>{src.title}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
             </CardBody>
           </Card>
 
@@ -302,11 +276,6 @@ export default function EnvironmentPage() {
                       <Icon name="tune" size={18} />
                       {saving ? "Saving..." : "Save environment"}
                     </Button>
-                    {crew?.role ? (
-                      <span className="text-xs text-muted">
-                        Signed in as {crew.name} ({crew.role})
-                      </span>
-                    ) : null}
                   </div>
                 </form>
               ) : (

@@ -313,7 +313,7 @@ export default function MeasurementFlow() {
                           <p className="text-xs leading-5 text-secondary">{s.detail}</p>
                         ) : null}
                         {s.adaptation ? (
-                          <span className="mt-1 inline-block rounded-pill border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] font-medium text-accent">
+                          <span className="mt-1 inline-block rounded-pill border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
                             Microgravity adaptation
                           </span>
                         ) : null}

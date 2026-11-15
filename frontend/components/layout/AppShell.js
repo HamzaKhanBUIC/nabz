@@ -40,10 +40,10 @@ function EmergencyBar() {
         <ThemeToggle variant="on-emergency" />
         <Link
           href={isAuthenticated ? "/" : "/sign-in"}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-md bg-white/15 px-3.5 text-sm font-semibold text-white transition-[transform,background-color] duration-150 hover:bg-white/25 active:scale-[0.98]"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-white bg-emergency-solid px-3.5 text-sm font-semibold text-white transition-[transform,background-color] duration-150 hover:bg-emergency-hover active:scale-[0.98]"
         >
           <Icon name="close" size={18} />
-          <span>Exit</span>
+          <span>Close</span>
         </Link>
       </div>
     </header>
@@ -63,14 +63,6 @@ function SignInBar() {
         </Link>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link
-            href="/real-data"
-            className="hidden sm:inline-flex min-h-11 items-center gap-1.5 rounded-md border border-line bg-surface px-3.5 text-sm font-medium text-secondary transition-colors hover:bg-hover hover:text-primary"
-          >
-            <Icon name="biotech" size={18} />
-            <span>Real astronaut data</span>
-          </Link>
-
           <ThemeToggle />
 
           <Link

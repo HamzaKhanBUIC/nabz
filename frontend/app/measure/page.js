@@ -49,23 +49,24 @@ export default function MeasurePage() {
       <div>
         <h1 className="t-h1 mt-1 text-primary">Take a measurement</h1>
         <p className="mt-1 text-sm text-secondary">
-          Step-by-step cuff protocol with rest timers, AHA categories, and symptom checks.
+          Guided blood pressure check with rest timers and symptom checks.
         </p>
       </div>
 
-      <div className="space-y-3">
-        {MEASUREMENTS.map((m) => (
-          <MeasurementItem
-            key={m.id}
-            href={m.href}
-            title={m.title}
-            subtitle={m.subtitle}
-            icon={m.icon}
-          />
-        ))}
-      </div>
+      <div className="grid items-start gap-5 sm:gap-6 lg:grid-cols-2">
+        <div className="min-w-0 space-y-5 sm:space-y-6">
+          <div className="space-y-3">
+            {MEASUREMENTS.map((m) => (
+              <MeasurementItem
+                key={m.id}
+                href={m.href}
+                title={m.title}
+                subtitle={m.subtitle}
+                icon={m.icon}
+              />
+            ))}
+          </div>
 
-      <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader
             title="Recent blood pressure history"
@@ -114,6 +115,7 @@ export default function MeasurePage() {
             </ul>
           </CardBody>
         </Card>
+        </div>
 
         <Card>
           <CardHeader

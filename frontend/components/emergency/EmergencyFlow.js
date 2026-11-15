@@ -1,12 +1,12 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import Button from "@/components/ui/Button";
-import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import Button, { buttonClassName } from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import InstructionStep from "@/components/ui/InstructionStep";
-import StatusBadge from "@/components/ui/StatusBadge";
+import { useSession } from "@/lib/data/session";
 import { useStore } from "@/lib/data/store";
 import { formatTime, makeId } from "@/lib/utils/format";
 
@@ -164,41 +164,165 @@ function MetronomeControl({ bpm = 110 }) {
   );
 }
 
+/** Icon per procedure for the big "What is happening?" buttons. Presentation only. */
+const PROCEDURE_ICONS = {
+  "allergic-reaction": "allergy",
+  bleeding: "water_drop",
+  burn: "local_fire_department",
+  eye: "visibility",
+  "near-fainting": "airline_seat_flat",
+  "crewmate-collapse": "personal_injury",
+  "crewmate-cpr": "ecg_heart",
+  "crewmate-low-blood-sugar": "glucose",
+  "crewmate-seizure": "neurology",
+};
+
+const TOTAL_STEPS = 4;
+
+function StepHeader({ step, title, subtitle, onBack, headingRef }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-secondary">
+          Step {step} of {TOTAL_STEPS}
+        </p>
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex min-h-10 items-center gap-1 rounded-md px-2 text-sm font-medium text-secondary hover:bg-hover hover:text-primary"
+          >
+            <Icon name="arrow_back" size={18} />
+            Back
+          </button>
+        ) : null}
+      </div>
+      <div
+        className="grid grid-cols-4 gap-1.5"
+        role="progressbar"
+        aria-label="Emergency steps"
+        aria-valuemin={1}
+        aria-valuemax={TOTAL_STEPS}
+        aria-valuenow={step}
+      >
+        {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+          <span
+            key={i}
+            className={`h-1.5 rounded-full ${i < step ? "bg-emergency-solid" : "bg-line"}`}
+          />
+        ))}
+      </div>
+      <div>
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          className="t-h1 text-primary focus:outline-none"
+        >
+          {title}
+        </h1>
+        {subtitle ? <p className="mt-1 text-sm text-secondary">{subtitle}</p> : null}
+      </div>
+    </div>
+  );
+}
+
+function BigChoice({ icon, label, onClick, selected = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={`flex min-h-36 w-full flex-col items-center justify-center gap-3 rounded-xl border-2 p-5 text-center text-base font-semibold transition-[transform,background-color,border-color] duration-150 active:scale-[0.98] ${
+        selected
+          ? "border-emergency-solid bg-emergency-solid text-white"
+          : "border-line bg-surface text-primary hover:border-emergency hover:bg-hover"
+      }`}
+    >
+      <Icon
+        name={icon}
+        size={36}
+        className={selected ? "text-white" : "text-emergency"}
+      />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function StepList({ procedure, doneSteps, onToggle }) {
+  return (
+    <ol className="space-y-3">
+      {procedure.steps.map((s, idx) => {
+        const key = `${procedure.id}:${s.id}`;
+        return (
+          <li key={s.id} className="space-y-1.5">
+            <InstructionStep
+              number={idx + 1}
+              done={Boolean(doneSteps[key])}
+              onToggle={() => onToggle(procedure.id, s.id)}
+            >
+              {s.text}
+            </InstructionStep>
+            <div className="pl-4">
+              {s.detail ? (
+                <p className="text-sm leading-6 text-secondary">{s.detail}</p>
+              ) : null}
+              {s.caution ? (
+                <p className="mt-1 rounded-md border border-attention/40 bg-attention/10 px-3 py-1.5 text-xs font-medium text-attention">
+                  Caution: {s.caution}
+                </p>
+              ) : null}
+              {s.timerSeconds ? (
+                <StepCountdown
+                  key={`${procedure.id}:${s.id}:${s.timerSeconds}`}
+                  seconds={s.timerSeconds}
+                />
+              ) : null}
+              {s.metronomeBpm ? <MetronomeControl bpm={s.metronomeBpm} /> : null}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function EmergencyFlowInner() {
   const searchParams = useSearchParams();
   const initialId = searchParams.get("id");
-  const {
-    emergencySelf,
-    emergencyCrewmate,
-    emergencyLog,
-    environment,
-    recordEmergencyAlert,
-  } = useStore();
+  const { isAuthenticated } = useSession();
+  const { emergencySelf, emergencyCrewmate, environment, recordEmergencyAlert } =
+    useStore();
   const activeEnv = environment?.active || null;
 
-  const [userTarget, setUserTarget] = useState(null); // self | crewmate | null
-  const [userSelectedId, setUserSelectedId] = useState(null);
+  const initialProc =
+    (initialId &&
+      [...emergencySelf, ...emergencyCrewmate].find((p) => p.id === initialId)) ||
+    null;
+
+  // 1: who, 2: what is happening, 3: do this now, 4: help is on the way
+  const [userStep, setUserStep] = useState(null);
+  const [userTarget, setUserTarget] = useState(null); // self | crewmate
+  const [userProcId, setUserProcId] = useState(null);
   const [doneSteps, setDoneSteps] = useState({});
-  const [alertNotice, setAlertNotice] = useState(null);
+  const [alertedAt, setAlertedAt] = useState(null);
+  const headingRef = useRef(null);
 
-  const defaultTarget =
-    initialId && emergencyCrewmate.some((p) => p.id === initialId)
-      ? "crewmate"
-      : "self";
-  const target = userTarget ?? defaultTarget;
-  const selectedId =
-    userSelectedId ?? (userTarget === null ? initialId : null);
-
+  const step = userStep ?? (initialProc ? 3 : 1);
+  const target = userTarget ?? initialProc?.for ?? null;
+  const procId = userProcId ?? initialProc?.id ?? null;
   const list = target === "crewmate" ? emergencyCrewmate : emergencySelf;
-  const activeProcedure =
-    list.find((p) => p.id === selectedId) || list[0] || null;
+  const procedure = list.find((p) => p.id === procId) || null;
 
-  const toggleDone = (procId, stepId) => {
-    const key = `${procId}:${stepId}`;
+  useEffect(() => {
+    if (userStep !== null) headingRef.current?.focus();
+  }, [userStep]);
+
+  const toggleDone = (pid, sid) => {
+    const key = `${pid}:${sid}`;
     setDoneSteps((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleAlertCrew = (proc) => {
+  const handleAlert = (proc) => {
     const entry = {
       id: makeId("alert"),
       procedureId: proc.id,
@@ -207,261 +331,214 @@ function EmergencyFlowInner() {
       triggeredAt: new Date().toISOString(),
     };
     recordEmergencyAlert(entry);
-    setAlertNotice(
-      `Local crew alert recorded at ${formatTime(entry.triggeredAt)} for "${proc.title}".`,
-    );
+    setAlertedAt(entry.triggeredAt);
+    setUserStep(4);
   };
+
+  const contactLine =
+    activeEnv?.name && activeEnv?.escalation ? (
+      <div className="flex items-start gap-3 rounded-lg border border-attention/40 bg-attention/10 px-4 py-3 text-sm">
+        <Icon
+          name="contact_phone"
+          size={20}
+          className="mt-0.5 shrink-0 text-attention"
+        />
+        <div className="min-w-0">
+          <p className="t-label-md text-secondary">Who to contact</p>
+          <p className="mt-0.5 font-semibold text-primary">
+            {`${activeEnv.name}: ${activeEnv.escalation}`}
+          </p>
+        </div>
+      </div>
+    ) : null;
+
+  if (step === 1 || !target) {
+    const pickTarget = (t) => {
+      setUserTarget(t);
+      setUserProcId(null);
+      setUserStep(2);
+    };
+    return (
+      <div className="mx-auto max-w-3xl space-y-6">
+        <StepHeader
+          step={1}
+          title="Who is this for?"
+          subtitle="Tap one. Help steps change depending on who needs it."
+          headingRef={headingRef}
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <BigChoice
+            icon="person"
+            label="Me"
+            selected={target === "self"}
+            onClick={() => pickTarget("self")}
+          />
+          <BigChoice
+            icon="group"
+            label="A crewmate"
+            selected={target === "crewmate"}
+            onClick={() => pickTarget("crewmate")}
+          />
+        </div>
+        {contactLine}
+      </div>
+    );
+  }
+
+  if (step === 2 || !procedure) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-6">
+        <StepHeader
+          step={2}
+          title="What is happening?"
+          subtitle={`For: ${target === "crewmate" ? "a crewmate" : "me"}. Pick the closest match. No typing needed.`}
+          onBack={() => setUserStep(1)}
+          headingRef={headingRef}
+        />
+        {list.length === 0 ? (
+          <div className="rounded-lg border border-line bg-surface p-4 text-sm text-muted">
+            No local guides loaded yet. Make sure the server ran at least once so
+            procedures are cached.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((proc) => (
+              <BigChoice
+                key={proc.id}
+                icon={PROCEDURE_ICONS[proc.id] || "medical_services"}
+                label={proc.title}
+                selected={procId === proc.id}
+                onClick={() => {
+                  setUserProcId(proc.id);
+                  setAlertedAt(null);
+                  setUserStep(3);
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const redFlags = Array.isArray(procedure.redFlags) ? procedure.redFlags : [];
+  const footer = (
+    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4 text-xs text-muted">
+      <span className="font-medium">{procedure.disclaimer}</span>
+      <div className="flex flex-wrap gap-3">
+        {(procedure.sources || []).map((src) => (
+          <a
+            key={src.id}
+            href={src.url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-accent hover:underline"
+          >
+            {src.title}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (step === 4) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6">
+        <StepHeader
+          step={4}
+          title="Help is on the way"
+          subtitle="Keep following the steps until the medical officer takes over."
+          headingRef={headingRef}
+        />
+        <div
+          role="status"
+          className="flex items-center gap-2.5 rounded-lg bg-ok px-4 py-3 text-sm font-semibold text-on-status"
+        >
+          <Icon name="check_circle" size={20} />
+          <span>
+            Medical officer alerted{alertedAt ? ` at ${formatTime(alertedAt)}` : ""}.
+          </span>
+        </div>
+        <p className="text-sm font-semibold text-primary">{procedure.title}</p>
+        <StepList procedure={procedure} doneSteps={doneSteps} onToggle={toggleDone} />
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={isAuthenticated ? "/" : "/sign-in"}
+            className={buttonClassName("primary", "lg")}
+          >
+            Close emergency mode
+          </Link>
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            onClick={() => setUserStep(3)}
+          >
+            Back to steps
+          </Button>
+        </div>
+        {footer}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="t-h1 mt-1 text-primary">Emergency action guides</h1>
-          <p className="mt-1 text-sm text-secondary">
-            Works offline without internet. Follow each step carefully and alert crewmates early if red flags appear.
-          </p>
-        </div>
+      <StepHeader
+        step={3}
+        title={`Do this now: ${procedure.title}`}
+        subtitle="Tap each step when it is done."
+        onBack={() => setUserStep(2)}
+        headingRef={headingRef}
+      />
+      <p className="text-sm text-secondary">
+        <strong className="text-primary">When to use: </strong>
+        {procedure.whenToUse}
+      </p>
 
-        <div
-          role="tablist"
-          aria-label="Who needs help"
-          className="flex w-full rounded-lg border border-line bg-surface p-1 sm:inline-flex sm:w-auto"
-        >
-          <button
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <StepList procedure={procedure} doneSteps={doneSteps} onToggle={toggleDone} />
+
+        <div className="space-y-4">
+          <Button
             type="button"
-            role="tab"
-            aria-selected={target === "self"}
-            onClick={() => {
-              setUserTarget("self");
-              setUserSelectedId(null);
-              setAlertNotice(null);
-            }}
-            className={`min-h-10 flex-1 cursor-pointer rounded-md px-4 py-2 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-[var(--ease-smooth)] sm:flex-initial ${
-              target === "self"
-                ? "bg-emergency-solid text-white"
-                : "text-secondary hover:bg-hover hover:text-primary"
-            }`}
+            variant="danger"
+            size="lg"
+            className="w-full justify-center"
+            onClick={() => handleAlert(procedure)}
           >
-            For me ({emergencySelf.length})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={target === "crewmate"}
-            onClick={() => {
-              setUserTarget("crewmate");
-              setUserSelectedId(null);
-              setAlertNotice(null);
-            }}
-            className={`min-h-10 flex-1 cursor-pointer rounded-md px-4 py-2 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-[var(--ease-smooth)] sm:flex-initial ${
-              target === "crewmate"
-                ? "bg-emergency-solid text-white"
-                : "text-secondary hover:bg-hover hover:text-primary"
-            }`}
+            <Icon name="emergency" filled size={20} />
+            Alert medical officer
+          </Button>
+          <Link
+            href="/measure/blood-pressure"
+            className={`${buttonClassName("secondary", "lg")} w-full justify-center`}
           >
-            For a crewmate ({emergencyCrewmate.length})
-          </button>
-        </div>
-      </div>
-
-      {activeEnv?.name && activeEnv?.escalation ? (
-        <div className="flex items-start gap-3 rounded-lg border border-attention/40 bg-attention/10 px-4 py-3 text-sm">
-          <Icon
-            name="contact_phone"
-            size={20}
-            className="mt-0.5 shrink-0 text-attention"
-          />
-          <div className="min-w-0">
-            <p className="t-label-md text-secondary">Who to contact</p>
-            <p className="mt-0.5 font-semibold text-primary">
-              {`${activeEnv.name}: ${activeEnv.escalation}`}
-            </p>
-          </div>
-        </div>
-      ) : null}
-
-      {alertNotice ? (
-        <div
-          role="status"
-          className="flex items-center gap-2.5 rounded-lg border border-emergency bg-emergency/15 px-4 py-3 text-sm font-semibold text-primary"
-        >
-          <Icon name="notifications_active" size={20} className="text-emergency" />
-          <span>{alertNotice}</span>
-        </div>
-      ) : null}
-
-      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-muted">
-            {target === "self" ? "Self-care procedures" : "Crewmate responder protocols"}
-          </p>
-          {list.length === 0 ? (
-            <div className="rounded-lg border border-line bg-surface p-4 text-sm text-muted">
-              No local guides loaded yet. Make sure the server ran at least once so procedures are cached.
-            </div>
-          ) : (
-            list.map((proc) => {
-              const active = activeProcedure?.id === proc.id;
-              return (
-                <button
-                  key={proc.id}
-                  type="button"
-                  onClick={() => {
-                    setUserSelectedId(proc.id);
-                    setAlertNotice(null);
-                  }}
-                  aria-current={active ? "true" : undefined}
-                  className={`interactive-surface flex w-full cursor-pointer items-start justify-between gap-2 rounded-lg border p-4 text-left ${
-                    active
-                      ? "border-emergency bg-raised"
-                      : "border-line bg-surface hover:bg-hover"
-                  }`}
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-primary">
-                      {proc.title}
-                    </p>
-                    <p className="mt-1 text-xs text-muted">
-                      {proc.steps.length} steps
-                    </p>
-                  </div>
-                  <Icon
-                    name="chevron_right"
-                    size={18}
-                    className={active ? "text-emergency" : "text-muted"}
-                  />
-                </button>
-              );
-            })
-          )}
-
-          {emergencyLog.length > 0 ? (
-            <Card className="mt-4">
-              <CardBody className="p-4 sm:p-4">
-                <p className="text-xs font-semibold text-muted">
-                  Local alert log ({emergencyLog.length})
+            <Icon name="monitor_heart" size={20} />
+            Check heart rate &amp; oxygen
+          </Link>
+          {contactLine}
+          {redFlags.length > 0 ? (
+            <div className="rounded-lg bg-emergency-solid p-4 text-white">
+              <p className="flex items-center gap-1.5 text-sm font-bold">
+                <Icon name="warning" size={18} />
+                Red flags: escalate immediately
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
+                {redFlags.map((rf, i) => (
+                  <li key={i}>{rf}</li>
+                ))}
+              </ul>
+              {procedure.escalation?.text ? (
+                <p className="mt-3 text-sm font-semibold">
+                  {procedure.escalation.text}
                 </p>
-                <ul className="mt-2 space-y-1.5 text-xs text-secondary">
-                  {emergencyLog.slice(0, 3).map((entry) => (
-                    <li key={entry.id}>
-                      {formatTime(entry.triggeredAt)}: {entry.title}
-                    </li>
-                  ))}
-                </ul>
-              </CardBody>
-            </Card>
+              ) : null}
+            </div>
           ) : null}
         </div>
-
-        {activeProcedure ? (
-          <div className="space-y-5">
-            <Card>
-              <CardBody className="space-y-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <StatusBadge tone="bad" dot={false}>
-                        {activeProcedure.for === "crewmate"
-                          ? "Crewmate emergency"
-                          : "Self protocol"}
-                      </StatusBadge>
-                      <span className="text-xs text-muted">
-                        v{activeProcedure.version}
-                      </span>
-                    </div>
-                    <h2 className="t-h1 mt-2 text-primary">
-                      {activeProcedure.title}
-                    </h2>
-                    <p className="mt-1 text-sm text-secondary">
-                      <strong className="text-primary">When to use: </strong>
-                      {activeProcedure.whenToUse}
-                    </p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    variant="danger"
-                    onClick={() => handleAlertCrew(activeProcedure)}
-                  >
-                    <Icon name="emergency" filled size={18} />
-                    Alert crew
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {activeProcedure.steps.map((s, idx) => {
-                    const key = `${activeProcedure.id}:${s.id}`;
-                    return (
-                      <div key={s.id} className="space-y-1.5">
-                        <InstructionStep
-                          number={idx + 1}
-                          done={Boolean(doneSteps[key])}
-                          onToggle={() => toggleDone(activeProcedure.id, s.id)}
-                        >
-                          {s.text}
-                        </InstructionStep>
-
-                        <div className="pl-4">
-                          {s.detail ? (
-                            <p className="text-xs leading-5 text-secondary">
-                              {s.detail}
-                            </p>
-                          ) : null}
-                          {s.caution ? (
-                            <p className="mt-1 rounded-md border border-attention/40 bg-attention/10 px-3 py-1.5 text-xs font-medium text-attention">
-                              Caution: {s.caution}
-                            </p>
-                          ) : null}
-                          {s.timerSeconds ? (
-                            <StepCountdown
-                              key={`${activeProcedure.id}:${s.id}:${s.timerSeconds}`}
-                              seconds={s.timerSeconds}
-                            />
-                          ) : null}
-                          {s.metronomeBpm ? (
-                            <MetronomeControl bpm={s.metronomeBpm} />
-                          ) : null}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="rounded-lg border border-emergency/50 bg-emergency/10 p-4">
-                  <p className="text-xs font-bold text-emergency">
-                    Red flags: escalate immediately
-                  </p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-primary">
-                    {activeProcedure.redFlags.map((rf, i) => (
-                      <li key={i}>{rf}</li>
-                    ))}
-                  </ul>
-                  <p className="mt-3 text-xs font-semibold text-secondary">
-                    {activeProcedure.escalation.text}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4 text-xs text-muted">
-                  <span className="font-medium">{activeProcedure.disclaimer}</span>
-                  <div className="flex flex-wrap gap-3">
-                    {activeProcedure.sources.map((src) => (
-                      <a
-                        key={src.id}
-                        href={src.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-accent hover:underline"
-                      >
-                        {src.title}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </div>
-        ) : null}
       </div>
+      {footer}
     </div>
   );
 }
