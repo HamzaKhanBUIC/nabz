@@ -27,7 +27,7 @@ export default function CheckInResult({ record, onReset }) {
           </p>
           <h2 className="t-h1 mt-1 text-primary">Check-in scored</h2>
           <p className="mt-1 text-sm text-secondary">
-            Compared against your rolling 28-day personal normal.
+            Compared against your last 14 valid check-ins.
           </p>
         </div>
 

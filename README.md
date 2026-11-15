@@ -21,6 +21,7 @@ Once running:
 Optional environment variables:
 
 - `PORT` — HTTP port (default `8787`, binds `127.0.0.1`)
+- `NEXT_PUBLIC_DEMO=1` (frontend, at build time): shows a demo button on the check-in screen that submits a made-up 64-trial session instead of real taps. Leave it unset for real use.
 - `MISSION_NOW` — ISO-8601 clock override (default `2026-11-15T08:00:00+00:00`, Day 120 for Sara)
 
 ---

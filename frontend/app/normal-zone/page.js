@@ -45,7 +45,7 @@ export default function NormalZonePage() {
           <p className="t-label-md text-muted">Personal baseline</p>
           <h1 className="t-h1 mt-1 text-primary">Your normal zone</h1>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-secondary">
-            Your normal range updates from your rolling 28-day history. Watch flags surface early shifts before fatigue or stress builds.
+            Your normal range comes from your last 14 valid check-ins (at least 5 needed). A watch flag means today is noticeably outside that range.
           </p>
         </div>
 
