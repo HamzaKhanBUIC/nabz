@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import Button, { buttonClassName } from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import MetricTile from "@/components/ui/MetricTile";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -20,23 +21,23 @@ export default function CheckInResult({ record, onReset }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="t-label-md text-muted">
             Day {record.missionDay} · Protocol {record.protocolId}
           </p>
           <h2 className="t-h1 mt-1 text-primary">Check-in scored</h2>
           <p className="mt-1 text-sm text-secondary">
-            Computed by the CrewPulse backend against your rolling personal baseline.
+            Compared against your rolling 28-day personal normal.
           </p>
         </div>
 
-        <StatusBadge tone={badgeTone} dot={false} className="py-1.5 text-sm">
+        <StatusBadge tone={badgeTone} dot={false} className="shrink-0 py-1.5 text-sm">
           <Icon name={badgeIcon} size={16} />
           <span>{zoneStatus?.label || "Scored"}</span>
         </StatusBadge>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4">
         <MetricTile
           label="Mean reaction speed"
           value={formatMetricValue("reaction-speed", record.metrics?.meanSpeed)}
@@ -52,7 +53,7 @@ export default function CheckInResult({ record, onReset }) {
         <MetricTile
           label="Lapses & early taps"
           value={`${record.metrics?.lapses ?? 0} / ${record.metrics?.falseStarts ?? 0}`}
-          helper="Lapses (>= 355 ms) / False starts (< 100 ms)"
+          helper="Lapses >= 355 ms · Early < 100 ms"
         />
         <MetricTile
           label="Sleep logged"
@@ -74,15 +75,17 @@ export default function CheckInResult({ record, onReset }) {
         <Card>
           <CardHeader
             title="Quality check notes"
-            subtitle="Recorded by the backend validator"
+            subtitle="Session timing and validity checks"
           />
-          <div className="mt-3 flex flex-wrap gap-2">
-            {record.qcFlags.map((flag) => (
-              <StatusBadge key={flag} tone="warn" dot={false}>
-                {flag}
-              </StatusBadge>
-            ))}
-          </div>
+          <CardBody>
+            <div className="flex flex-wrap gap-2">
+              {record.qcFlags.map((flag) => (
+                <StatusBadge key={flag} tone="warn" dot={false}>
+                  {flag}
+                </StatusBadge>
+              ))}
+            </div>
+          </CardBody>
         </Card>
       ) : null}
 
@@ -91,25 +94,21 @@ export default function CheckInResult({ record, onReset }) {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/normal-zone"
-          className="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-on-status hover:bg-accent-hover"
+          className={buttonClassName("primary", "md")}
         >
           <Icon name="monitoring" size={18} />
           View normal zone trends
         </Link>
         <Link
           href="/"
-          className="inline-flex h-11 items-center gap-2 rounded-md border border-line bg-surface px-5 text-sm font-medium text-primary hover:bg-hover"
+          className={buttonClassName("secondary", "md")}
         >
           Back to Today
         </Link>
         {onReset ? (
-          <button
-            type="button"
-            onClick={onReset}
-            className="inline-flex h-11 items-center gap-2 rounded-md border border-line px-4 text-sm font-medium text-secondary hover:bg-hover hover:text-primary"
-          >
+          <Button type="button" variant="ghost" size="md" onClick={onReset}>
             Run another check-in
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

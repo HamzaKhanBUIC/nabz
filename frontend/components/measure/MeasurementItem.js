@@ -31,7 +31,7 @@ export default function MeasurementItem({
   );
 
   const className =
-    "flex w-full max-w-[720px] items-center gap-4 rounded-lg border border-line bg-surface px-6 py-4 text-left transition-colors hover:bg-hover";
+    "interactive-surface flex w-full max-w-[720px] items-center gap-4 rounded-lg border border-line bg-surface px-4 py-3.5 text-left sm:px-6 sm:py-4";
 
   if (onClick) {
     return (

@@ -372,7 +372,7 @@ export default function AstronautBodyMap({
                 className="mt-3 rounded-xl border border-dashed border-line bg-canvas/60 p-4 text-center"
               >
                 <p className="text-xs text-muted">
-                  No region selected — choose a body part on the figure or the
+                  No region selected. Pick a body part on the figure or the
                   chips above.
                 </p>
               </motion.div>

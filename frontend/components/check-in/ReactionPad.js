@@ -37,7 +37,7 @@ export default function ReactionPad({
   const [phase, setPhase] = useState("waiting"); // waiting | stimulus | feedback | finishing
   const [trials, setTrials] = useState([]);
   const [remainingMs, setRemainingMs] = useState(durationMs);
-  const [feedbackText, setFeedbackText] = useState("Wait for the target...");
+  const [feedbackText, setFeedbackText] = useState("Wait for the cue...");
   const [lastRt, setLastRt] = useState(null);
 
   const startedAtIsoRef = useRef(new Date().toISOString());
@@ -189,7 +189,7 @@ export default function ReactionPad({
         phaseRef.current = "feedback";
         setPhase("feedback");
         setLastRt(null);
-        setFeedbackText("Too early — wait for the blue cue");
+        setFeedbackText("Too early. Wait for the blue cue");
         timerRef.current = setTimeout(scheduleNextWaiting, feedbackMs);
         return;
       }
@@ -245,19 +245,19 @@ export default function ReactionPad({
   const ss = remainSecs % 60;
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-3.5">
+    <div className="space-y-4 sm:space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface px-4 py-3.5 shadow-card sm:px-5">
         <div className="flex items-center gap-4">
           <div>
-            <p className="text-xs text-muted">Time remaining</p>
-            <p className="font-mono text-lg font-semibold text-primary">
+            <p className="text-xs text-muted">Time left</p>
+            <p className="font-mono text-lg font-semibold text-primary tabular-nums">
               {String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
             </p>
           </div>
           <div className="h-8 w-px bg-line" />
           <div>
             <p className="text-xs text-muted">Trials logged</p>
-            <p className="font-mono text-lg font-semibold text-primary">
+            <p className="font-mono text-lg font-semibold text-primary tabular-nums">
               {trials.length}
             </p>
           </div>
@@ -306,10 +306,10 @@ export default function ReactionPad({
           handleTap(e.timeStamp);
         }}
         disabled={phase === "finishing" || submitting}
-        aria-label="PVT reaction test tap pad — press Space or click when target appears"
-        className={`flex min-h-[320px] w-full flex-col items-center justify-center rounded-xl border-2 p-8 text-center transition-colors select-none focus-visible:outline-2 focus-visible:outline-accent ${
+        aria-label="PVT reaction test tap pad: press Space or click when target appears"
+        className={`flex min-h-[260px] w-full flex-col items-center justify-center rounded-lg border-2 p-6 text-center select-none transition-[transform,background-color,border-color,box-shadow] duration-100 active:scale-[0.995] focus-visible:outline-2 focus-visible:outline-accent sm:min-h-[340px] sm:p-8 ${
           phase === "stimulus"
-            ? "border-accent bg-accent text-on-status shadow-lg"
+            ? "border-accent bg-accent text-on-status shadow-lg shadow-accent/25"
             : phase === "feedback" && feedbackText.startsWith("Too early")
               ? "border-attention bg-attention/15 text-primary"
               : "border-line-strong bg-surface text-primary hover:bg-raised"
@@ -322,7 +322,7 @@ export default function ReactionPad({
         />
         <p className="t-h1 mt-4">
           {submitting || phase === "finishing"
-            ? "Scoring session on server..."
+            ? "Scoring session..."
             : phase === "stimulus"
               ? "TAP!"
               : lastRt !== null
@@ -334,7 +334,7 @@ export default function ReactionPad({
             phase === "stimulus" ? "text-on-status/90" : "text-secondary"
           }`}
         >
-          {feedbackText} · Tap anywhere in this box or press Spacebar
+          {feedbackText} · Tap this box or press Spacebar
         </p>
       </button>
     </div>

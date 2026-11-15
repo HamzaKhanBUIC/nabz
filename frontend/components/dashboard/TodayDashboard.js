@@ -32,17 +32,17 @@ export default function TodayDashboard() {
       {!backendOnline && error ? (
         <div
           role="alert"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-attention/50 bg-attention/10 px-4 py-3 text-sm text-primary"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-attention/40 bg-attention/10 px-4 py-3 text-sm text-primary"
         >
-          <div className="flex items-center gap-2.5">
-            <Icon name="cloud_off" size={20} className="text-attention" />
+          <div className="flex min-w-0 items-center gap-2.5">
+            <Icon name="cloud_off" size={20} className="shrink-0 text-attention" />
             <span>
-              Backend unavailable ({error}). Start <code className="font-mono">npm run dev</code> on port 8787. Offline Emergency guides remain ready.
+              Local server unreachable ({error}). Cached offline emergency guides stay ready.
             </span>
           </div>
           <Link
             href="/emergency"
-            className="font-semibold text-emergency underline-offset-2 hover:underline"
+            className="shrink-0 font-semibold text-emergency underline-offset-2 hover:underline"
           >
             Open Emergency
           </Link>
@@ -50,7 +50,7 @@ export default function TodayDashboard() {
       ) : null}
 
       <section className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="t-label-md text-muted">
             Day {today?.missionDay ?? mission?.missionDay ?? 1} · {mission?.name || "Mars Transit Sim"}
           </p>
@@ -58,11 +58,11 @@ export default function TodayDashboard() {
             {greeting}, {commander.name}
           </h1>
           <p className="t-body-md mt-1 text-secondary">
-            Daily reaction speed, sleep, blood pressure and personal baseline overview.
+            Reaction speed, sleep, and blood pressure against your personal normal.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex shrink-0 flex-wrap items-center gap-3">
           <StatusBadge tone={overall.badgeTone} dot={false} className="py-1.5 text-sm">
             <Icon name={overall.iconName} size={16} />
             <span>{loading && !today ? "Syncing..." : overall.label}</span>
@@ -70,49 +70,49 @@ export default function TodayDashboard() {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Link
           href="/check-in"
-          className="flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent px-5 py-4 text-on-status transition-colors hover:bg-accent-hover"
+          className="interactive-surface flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent px-5 py-4 text-on-status shadow-sm shadow-accent/20 hover:bg-accent-hover hover:shadow-md hover:shadow-accent/25"
         >
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold">3-min check-in</p>
-            <p className="text-xs opacity-90">PVT-B reaction + sleep</p>
+            <p className="text-xs opacity-90">Reaction test + sleep</p>
           </div>
-          <Icon name="touch_app" size={24} />
+          <Icon name="touch_app" size={24} className="shrink-0" />
         </Link>
 
         <Link
           href="/measure/blood-pressure"
-          className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary transition-colors hover:bg-hover"
+          className="interactive-surface flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary shadow-card hover:border-line-strong hover:bg-hover"
         >
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold">Blood pressure</p>
             <p className="text-xs text-muted">Guided 8-step cuff check</p>
           </div>
-          <Icon name="monitor_heart" size={24} className="text-accent" />
+          <Icon name="monitor_heart" size={24} className="shrink-0 text-accent" />
         </Link>
 
         <Link
           href="/coach"
-          className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary transition-colors hover:bg-hover"
+          className="interactive-surface flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary shadow-card hover:border-line-strong hover:bg-hover"
         >
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold">Offline coach</p>
-            <p className="text-xs text-muted">Ask why a card triggered</p>
+            <p className="text-xs text-muted">Questions about your readings</p>
           </div>
-          <Icon name="smart_toy" size={24} className="text-accent" />
+          <Icon name="smart_toy" size={24} className="shrink-0 text-accent" />
         </Link>
 
         <Link
           href="/send-to-earth"
-          className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary transition-colors hover:bg-hover"
+          className="interactive-surface flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary shadow-card hover:border-line-strong hover:bg-hover"
         >
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold">Send to Earth</p>
-            <p className="text-xs text-muted">Preview & queue downlink</p>
+            <p className="text-xs text-muted">Prepare downlink report</p>
           </div>
-          <Icon name="send" size={24} className="text-accent" />
+          <Icon name="send" size={24} className="shrink-0 text-accent" />
         </Link>
       </section>
 
@@ -128,7 +128,7 @@ export default function TodayDashboard() {
           helper={
             latestCheckin
               ? `Median RT ${Math.round(latestCheckin.metrics.medianRtMs ?? 0)} ms · ${formatTime(latestCheckin.effectiveDateTime)}`
-              : "No check-in logged today yet"
+              : "No check-in logged today"
           }
         />
 
@@ -143,7 +143,7 @@ export default function TodayDashboard() {
           helper={
             latestCheckin?.sleepHours != null
               ? "Logged with check-in"
-              : "Add hours slept during check-in"
+              : "Log hours rested at check-in"
           }
         />
 
@@ -158,12 +158,12 @@ export default function TodayDashboard() {
           helper={
             latestBp
               ? `Category: ${latestBp.category} · ${formatTime(latestBp.effectiveDateTime)}`
-              : "No reading logged today yet"
+              : "No reading logged today"
           }
         />
       </section>
 
-      <ClinicalActionCard card={today?.card} heading="Today's priority guidance" />
+      <ClinicalActionCard card={today?.card} heading="Today's focus" />
 
       {secondaryCards.length > 0 ? (
         <div className="space-y-4">
@@ -171,14 +171,14 @@ export default function TodayDashboard() {
             <ClinicalActionCard
               key={card.id}
               card={card}
-              heading="Additional guidance today"
+              heading="Also keep in mind"
               compact
             />
           ))}
         </div>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
         <NormalZoneWidget />
         <ReminderCard />
       </div>

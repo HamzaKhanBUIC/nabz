@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import BackLink from "@/components/ui/BackLink";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import StatusBadge from "@/components/ui/StatusBadge";
 import MeasurementItem from "@/components/measure/MeasurementItem";
@@ -47,10 +47,10 @@ export default function MeasurePage() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <p className="t-label-md text-muted">Guided measurements</p>
+        <p className="t-label-md text-muted">Guided checks</p>
         <h1 className="t-h1 mt-1 text-primary">Take a measurement</h1>
         <p className="mt-1 text-sm text-secondary">
-          Step-by-step protocol with resting countdown timers, AHA classification and symptom screening.
+          Step-by-step cuff protocol with rest timers, AHA categories, and symptom checks.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export default function MeasurePage() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader
             title="Recent blood pressure history"
@@ -78,40 +78,42 @@ export default function MeasurePage() {
             action={
               <Link
                 href="/measure/blood-pressure"
-                className="text-xs font-semibold text-accent hover:underline"
+                className="text-xs font-semibold text-accent underline-offset-2 hover:underline"
               >
                 New BP check
               </Link>
             }
           />
 
-          <ul className="mt-4 space-y-2.5">
-            {recentBp.length === 0 ? (
-              <li className="rounded-md border border-line bg-raised p-4 text-sm text-muted">
-                No blood pressure readings available yet.
-              </li>
-            ) : (
-              recentBp.map((entry) => (
-                <li
-                  key={`${entry.missionDay}-${entry.effectiveDateTime}`}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-raised px-4 py-3"
-                >
-                  <div>
-                    <p className="font-mono text-sm font-semibold text-primary">
-                      {entry.systolic}/{entry.diastolic} mmHg
-                    </p>
-                    <p className="text-xs text-muted">
-                      Day {entry.missionDay} · {formatDateTime(entry.effectiveDateTime)}
-                    </p>
-                  </div>
-                  <StatusBadge tone={entry.status.badgeTone} dot={false}>
-                    <Icon name={entry.status.iconName} size={14} />
-                    <span>{entry.status.label}</span>
-                  </StatusBadge>
+          <CardBody>
+            <ul className="space-y-2.5">
+              {recentBp.length === 0 ? (
+                <li className="rounded-md border border-line bg-raised p-4 text-sm text-muted">
+                  No blood pressure readings logged yet.
                 </li>
-              ))
-            )}
-          </ul>
+              ) : (
+                recentBp.map((entry) => (
+                  <li
+                    key={`${entry.missionDay}-${entry.effectiveDateTime}`}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-raised px-4 py-3"
+                  >
+                    <div>
+                      <p className="font-mono text-sm font-semibold text-primary">
+                        {entry.systolic}/{entry.diastolic} mmHg
+                      </p>
+                      <p className="text-xs text-muted">
+                        Day {entry.missionDay} · {formatDateTime(entry.effectiveDateTime)}
+                      </p>
+                    </div>
+                    <StatusBadge tone={entry.status.badgeTone} dot={false}>
+                      <Icon name={entry.status.iconName} size={14} />
+                      <span>{entry.status.label}</span>
+                    </StatusBadge>
+                  </li>
+                ))
+              )}
+            </ul>
+          </CardBody>
         </Card>
 
         <Card>
@@ -119,12 +121,12 @@ export default function MeasurePage() {
             title="Anatomical cuff & check-up guide"
             subtitle={activeRegion ? `${activeRegion.label}: ${activeRegion.description}` : "Select a region"}
           />
-          <div className="mt-4">
+          <CardBody>
             <AstronautBodyMap
               selected={selectedRegion}
               onSelect={setSelectedRegion}
             />
-          </div>
+          </CardBody>
         </Card>
       </div>
     </div>

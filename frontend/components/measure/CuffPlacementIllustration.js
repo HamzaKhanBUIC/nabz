@@ -85,7 +85,7 @@ export default function CuffPlacementIllustration({
           <line x1="76" y1={cuffY + 34} x2="76" y2="194" stroke="var(--color-muted)" strokeWidth="1" strokeDasharray="3 3" />
           <path d={`M72 ${cuffY + 34} h8 M72 194 h8`} stroke="var(--color-muted)" strokeWidth="1" />
           <text x="60" y={cuffY + 62} fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
-            2–3 cm
+            2-3 cm
           </text>
         </g>
 
@@ -163,7 +163,7 @@ export default function CuffPlacementIllustration({
       </svg>
 
       <figcaption className="mt-3 text-center text-xs text-muted">
-        Cuff edge sits <span className="font-mono">2–3 cm</span> above the elbow
+        Cuff edge sits <span className="font-mono">2 to 3 cm</span> above the elbow
         crease, snug on bare skin, heart level.
       </figcaption>
     </figure>

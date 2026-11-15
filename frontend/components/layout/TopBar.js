@@ -15,8 +15,8 @@ function MissionPill({ icon, children, title, tone = "neutral", compact = false 
   return (
     <span
       title={title}
-      className={`inline-flex items-center gap-1.5 rounded-pill border font-medium whitespace-nowrap ${palette} ${
-        compact ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-xs"
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill border font-medium whitespace-nowrap ${palette} ${
+        compact ? "px-2.5 py-0.5 text-[11px]" : "px-3 py-1.5 text-xs"
       }`}
     >
       <Icon name={icon} size={compact ? 14 : 16} />
@@ -32,31 +32,31 @@ export default function TopBar({ onOpenMenu }) {
   const delayLabel = getEarthDelayLabel(mission);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-canvas/95 backdrop-blur">
-      <div className="flex h-[72px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 items-center gap-3">
+    <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-xl">
+      <div className="flex min-h-[64px] items-center justify-between gap-2 px-4 py-2 sm:min-h-[72px] sm:gap-3 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           <button
             type="button"
             onClick={onOpenMenu}
             aria-label="Open navigation menu"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line bg-surface text-secondary transition-colors hover:bg-hover hover:text-primary md:hidden"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-line bg-surface text-secondary transition-[transform,background-color,color] duration-150 ease-[var(--ease-smooth)] hover:bg-hover hover:text-primary active:scale-95 lg:hidden"
           >
             <Icon name="menu" size={22} />
           </button>
 
-          <Link href="/" className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent text-on-status">
+          <Link href="/" className="flex min-w-0 items-center gap-2.5 group">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent text-on-status shadow-xs transition-transform duration-200 ease-[var(--ease-smooth)] group-hover:scale-[1.03]">
               <Icon name="pulse_alert" size={20} />
             </span>
             <span className="t-h3 truncate text-primary">{APP_NAME}</span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden items-center gap-2 md:flex">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="hidden items-center gap-2 lg:flex">
             <MissionPill
               icon="rocket_launch"
-              title={`Mission day ${missionDay} — ${missionName}`}
+              title={`Mission day ${missionDay}: ${missionName}`}
             >
               {`Day ${missionDay} · ${missionName}`}
             </MissionPill>
@@ -70,9 +70,9 @@ export default function TopBar({ onOpenMenu }) {
               <MissionPill
                 icon="cloud_off"
                 tone="offline"
-                title="Local API offline — cached emergency procedures remain ready"
+                title="Local API unreachable. Cached emergency guides stay ready."
               >
-                API offline
+                Offline cache
               </MissionPill>
             ) : null}
           </div>
@@ -81,7 +81,7 @@ export default function TopBar({ onOpenMenu }) {
 
           <Link
             href="/emergency"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-emergency px-4 text-sm font-semibold text-white transition-colors hover:bg-emergency-hover"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emergency px-3.5 sm:px-4 text-sm font-semibold text-white shadow-sm shadow-emergency/25 transition-[transform,background-color,box-shadow] duration-150 ease-[var(--ease-smooth)] hover:bg-emergency-hover active:scale-[0.98]"
             aria-label="Open emergency mode"
           >
             <Icon name="emergency" filled size={20} />
@@ -90,7 +90,7 @@ export default function TopBar({ onOpenMenu }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-2 md:hidden">
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-line/70 px-4 py-2 lg:hidden">
         <MissionPill compact icon="rocket_launch">
           {`Day ${missionDay} · ${missionName}`}
         </MissionPill>
@@ -99,7 +99,7 @@ export default function TopBar({ onOpenMenu }) {
         </MissionPill>
         {!backendOnline ? (
           <MissionPill compact icon="cloud_off" tone="offline">
-            API offline
+            Offline cache
           </MissionPill>
         ) : null}
       </div>

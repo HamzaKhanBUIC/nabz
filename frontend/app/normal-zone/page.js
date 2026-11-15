@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BackLink from "@/components/ui/BackLink";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import StatusBadge from "@/components/ui/StatusBadge";
 import MetricCard from "@/components/analytics/MetricCard";
@@ -41,24 +41,24 @@ export default function NormalZonePage() {
       <BackLink href="/">Today</BackLink>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="t-label-md text-muted">Personal baseline analytics</p>
+        <div className="min-w-0">
+          <p className="t-label-md text-muted">Personal baseline</p>
           <h1 className="t-h1 mt-1 text-primary">Your normal zone</h1>
-          <p className="mt-1 text-sm text-secondary">
-            Every baseline mean, standard deviation and z-score band comes directly from the CrewPulse backend.
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-secondary">
+            Your normal range updates from your rolling 28-day history. Watch flags surface early shifts before fatigue or stress builds.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 rounded-lg border border-line bg-surface p-1">
+        <div className="flex flex-wrap gap-1 rounded-lg border border-line bg-surface p-1 shadow-card">
           {DAY_RANGES.map((days) => (
             <button
               key={days}
               type="button"
               onClick={() => setRangeDays(days)}
               aria-pressed={rangeDays === days}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`min-h-9 rounded-md px-3.5 py-1.5 text-xs font-semibold tabular-nums transition-[transform,background-color,color] duration-150 ease-[var(--ease-smooth)] active:scale-95 ${
                 rangeDays === days
-                  ? "bg-accent text-on-status"
+                  ? "bg-accent text-on-status shadow-xs"
                   : "text-secondary hover:bg-hover hover:text-primary"
               }`}
             >
@@ -68,7 +68,7 @@ export default function NormalZonePage() {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
         {METRIC_KEYS.map((key) => (
           <MetricCard
             key={key}
@@ -83,7 +83,7 @@ export default function NormalZonePage() {
       <Card>
         <CardHeader
           title={metric.label}
-          subtitle={`${metric.description}${loadingRange ? " · Loading..." : ""}`}
+          subtitle={`${metric.description}${loadingRange ? " · Updating..." : ""}`}
           action={
             <StatusBadge tone={status.badgeTone} dot={false}>
               <Icon name={status.iconName} size={14} />
@@ -92,45 +92,45 @@ export default function NormalZonePage() {
           }
         />
 
-        <div className="mt-4">
+        <CardBody>
           <HealthTrendChart
             metricKey={selectedMetric}
             rangeDays={rangeDays}
             store={store}
             height={320}
           />
-        </div>
 
-        <div className="mt-5 grid gap-3 border-t border-line pt-4 sm:grid-cols-4">
-          <div className="rounded-md border border-line bg-raised p-3">
-            <p className="text-xs text-muted">Latest value</p>
-            <p className="mt-1 font-mono text-base font-semibold text-primary">
-              {latest ? `${formatMetricValue(selectedMetric, latest.value)} ${metric.unit}` : "—"}
-            </p>
+          <div className="mt-5 grid gap-3 border-t border-line pt-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-md border border-line bg-raised p-3.5">
+              <p className="text-xs text-muted">Latest reading</p>
+              <p className="mt-1 font-mono text-base font-semibold tabular-nums text-primary">
+                {latest ? `${formatMetricValue(selectedMetric, latest.value)} ${metric.unit}` : "—"}
+              </p>
+            </div>
+            <div className="rounded-md border border-line bg-raised p-3.5">
+              <p className="text-xs text-muted">Personal mean</p>
+              <p className="mt-1 font-mono text-base font-semibold tabular-nums text-primary">
+                {band?.ready && band.mean != null
+                  ? `${formatMetricValue(selectedMetric, band.mean)} ${metric.unit}`
+                  : "Building"}
+              </p>
+            </div>
+            <div className="rounded-md border border-line bg-raised p-3.5">
+              <p className="text-xs text-muted">Watch / Act thresholds</p>
+              <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-primary">
+                {band?.ready && band.watchAt != null
+                  ? `${formatMetricValue(selectedMetric, band.watchAt)} / ${band.actAt != null ? formatMetricValue(selectedMetric, band.actAt) : "—"}`
+                  : "Not ready"}
+              </p>
+            </div>
+            <div className="rounded-md border border-line bg-raised p-3.5">
+              <p className="text-xs text-muted">Shift (z-score)</p>
+              <p className="mt-1 font-mono text-base font-semibold tabular-nums text-primary">
+                {latest?.z != null ? Number(latest.z).toFixed(2) : "—"}
+              </p>
+            </div>
           </div>
-          <div className="rounded-md border border-line bg-raised p-3">
-            <p className="text-xs text-muted">Baseline mean</p>
-            <p className="mt-1 font-mono text-base font-semibold text-primary">
-              {band?.ready && band.mean != null
-                ? `${formatMetricValue(selectedMetric, band.mean)} ${metric.unit}`
-                : "Building"}
-            </p>
-          </div>
-          <div className="rounded-md border border-line bg-raised p-3">
-            <p className="text-xs text-muted">Watch / Act thresholds</p>
-            <p className="mt-1 font-mono text-sm font-semibold text-primary">
-              {band?.ready && band.watchAt != null
-                ? `${formatMetricValue(selectedMetric, band.watchAt)} / ${band.actAt != null ? formatMetricValue(selectedMetric, band.actAt) : "—"}`
-                : "Not ready"}
-            </p>
-          </div>
-          <div className="rounded-md border border-line bg-raised p-3">
-            <p className="text-xs text-muted">Latest z-score</p>
-            <p className="mt-1 font-mono text-base font-semibold text-primary">
-              {latest?.z != null ? Number(latest.z).toFixed(2) : "—"}
-            </p>
-          </div>
-        </div>
+        </CardBody>
       </Card>
     </div>
   );

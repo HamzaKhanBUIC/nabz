@@ -21,17 +21,21 @@ export function NavList({ onNavigate }) {
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            className={`group flex min-h-11 items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
+            className={`group flex min-h-11 items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-medium transition-[transform,background-color,border-color,color] duration-150 ease-[var(--ease-smooth)] active:scale-[0.985] ${
               active
-                ? "bg-raised text-primary border border-line-strong"
-                : "text-secondary border border-transparent hover:bg-hover hover:text-primary"
+                ? "border border-line-strong bg-raised text-primary shadow-xs"
+                : "border border-transparent text-secondary hover:bg-hover hover:text-primary"
             }`}
           >
             <Icon
               name={item.icon}
               filled={active}
               size={20}
-              className={active ? "text-accent" : "text-muted group-hover:text-secondary"}
+              className={`transition-colors duration-150 ${
+                active
+                  ? "text-accent"
+                  : "text-muted group-hover:text-secondary"
+              }`}
             />
             <span className="truncate">{item.label}</span>
           </Link>
@@ -52,7 +56,7 @@ export function UserRow() {
     .toUpperCase();
 
   return (
-    <div className="flex items-center gap-3 rounded-md border border-line bg-surface px-3.5 py-3">
+    <div className="flex items-center gap-3 rounded-md border border-line bg-surface px-3.5 py-3 shadow-card">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-raised text-sm font-semibold text-primary">
         {initials}
       </span>
@@ -61,7 +65,7 @@ export function UserRow() {
           {commander.name}
         </p>
         <p className="truncate text-xs text-muted">
-          {commander.role} · {backendOnline ? "Local API ready" : "Offline cache"}
+          {commander.role} · {backendOnline ? "Onboard link active" : "Offline mode"}
         </p>
       </div>
     </div>
@@ -71,11 +75,11 @@ export function UserRow() {
 export default function Sidebar({ className = "" }) {
   return (
     <aside
-      className={`hidden md:flex md:w-64 md:shrink-0 md:flex-col md:justify-between md:border-r md:border-line md:bg-canvas md:p-5 ${className}`}
+      className={`hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:justify-between lg:border-r lg:border-line lg:bg-canvas lg:p-5 ${className}`}
     >
       <div>
-        <p className="mb-3 px-3.5 text-xs font-semibold uppercase tracking-wider text-muted">
-          Crew workspace
+        <p className="mb-3 px-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-muted">
+          Menu
         </p>
         <NavList />
       </div>

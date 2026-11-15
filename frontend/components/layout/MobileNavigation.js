@@ -1,11 +1,9 @@
 "use client";
 
 /**
- * Mobile navigation:
- *   - bottom tab bar with the three primary sections (>=44px targets)
- *   - slide-in drawer (top bar menu button) with the nav + profile row
- *
- * Both replace the 240px sidebar below `lg`.
+ * Mobile & tablet navigation (< lg):
+ *   - Bottom tab bar with concise labels and >=44px touch targets
+ *   - Slide-in drawer triggered from the TopBar menu button
  */
 
 import Link from "next/link";
@@ -16,6 +14,8 @@ import Icon from "@/components/ui/Icon";
 import { NAV_ITEMS, SECTION_FOR_PATH, sectionForPath } from "@/lib/data/nav";
 import { NavList, UserRow } from "@/components/layout/Sidebar";
 
+const DRAWER_EASE = [0.22, 1, 0.36, 1];
+
 export function BottomTabBar({ enabled = true }) {
   const pathname = usePathname();
   const section = sectionForPath(pathname);
@@ -25,10 +25,12 @@ export function BottomTabBar({ enabled = true }) {
   return (
     <nav
       aria-label="Primary mobile"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface lg:hidden"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/92 backdrop-blur-xl lg:hidden"
+      style={{
+        paddingBottom: "max(0.25rem, env(safe-area-inset-bottom, 0px))",
+      }}
     >
-      <ul className="flex">
+      <ul className="mx-auto flex max-w-2xl items-stretch">
         {NAV_ITEMS.map((item) => {
           const active = section === SECTION_FOR_PATH[item.href];
           return (
@@ -36,13 +38,21 @@ export function BottomTabBar({ enabled = true }) {
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-14 min-w-[44px] flex-col items-center justify-center gap-0.5 px-1 text-center transition-colors ${
-                  active ? "text-accent" : "text-secondary hover:text-primary"
+                className={`group flex min-h-13 min-w-[44px] flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-center transition-[transform,color] duration-150 ease-[var(--ease-smooth)] active:scale-95 ${
+                  active
+                    ? "text-accent"
+                    : "text-secondary hover:text-primary"
                 }`}
               >
-                <Icon name={item.icon} filled={active} size={22} />
-                <span className="truncate text-[11px] font-medium leading-4">
-                  {item.label}
+                <span
+                  className={`flex h-7 w-10 items-center justify-center rounded-pill transition-colors duration-150 ${
+                    active ? "bg-accent/15" : "bg-transparent group-hover:bg-hover"
+                  }`}
+                >
+                  <Icon name={item.icon} filled={active} size={20} />
+                </span>
+                <span className="w-full truncate text-[11px] font-medium leading-4">
+                  {item.mobileLabel || item.label}
                 </span>
               </Link>
             </li>
@@ -58,7 +68,7 @@ export function MobileDrawer({ open, onClose }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onKey = (event) => {
       if (event.key === "Escape") onClose();
     };
@@ -66,7 +76,6 @@ export function MobileDrawer({ open, onClose }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Close whenever the route changes.
   useEffect(() => {
     onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,34 +92,44 @@ export function MobileDrawer({ open, onClose }) {
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduceMotion ? undefined : { opacity: 0 }}
-            className="absolute inset-0 bg-[#070b14]/70"
+            transition={{ duration: 0.2, ease: DRAWER_EASE }}
+            className="absolute inset-0 bg-[#070b14]/75 backdrop-blur-xs"
           />
           <motion.div
             role="dialog"
+            aria-modal="true"
             aria-label="Navigation"
             initial={reduceMotion ? false : { x: "-100%" }}
             animate={{ x: 0 }}
             exit={reduceMotion ? undefined : { x: "-100%" }}
-            transition={{ type: "tween", duration: reduceMotion ? 0 : 0.22 }}
-            className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-line bg-surface"
+            transition={{
+              duration: reduceMotion ? 0 : 0.26,
+              ease: DRAWER_EASE,
+            }}
+            className="absolute inset-y-0 left-0 flex w-72 max-w-[85dvw] flex-col overscroll-contain border-r border-line bg-surface shadow-2xl"
           >
-            <div className="flex h-16 items-center justify-between border-b border-line px-4">
+            <div className="flex min-h-16 items-center justify-between border-b border-line px-4 py-2">
               <span className="t-h3 text-primary">Menu</span>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-11 w-11 items-center justify-center rounded-md border border-line text-secondary hover:bg-hover"
+                className="flex h-11 w-11 items-center justify-center rounded-md border border-line text-secondary transition-[transform,background-color,color] duration-150 hover:bg-hover hover:text-primary active:scale-95"
                 aria-label="Close navigation menu"
               >
                 <Icon name="close" size={22} />
               </button>
             </div>
 
-            <div className="flex flex-col px-3 pt-4">
+            <div className="flex flex-1 flex-col overflow-y-auto px-3 pt-4">
               <NavList onNavigate={onClose} />
             </div>
 
-            <div className="mt-auto px-3 pb-4">
+            <div
+              className="mt-auto px-3 pb-4 pt-3"
+              style={{
+                paddingBottom: "max(1rem, env(safe-area-inset-bottom, 0px))",
+              }}
+            >
               <UserRow onNavigate={onClose} />
             </div>
           </motion.div>

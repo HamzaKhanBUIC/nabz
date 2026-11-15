@@ -3,7 +3,7 @@ import { formatDelayRange } from "@/lib/api";
 export const DISCLAIMER_TEXT = "Decision support, not a diagnosis.";
 
 export const coachDisclaimer =
-  "Offline rule-grounded explanation. " + DISCLAIMER_TEXT;
+  "Offline rule-based explanation. " + DISCLAIMER_TEXT;
 
 export function getEarthDelayLabel(mission) {
   const range = formatDelayRange(mission?.commsDelay);

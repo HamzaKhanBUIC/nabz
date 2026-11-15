@@ -2,37 +2,32 @@ import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 
 /**
- * Button primitive — handoff components.md:
- *   kind:    Primary · Secondary · Ghost · Danger
- *   size:    Large (56px) · Medium (44px)
- *   radius:  radius-md (10px)
- *
- * Rules enforced by the screens that use it: one Primary per screen, and
- * Danger only inside Emergency (with the filled `emergency` icon).
- *
- * Renders as <button> by default, or as a Next <Link> when `href` is given.
+ * Button primitive — tactile Apple/Google-smooth transitions while preserving
+ * Nova design tokens (Primary, Secondary, Ghost, Danger).
  */
-
 const VARIANTS = {
-  primary: "bg-accent text-on-accent hover:bg-accent-hover border border-transparent",
+  primary:
+    "bg-accent text-on-accent border border-transparent shadow-sm shadow-accent/20 hover:bg-accent-hover hover:shadow-md hover:shadow-accent/25",
   secondary:
-    "bg-surface text-primary border border-line hover:bg-hover",
-  ghost: "bg-transparent text-secondary border border-transparent hover:bg-hover hover:text-primary",
+    "bg-surface text-primary border border-line hover:bg-hover hover:border-line-strong",
+  ghost:
+    "bg-transparent text-secondary border border-transparent hover:bg-hover hover:text-primary",
   danger:
-    "bg-emergency text-white border border-transparent hover:bg-emergency-hover",
+    "bg-emergency text-white border border-transparent shadow-sm shadow-emergency/20 hover:bg-emergency-hover",
 };
 
 const SIZES = {
-  sm: "h-9 px-3.5 gap-1.5 t-label-md",
-  md: "h-11 px-4 gap-2 t-label-md font-semibold",
-  lg: "h-14 px-6 gap-3 t-label-lg",
+  sm: "min-h-9 px-3.5 py-1.5 gap-1.5 t-label-md",
+  md: "min-h-11 px-4 py-2 gap-2 t-label-md font-semibold",
+  lg: "min-h-13 px-6 py-2.5 gap-2.5 t-label-lg",
   icon: "h-11 w-11 justify-center",
 };
 
 export function buttonClassName(variant = "primary", size = "md", className = "") {
   return [
-    "inline-flex items-center justify-center rounded-md font-heading select-none",
-    "transition-colors duration-150",
+    "inline-flex items-center justify-center rounded-md font-heading select-none cursor-pointer",
+    "transition-[transform,background-color,border-color,color,box-shadow] duration-200 ease-[var(--ease-smooth)]",
+    "active:scale-[0.985]",
     "disabled:opacity-50 disabled:pointer-events-none",
     VARIANTS[variant] || VARIANTS.primary,
     SIZES[size] || SIZES.md,

@@ -224,9 +224,9 @@ export function statusToPill(status) {
 }
 
 export function formatDelayRange(commsDelay) {
-  if (!commsDelay) return "3–22 min";
+  if (!commsDelay) return "3-22 min";
   const min = commsDelay.oneWayMinMinutes;
   const max = commsDelay.oneWayMaxMinutes;
-  if (min == null || max == null) return "3–22 min";
-  return min === max ? `${min} min` : `${min}–${max} min`;
+  if (min == null || max == null) return "3-22 min";
+  return min === max ? `${min} min` : `${min}-${max} min`;
 }

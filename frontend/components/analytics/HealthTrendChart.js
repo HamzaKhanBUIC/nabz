@@ -147,7 +147,7 @@ export default function HealthTrendChart({
         </span>
         {referenceRange ? (
           <span>
-            Reference range: {referenceRange.low}–{referenceRange.high} {metric.unit}
+            Reference range: {referenceRange.low} to {referenceRange.high} {metric.unit}
           </span>
         ) : null}
       </div>

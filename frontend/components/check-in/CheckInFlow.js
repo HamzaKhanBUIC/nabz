@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import BackLink from "@/components/ui/BackLink";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import InstructionStep from "@/components/ui/InstructionStep";
@@ -52,7 +52,7 @@ export default function CheckInFlow() {
         <p className="t-label-md text-muted">Daily readiness · PVT-B + Sleep</p>
         <h1 className="t-h1 mt-1 text-primary">3-minute reaction check-in</h1>
         <p className="mt-1 text-sm text-secondary">
-          Captures raw inter-stimulus gaps and millisecond reaction times for server scoring.
+          Tap as soon as each blue cue appears. Takes {Math.max(1, Math.round(protoDurationSec / 60))} minutes.
         </p>
       </div>
 
@@ -71,78 +71,88 @@ export default function CheckInFlow() {
       ) : null}
 
       {stage === "intro" ? (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader
-              title="Protocol rules"
-              subtitle={`Loaded from ${protocol ? "backend protocol" : "PVT-B defaults"} (${protoDurationSec}s session)`}
+              title="How the test works"
+              subtitle={`3-minute PVT-B session · ${isiMinSec} to ${isiMaxSec} s random intervals`}
             />
-            <div className="mt-4 space-y-3">
-              <InstructionStep number={1}>
-                Keep focus on the reaction box. Wait between {isiMinSec}–{isiMaxSec} s for each blue target.
-              </InstructionStep>
-              <InstructionStep number={2}>
-                Tap the pad or press Spacebar as quickly as possible after the target appears.
-              </InstructionStep>
-              <InstructionStep number={3}>
-                Avoid tapping early before the cue; false starts and lapses (&gt;= {protocol?.lapseMs ?? 355} ms) are logged.
-              </InstructionStep>
-            </div>
+            <CardBody>
+              <div className="space-y-3">
+                <InstructionStep number={1}>
+                  Watch the reaction pad. Wait {isiMinSec} to {isiMaxSec} seconds between targets.
+                </InstructionStep>
+                <InstructionStep number={2}>
+                  Tap anywhere inside the pad (or press Space) as soon as the blue cue appears.
+                </InstructionStep>
+                <InstructionStep number={3}>
+                  Wait for the cue before tapping. Early taps and slow responses (&gt;= {protocol?.lapseMs ?? 355} ms) are tracked separately.
+                </InstructionStep>
+              </div>
+            </CardBody>
           </Card>
 
           <Card>
             <CardHeader
-              title="Sleep before check-in (optional)"
-              subtitle="Helps the backend explain reaction speed shifts"
+              title="Last rest period (optional)"
+              subtitle="Adds context to today's reaction score"
             />
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSubmitError("");
-                setStage("test");
-              }}
-              className="mt-4 space-y-4"
-            >
-              <div className="flex items-center gap-2.5">
-                <input
-                  id={sleepToggleId}
-                  type="checkbox"
-                  checked={includeSleep}
-                  onChange={(e) => setIncludeSleep(e.target.checked)}
-                  className="h-5 w-5 accent-[var(--color-accent)]"
-                />
-                <label htmlFor={sleepToggleId} className="text-sm font-medium text-primary">
-                  Include hours slept last rest period
-                </label>
-              </div>
-
-              {includeSleep ? (
-                <div>
-                  <label htmlFor={sleepInputId} className="block text-xs font-medium text-secondary">
-                    Hours slept (0 – 16 h)
-                  </label>
+            <CardBody>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setSubmitError("");
+                  setStage("test");
+                }}
+                className="space-y-5"
+              >
+                <label
+                  htmlFor={sleepToggleId}
+                  className="flex min-h-11 cursor-pointer items-center gap-3"
+                >
                   <input
-                    id={sleepInputId}
-                    name="sleepHours"
-                    type="number"
-                    min={0}
-                    max={16}
-                    step={0.5}
-                    required
-                    value={sleepHours}
-                    onChange={(e) => setSleepHours(e.target.value)}
-                    className="mt-1.5 w-full max-w-[200px] rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+                    id={sleepToggleId}
+                    type="checkbox"
+                    checked={includeSleep}
+                    onChange={(e) => setIncludeSleep(e.target.checked)}
+                    className="h-5 w-5 accent-[var(--color-accent)]"
                   />
-                </div>
-              ) : null}
+                  <span className="text-sm font-medium text-primary">
+                    Include hours slept before this check-in
+                  </span>
+                </label>
 
-              <div className="pt-2">
-                <Button type="submit" variant="primary" size="lg">
-                  <Icon name="play_arrow" size={20} />
-                  Start 3-minute reaction test
-                </Button>
-              </div>
-            </form>
+                {includeSleep ? (
+                  <div>
+                    <label
+                      htmlFor={sleepInputId}
+                      className="block text-xs font-medium text-secondary"
+                    >
+                      Hours slept (0 to 16 h)
+                    </label>
+                    <input
+                      id={sleepInputId}
+                      name="sleepHours"
+                      type="number"
+                      min={0}
+                      max={16}
+                      step={0.5}
+                      required
+                      value={sleepHours}
+                      onChange={(e) => setSleepHours(e.target.value)}
+                      className="mt-1.5 w-full max-w-[200px] rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-sm text-primary transition-colors focus:border-accent focus:outline-none"
+                    />
+                  </div>
+                ) : null}
+
+                <div className="pt-1">
+                  <Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto">
+                    <Icon name="play_arrow" size={20} />
+                    Start 3-minute reaction test
+                  </Button>
+                </div>
+              </form>
+            </CardBody>
           </Card>
         </div>
       ) : null}

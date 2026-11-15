@@ -95,8 +95,8 @@ function ChatInterfaceInner() {
   }
 
   return (
-    <div className="flex flex-col rounded-lg border border-line bg-canvas">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-line bg-canvas shadow-card">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:px-5">
         <div className="flex items-center gap-2">
           <Icon name="smart_toy" size={20} className="text-accent" />
           <span className="text-sm font-semibold text-primary">
@@ -114,7 +114,7 @@ function ChatInterfaceInner() {
                 id={contextSelectId}
                 value={selectedCardId}
                 onChange={(e) => setCustomCardId(e.target.value)}
-                className="max-w-[220px] rounded-md border border-line bg-canvas px-2.5 py-1 text-xs text-primary"
+                className="max-w-[220px] rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs text-primary transition-colors focus:border-accent focus:outline-none"
               >
                 {activeCards.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -129,7 +129,7 @@ function ChatInterfaceInner() {
             <button
               type="button"
               onClick={clearCoachMessages}
-              className="rounded-md border border-line px-2.5 py-1 text-xs text-secondary hover:bg-hover hover:text-primary"
+              className="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary"
             >
               Clear thread
             </button>
@@ -137,14 +137,14 @@ function ChatInterfaceInner() {
         </div>
       </div>
 
-      <div className="h-[420px] space-y-4 overflow-y-auto p-4">
+      <div className="h-[min(56dvh,460px)] space-y-4 overflow-y-auto p-4 sm:p-5">
         {coachMessages.length === 0 ? (
-          <div className="rounded-lg border border-line bg-surface p-5 text-sm text-secondary">
+          <div className="rounded-lg border border-line bg-surface p-5 text-sm text-secondary shadow-card">
             <p className="font-semibold text-primary">
-              Ask about today&apos;s server-scored action card or readings.
+              Ask about today&apos;s readings or advice
             </p>
-            <p className="mt-1 text-xs leading-5 text-muted">
-              Answers are deterministically grounded in verified CrewPulse source snippets—zero cloud dependency, and red-flag questions surface emergency links immediately.
+            <p className="mt-1.5 text-xs leading-5 text-muted">
+              Uses your open action card and mission medical notes. Works offline and flags urgent symptoms right away.
             </p>
           </div>
         ) : (
@@ -155,7 +155,7 @@ function ChatInterfaceInner() {
         <div ref={listEndRef} />
       </div>
 
-      <div className="border-t border-line bg-surface p-4 space-y-3">
+      <div className="space-y-3 border-t border-line bg-surface p-4 sm:p-5">
         <div className="flex flex-wrap gap-2">
           {suggestions.map((q) => (
             <button
@@ -163,7 +163,7 @@ function ChatInterfaceInner() {
               type="button"
               onClick={() => submitQuestion(q)}
               disabled={sending}
-              className="rounded-pill border border-line bg-raised px-3 py-1 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary disabled:opacity-50"
+              className="min-h-8 rounded-pill border border-line bg-raised px-3.5 py-1.5 text-xs font-medium text-secondary transition-[transform,background-color,border-color,color] duration-150 hover:border-line-strong hover:bg-hover hover:text-primary active:scale-[0.98] disabled:opacity-50"
             >
               {q}
             </button>
@@ -198,12 +198,12 @@ function ChatInterfaceInner() {
                 e.preventDefault();
               }
             }}
-            placeholder="Ask why your card triggered, what to watch, or when to recheck..."
-            className="min-w-[200px] flex-1 rounded-md border border-line bg-canvas px-3.5 py-2.5 text-sm text-primary placeholder:text-muted"
+            placeholder="Ask why your card appeared, what to watch, or when to recheck..."
+            className="min-w-[200px] flex-1 rounded-md border border-line bg-canvas px-4 py-3 text-sm text-primary placeholder:text-muted transition-colors focus:border-accent focus:outline-none"
           />
-          <Button type="submit" variant="primary" disabled={sending}>
+          <Button type="submit" variant="primary" disabled={sending} className="w-full sm:w-auto">
             <Icon name="send" size={18} />
-            {sending ? "Sending..." : "Ask coach"}
+            {sending ? "Checking..." : "Ask coach"}
           </Button>
         </form>
 

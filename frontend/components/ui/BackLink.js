@@ -1,22 +1,17 @@
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 
-/**
- * Back link — handoff components.md:
- *   "arrow_back + Label/Medium, top-left of sub-screens."
- * Measured at y112 (content top), 14/500, `--color-text-secondary`.
- */
 export default function BackLink({
   href,
   onClick,
   children,
   className = "",
 }) {
-  const classes = `inline-flex h-5 items-center gap-2 t-label-md text-secondary transition-colors hover:text-primary ${className}`;
+  const classes = `inline-flex min-h-10 items-center gap-1.5 -ml-2 px-2 py-1.5 rounded-md t-label-md text-secondary transition-[transform,color,background-color] duration-150 ease-[var(--ease-smooth)] hover:bg-hover/60 hover:text-primary active:scale-[0.98] ${className}`;
   const content = (
     <>
-      <Icon name="arrow_back" size={20} />
-      {children}
+      <Icon name="arrow_back" size={18} />
+      <span>{children}</span>
     </>
   );
 
