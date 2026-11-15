@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import BackLink from "@/components/ui/BackLink";
 import Button from "@/components/ui/Button";
@@ -20,7 +20,7 @@ function delayLine(env) {
 
 export default function SendToEarthPage() {
   const router = useRouter();
-  const { environment, sendShare } = useStore();
+  const { environment, previewShare, sendShare } = useStore();
 
   const [selection, setSelection] = useState({
     includeReaction: false,
@@ -32,6 +32,9 @@ export default function SendToEarthPage() {
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [previewError, setPreviewError] = useState("");
 
   const baseId = useId();
   const daysId = useId();
@@ -39,6 +42,31 @@ export default function SendToEarthPage() {
 
   const anySelected = Object.values(selection).some(Boolean);
   const arrival = delayLine(environment?.active);
+
+  // Build the exact text that would leave the ship, only while the preview is open.
+  useEffect(() => {
+    if (!previewOpen || !anySelected) return undefined;
+    let active = true;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await previewShare({
+          ...selection,
+          days: Number(days),
+          ...(note.trim() ? { note: note.trim() } : {}),
+        });
+        if (active) {
+          setPreview(res);
+          setPreviewError("");
+        }
+      } catch (err) {
+        if (active) setPreviewError(err?.message || "Could not build the preview.");
+      }
+    }, 200);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [previewOpen, anySelected, selection, days, note, previewShare]);
 
   async function handleSend(e) {
     e.preventDefault();
@@ -175,6 +203,31 @@ export default function SendToEarthPage() {
           {!anySelected ? (
             <p className="text-xs text-muted">Tick at least one thing to share.</p>
           ) : null}
+
+          <details
+            className="rounded-lg border border-line bg-surface"
+            onToggle={(e) => setPreviewOpen(e.currentTarget.open)}
+          >
+            <summary className="flex min-h-11 cursor-pointer items-center gap-2 px-4 py-2.5 text-sm font-medium text-secondary hover:text-primary">
+              <Icon name="visibility" size={18} />
+              See exactly what will be sent
+            </summary>
+            <div className="border-t border-line p-4">
+              {!anySelected ? (
+                <p className="text-sm text-muted">Tick something to see the text.</p>
+              ) : previewError ? (
+                <p role="alert" className="text-sm text-emergency">
+                  {previewError}
+                </p>
+              ) : preview ? (
+                <pre className="max-h-72 overflow-y-auto whitespace-pre-wrap text-xs leading-6 text-primary">
+                  {preview.summaryText}
+                </pre>
+              ) : (
+                <p className="text-sm text-muted">Building the preview...</p>
+              )}
+            </div>
+          </details>
         </div>
       </div>
     </form>

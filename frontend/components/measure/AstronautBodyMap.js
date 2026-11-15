@@ -291,13 +291,13 @@ export default function AstronautBodyMap({
             {/* Region labels */}
             {showLabels ? (
               <g aria-hidden="true">
-                <text x="100" y="12" textAnchor="middle" fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
+                <text x="100" y="12" textAnchor="middle" fontSize="11" fill="var(--color-secondary)" fontFamily="monospace">
                   HEAD
                 </text>
-                <text x="100" y="150" textAnchor="middle" fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
+                <text x="100" y="150" textAnchor="middle" fontSize="11" fill="var(--color-secondary)" fontFamily="monospace">
                   CHEST
                 </text>
-                <text x="100" y="215" textAnchor="middle" fontSize="9" fill="var(--color-muted)" fontFamily="monospace">
+                <text x="100" y="215" textAnchor="middle" fontSize="11" fill="var(--color-secondary)" fontFamily="monospace">
                   ABDOMEN
                 </text>
               </g>
@@ -326,7 +326,7 @@ export default function AstronautBodyMap({
                   aria-pressed={active}
                   className={`rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
                     active
-                      ? "border-nasa-blue bg-nasa-blue text-white"
+                      ? "border-accent bg-accent text-on-status"
                       : "border-line bg-surface text-navy hover:border-nasa-blue/40 hover:bg-canvas"
                   }`}
                 >

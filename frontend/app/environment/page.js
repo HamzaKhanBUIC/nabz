@@ -237,7 +237,7 @@ export default function EnvironmentPage() {
                             </span>
                           </span>
                           {isActive ? (
-                            <span className="shrink-0 rounded-pill border border-accent/40 bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent">
+                            <span className="shrink-0 rounded-pill bg-accent px-2.5 py-0.5 text-xs font-semibold text-on-status">
                               Current
                             </span>
                           ) : null}
@@ -296,7 +296,7 @@ export default function EnvironmentPage() {
                             {opt.name}
                           </span>
                           {isActive ? (
-                            <span className="shrink-0 rounded-pill border border-accent/40 bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent">
+                            <span className="shrink-0 rounded-pill bg-accent px-2.5 py-0.5 text-xs font-semibold text-on-status">
                               Current
                             </span>
                           ) : null}
