@@ -1,324 +1,460 @@
 "use client";
 
-/**
- * EMERGENCY MODE — screens 10 → 11 → 12/12b → 13.
- *
- * The red `Emergency bar`, the absence of a sidebar and the full-width step
- * indicator are provided by `AppShell`. This component owns the four steps.
- *
- * Safety notes (frontend-only phase):
- *   - Nothing leaves the device. "Alert medical officer" writes a local,
- *     clearly-labelled record to the CrewPulse store and moves to step 13.
- *   - Steps come from fixed data below (no AI, no network). Chest pain and
- *     "Something else" are verbatim from the handoff `screens.md`; the three
- *     remaining conditions reuse the protocol steps that already shipped with
- *     CrewPulse. No new medical procedure is invented here.
- */
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { Card, CardHeader } from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
-import BackLink from "@/components/ui/BackLink";
-import StepIndicator from "@/components/ui/StepIndicator";
 import InstructionStep from "@/components/ui/InstructionStep";
+import StatusBadge from "@/components/ui/StatusBadge";
 import { useStore } from "@/lib/data/store";
-import { crewProfile } from "@/lib/data/mission";
+import { formatTime, makeId } from "@/lib/utils/format";
 
-const SUBJECTS = [
-  { id: "me", label: "Me", icon: "person" },
-  { id: "crewmate", label: "A crewmate", icon: "group" },
-];
-
-const CONDITIONS = [
-  { id: "chest-pain", label: "Chest pain", icon: "cardiology" },
-  { id: "breathing", label: "Trouble breathing", icon: "pulmonology" },
-  { id: "collapsed", label: "Collapsed", icon: "falling" },
-  { id: "bleeding", label: "Bleeding or injury", icon: "bloodtype" },
-  { id: "other", label: "Something else", icon: "help" },
-];
-
-/** Verbatim from the handoff (screens.md §12 / §12b). */
-const HANDOFF_STEPS = {
-  "chest-pain": [
-    "Alert the medical officer now",
-    "Help them sit down and rest. Loosen tight clothing",
-    "Give medicine only if the medical officer says so",
-    "Stay with them and watch their breathing.",
-  ],
-  other: [
-    "Alert the medical officer now",
-    "Make sure the area is safe for you",
-    "Check they are awake and breathing",
-    "Stay with them until help arrives.",
-  ],
-};
-
-/** Protocol steps already present in CrewPulse — reused, never re-written. */
-const EXISTING_PROTOCOL_STEPS = [
-  "Ensure the scene is safe — check for hazards, electrical or pressure risks.",
-  "Stay with the patient. Monitor breathing and responsiveness.",
-  "Note the time of onset and any changes in condition.",
-  "Keep the medical officer informed of every change.",
-];
-
-function stepsFor(conditionId) {
-  return HANDOFF_STEPS[conditionId] || EXISTING_PROTOCOL_STEPS;
+function formatClock(totalSeconds) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-function headingFor(conditionId) {
-  if (conditionId === "other") return "Do this now";
-  const condition = CONDITIONS.find((entry) => entry.id === conditionId);
-  return `Do this now: ${condition ? condition.label.toLowerCase() : ""}`;
-}
+function StepCountdown({ seconds }) {
+  const [remaining, setRemaining] = useState(seconds);
+  const [running, setRunning] = useState(false);
 
-function EmergencyTile({ icon, label, selected, onClick }) {
+  useEffect(() => {
+    if (!running || remaining <= 0) return undefined;
+    const id = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev <= 1) {
+          setRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running, remaining]);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
-      className={`flex h-[160px] w-full max-w-[248px] sm:w-[248px] shrink-0 flex-col items-center justify-center gap-4 rounded-lg border transition-colors ${
-        selected
-          ? "border-transparent bg-emergency text-white"
-          : "border-line-strong bg-surface text-primary hover:bg-hover"
-      }`}
-    >
-      <Icon
-        name={icon}
-        filled
-        size={32}
-        className={selected ? "text-white" : "text-emergency"}
-      />
-      <span className="t-h3">{label}</span>
-    </button>
+    <div className="mt-2 flex flex-wrap items-center gap-2">
+      <span
+        aria-live="polite"
+        className="inline-flex items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 font-mono text-xs font-semibold text-primary"
+      >
+        <Icon name="timer" size={14} className="text-emergency" />
+        {remaining === 0 ? "Timer finished" : formatClock(remaining)}
+      </span>
+      <button
+        type="button"
+        onClick={() => setRunning((r) => !r)}
+        disabled={remaining === 0}
+        className="rounded-md border border-line bg-raised px-2.5 py-1 text-xs font-medium text-primary hover:bg-hover disabled:opacity-50"
+      >
+        {running ? "Pause" : remaining === seconds ? "Start timer" : "Resume"}
+      </button>
+      {remaining !== seconds ? (
+        <button
+          type="button"
+          onClick={() => {
+            setRunning(false);
+            setRemaining(seconds);
+          }}
+          className="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-secondary hover:bg-hover"
+        >
+          Reset
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function MetronomeControl({ bpm = 110 }) {
+  const [active, setActive] = useState(false);
+  const [beat, setBeat] = useState(false);
+  const [beatCount, setBeatCount] = useState(0);
+  const audioCtxRef = useRef(null);
+
+  useEffect(() => {
+    if (!active) return undefined;
+
+    const intervalMs = Math.round(60_000 / bpm);
+    const triggerTick = () => {
+      setBeat(true);
+      setBeatCount((c) => c + 1);
+      setTimeout(() => setBeat(false), Math.min(180, intervalMs * 0.45));
+
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          if (!audioCtxRef.current) {
+            audioCtxRef.current = new AudioCtx();
+          }
+          const ctx = audioCtxRef.current;
+          if (ctx.state === "suspended") {
+            ctx.resume().catch(() => null);
+          }
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.value = 880;
+          gain.gain.setValueAtTime(0.18, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.07);
+        }
+      } catch {
+        // visual beat still works if audio blocked
+      }
+    };
+
+    triggerTick();
+    const id = setInterval(triggerTick, intervalMs);
+    return () => clearInterval(id);
+  }, [active, bpm]);
+
+  useEffect(() => {
+    return () => {
+      if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
+        audioCtxRef.current.close().catch(() => null);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-emergency/50 bg-emergency/10 p-3">
+      <div
+        aria-hidden="true"
+        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-emergency font-mono text-xs font-bold transition-transform duration-100 ${
+          beat
+            ? "scale-110 bg-emergency text-white"
+            : "scale-100 bg-canvas text-emergency"
+        }`}
+      >
+        {bpm}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-semibold text-primary">
+          Compression cadence metronome ({bpm} bpm)
+        </p>
+        <p className="text-xs text-secondary">
+          {active
+            ? `Active — push on every flash/tone (beat ${beatCount})`
+            : "Tap start for rhythmic audio & visual cadence"}
+        </p>
+      </div>
+      <Button
+        type="button"
+        variant={active ? "secondary" : "primary"}
+        size="sm"
+        onClick={() => {
+          if (active) {
+            setActive(false);
+            setBeat(false);
+          } else {
+            setBeatCount(0);
+            setActive(true);
+          }
+        }}
+      >
+        <Icon name={active ? "stop" : "play_arrow"} size={16} />
+        {active ? "Stop cadence" : `Start ${bpm} bpm`}
+      </Button>
+    </div>
+  );
+}
+
+function EmergencyFlowInner() {
+  const searchParams = useSearchParams();
+  const initialId = searchParams.get("id");
+  const {
+    emergencySelf,
+    emergencyCrewmate,
+    emergencyLog,
+    recordEmergencyAlert,
+  } = useStore();
+
+  const [userTarget, setUserTarget] = useState(null); // self | crewmate | null
+  const [userSelectedId, setUserSelectedId] = useState(null);
+  const [doneSteps, setDoneSteps] = useState({});
+  const [alertNotice, setAlertNotice] = useState(null);
+
+  const defaultTarget =
+    initialId && emergencyCrewmate.some((p) => p.id === initialId)
+      ? "crewmate"
+      : "self";
+  const target = userTarget ?? defaultTarget;
+  const selectedId =
+    userSelectedId ?? (userTarget === null ? initialId : null);
+
+  const list = target === "crewmate" ? emergencyCrewmate : emergencySelf;
+  const activeProcedure =
+    list.find((p) => p.id === selectedId) || list[0] || null;
+
+  const toggleDone = (procId, stepId) => {
+    const key = `${procId}:${stepId}`;
+    setDoneSteps((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleAlertCrew = (proc) => {
+    const entry = {
+      id: makeId("alert"),
+      procedureId: proc.id,
+      title: proc.title,
+      target: proc.for,
+      triggeredAt: new Date().toISOString(),
+    };
+    recordEmergencyAlert(entry);
+    setAlertNotice(
+      `Local crew alert recorded at ${formatTime(entry.triggeredAt)} for "${proc.title}".`,
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="t-label-md text-emergency">
+            Offline decision support · Cached locally
+          </p>
+          <h1 className="t-h1 mt-1 text-primary">Emergency action guides</h1>
+          <p className="mt-1 text-sm text-secondary">
+            Zero network required. Follow verified steps carefully and alert crewmates early if red flags appear.
+          </p>
+        </div>
+
+        <div
+          role="tablist"
+          aria-label="Who needs help"
+          className="inline-flex rounded-lg border border-line bg-surface p-1"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={target === "self"}
+            onClick={() => {
+              setUserTarget("self");
+              setUserSelectedId(null);
+              setAlertNotice(null);
+            }}
+            className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
+              target === "self"
+                ? "bg-emergency text-white"
+                : "text-secondary hover:bg-hover hover:text-primary"
+            }`}
+          >
+            For me ({emergencySelf.length})
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={target === "crewmate"}
+            onClick={() => {
+              setUserTarget("crewmate");
+              setUserSelectedId(null);
+              setAlertNotice(null);
+            }}
+            className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
+              target === "crewmate"
+                ? "bg-emergency text-white"
+                : "text-secondary hover:bg-hover hover:text-primary"
+            }`}
+          >
+            For a crewmate ({emergencyCrewmate.length})
+          </button>
+        </div>
+      </div>
+
+      {alertNotice ? (
+        <div
+          role="status"
+          className="flex items-center gap-2.5 rounded-lg border border-emergency bg-emergency/15 px-4 py-3 text-sm font-semibold text-primary"
+        >
+          <Icon name="notifications_active" size={20} className="text-emergency" />
+          <span>{alertNotice}</span>
+        </div>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+            {target === "self" ? "Self-care procedures" : "Crewmate responder protocols"}
+          </p>
+          {list.length === 0 ? (
+            <div className="rounded-lg border border-line bg-surface p-4 text-sm text-muted">
+              No cached procedures loaded yet. Ensure the server ran at least once to cache procedures locally.
+            </div>
+          ) : (
+            list.map((proc) => {
+              const active = activeProcedure?.id === proc.id;
+              return (
+                <button
+                  key={proc.id}
+                  type="button"
+                  onClick={() => {
+                    setUserSelectedId(proc.id);
+                    setAlertNotice(null);
+                  }}
+                  aria-current={active ? "true" : undefined}
+                  className={`flex w-full items-start justify-between gap-2 rounded-lg border p-4 text-left transition-colors ${
+                    active
+                      ? "border-emergency bg-raised"
+                      : "border-line bg-surface hover:bg-hover"
+                  }`}
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-primary">
+                      {proc.title}
+                    </p>
+                    <p className="mt-1 text-xs text-muted">
+                      {proc.steps.length} steps
+                    </p>
+                  </div>
+                  <Icon
+                    name="chevron_right"
+                    size={18}
+                    className={active ? "text-emergency" : "text-muted"}
+                  />
+                </button>
+              );
+            })
+          )}
+
+          {emergencyLog.length > 0 ? (
+            <Card className="mt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Local alert log ({emergencyLog.length})
+              </p>
+              <ul className="mt-2 space-y-1.5 text-xs text-secondary">
+                {emergencyLog.slice(0, 3).map((entry) => (
+                  <li key={entry.id}>
+                    {formatTime(entry.triggeredAt)} — {entry.title}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : null}
+        </div>
+
+        {activeProcedure ? (
+          <div className="space-y-5">
+            <Card>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge tone="bad" dot={false}>
+                      {activeProcedure.for === "crewmate"
+                        ? "Crewmate emergency"
+                        : "Self protocol"}
+                    </StatusBadge>
+                    <span className="text-xs text-muted">
+                      v{activeProcedure.version}
+                    </span>
+                  </div>
+                  <h2 className="t-h1 mt-2 text-primary">
+                    {activeProcedure.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-secondary">
+                    <strong className="text-primary">When to use: </strong>
+                    {activeProcedure.whenToUse}
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() => handleAlertCrew(activeProcedure)}
+                >
+                  <Icon name="emergency" filled size={18} />
+                  Alert crew
+                </Button>
+              </div>
+
+              <div className="mt-5 space-y-3">
+                {activeProcedure.steps.map((s, idx) => {
+                  const key = `${activeProcedure.id}:${s.id}`;
+                  return (
+                    <div key={s.id} className="space-y-1.5">
+                      <InstructionStep
+                        number={idx + 1}
+                        done={Boolean(doneSteps[key])}
+                        onToggle={() => toggleDone(activeProcedure.id, s.id)}
+                      >
+                        {s.text}
+                      </InstructionStep>
+
+                      <div className="pl-4">
+                        {s.detail ? (
+                          <p className="text-xs leading-5 text-secondary">
+                            {s.detail}
+                          </p>
+                        ) : null}
+                        {s.caution ? (
+                          <p className="mt-1 rounded-md border border-attention/40 bg-attention/10 px-3 py-1.5 text-xs font-medium text-attention">
+                            Caution: {s.caution}
+                          </p>
+                        ) : null}
+                        {s.timerSeconds ? (
+                          <StepCountdown
+                            key={`${activeProcedure.id}:${s.id}:${s.timerSeconds}`}
+                            seconds={s.timerSeconds}
+                          />
+                        ) : null}
+                        {s.metronomeBpm ? (
+                          <MetronomeControl bpm={s.metronomeBpm} />
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 rounded-lg border border-emergency/50 bg-emergency/10 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-emergency">
+                  Red flags — escalate immediately
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-primary">
+                  {activeProcedure.redFlags.map((rf, i) => (
+                    <li key={i}>{rf}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs font-semibold text-secondary">
+                  {activeProcedure.escalation.text}
+                </p>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4 text-xs text-muted">
+                <span className="font-medium">{activeProcedure.disclaimer}</span>
+                <div className="flex flex-wrap gap-3">
+                  {activeProcedure.sources.map((src) => (
+                    <a
+                      key={src.id}
+                      href={src.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-accent hover:underline"
+                    >
+                      {src.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
 export default function EmergencyFlow() {
-  const router = useRouter();
-  const store = useStore();
-
-  const [step, setStep] = useState(1);
-  const [subject, setSubject] = useState(null);
-  const [condition, setCondition] = useState(null);
-  const [doneSteps, setDoneSteps] = useState([]);
-  const [alertedAt, setAlertedAt] = useState(null);
-
-  const subjectOption = SUBJECTS.find((entry) => entry.id === subject);
-  const conditionOption = CONDITIONS.find((entry) => entry.id === condition);
-  const steps = condition ? stepsFor(condition) : [];
-
-  function chooseSubject(id) {
-    setSubject(id);
-    setStep(2);
-  }
-
-  function chooseCondition(id) {
-    setCondition(id);
-    setDoneSteps([]);
-    setStep(3);
-  }
-
-  function toggleStep(index) {
-    setDoneSteps((current) =>
-      current.includes(index)
-        ? current.filter((entry) => entry !== index)
-        : [...current, index]
-    );
-  }
-
-  function alertMedicalOfficer() {
-    const now = new Date();
-    setAlertedAt(now);
-    setDoneSteps((current) =>
-      current.includes(0) ? current : [...current, 0]
-    );
-
-    const conditionLabel = conditionOption ? conditionOption.label : "Unknown";
-    store.addEmergencyLog({
-      subjectId: subject,
-      subject: subject === "me" ? crewProfile.fullName : "Crewmate",
-      subjectRole: subject === "me" ? crewProfile.role : "Crew",
-      situationId: condition,
-      situation: conditionLabel,
-      severity: "critical",
-      status: "alerted",
-      startedAt: now.toISOString(),
-      endedAt: now.toISOString(),
-      notified: [],
-      events: [
-        {
-          at: now.toISOString(),
-          message: `SIMULATED: medical officer alerted for ${conditionLabel.toLowerCase()} (no external service is contacted).`,
-        },
-      ],
-    });
-
-    setStep(4);
-  }
-
-  const rootClass = "flex min-h-[calc(100vh-112px)] flex-col";
-  const indicator = <StepIndicator step={step} total={4} variant="full" />;
-
-  /* ---------------------------------------------------------------- 10 / 11 */
-  if (step === 1 || step === 2) {
-    const isWho = step === 1;
-    const body = isWho
-      ? "Tap one. Help steps change depending on who needs it."
-      : `For: ${subject === "me" ? "you" : "a crewmate"}. Pick the closest match. No typing needed.`;
-
-    return (
-      <div className={rootClass}>
-        {indicator}
-
-        <div className="mt-10 min-h-[20px]">
-          {isWho ? null : (
-            <BackLink onClick={() => setStep(1)}>Back</BackLink>
-          )}
-        </div>
-
-        <div className="flex flex-1 flex-col items-center">
-          <div className="my-auto flex w-full flex-col items-center text-center">
-            <h1 className="t-display text-primary">
-              {isWho ? "Who is this for?" : "What is happening?"}
-            </h1>
-            <p className="mt-4 max-w-[560px] t-body-md text-muted">{body}</p>
-
-            <div className="mt-8 flex w-full flex-wrap justify-center gap-4">
-              {isWho
-                ? SUBJECTS.map((entry) => (
-                    <EmergencyTile
-                      key={entry.id}
-                      icon={entry.icon}
-                      label={entry.label}
-                      selected={subject === entry.id}
-                      onClick={() => chooseSubject(entry.id)}
-                    />
-                  ))
-                : CONDITIONS.map((entry) => (
-                    <EmergencyTile
-                      key={entry.id}
-                      icon={entry.icon}
-                      label={entry.label}
-                      selected={condition === entry.id}
-                      onClick={() => chooseCondition(entry.id)}
-                    />
-                  ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* -------------------------------------------------------------------- 12 */
-  if (step === 3) {
-    return (
-      <div className={rootClass}>
-        {indicator}
-
-        <div className="mt-10 min-h-[20px]">
-          <BackLink onClick={() => setStep(2)}>Back</BackLink>
-        </div>
-
-        <div className="mt-10">
-          <h1 className="t-display text-primary">{headingFor(condition)}</h1>
-          <p className="mt-4 t-body-md text-muted">
-            Tap each step when it is done.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-8 xl:flex-row xl:justify-between">
-            <ol className="flex w-full max-w-[640px] flex-col gap-3">
-              {steps.map((text, index) => (
-                <li key={text}>
-                  <InstructionStep
-                    number={index + 1}
-                    done={doneSteps.includes(index)}
-                    onToggle={() => toggleStep(index)}
-                  >
-                    {text}
-                  </InstructionStep>
-                </li>
-              ))}
-            </ol>
-
-            <div className="flex w-full max-w-[360px] flex-col gap-4">
-              <Button
-                variant="danger"
-                size="lg"
-                icon="emergency"
-                iconFilled
-                onClick={alertMedicalOfficer}
-              >
-                Alert medical officer
-              </Button>
-              <Button variant="secondary" size="lg" href="/measure">
-                Check heart rate &amp; oxygen
-              </Button>
-              <p className="text-sm leading-4 text-muted">
-                Draft steps. Check them against the crew medical checklist
-                before the demo.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* -------------------------------------------------------------------- 13 */
-  const alertTime = alertedAt
-    ? alertedAt.toTimeString().slice(0, 5)
-    : "--:--";
-
   return (
-    <div className={rootClass}>
-      {indicator}
-
-      <div className="mt-8">
-        <h1 className="t-display text-primary">Help is on the way</h1>
-        <p className="mt-4 t-body-md text-muted">
-          Keep following the steps until the medical officer takes over.
-        </p>
-
-        <div className="mt-8 inline-flex min-h-[56px] w-fit max-w-full items-center gap-3 rounded-lg bg-normal px-6 py-4 text-on-status">
-          <Icon name="check_circle" filled size={24} />
-          <span className="text-base font-medium leading-6">
-            Medical officer alerted at {alertTime}.{" "}
-            {subject === "me"
-              ? "Stay where you are until help arrives."
-              : "Stay with your crewmate."}
-          </span>
-        </div>
-
-        <ol className="mt-8 flex max-w-[640px] flex-col gap-3">
-          {steps.map((text, index) => (
-            <li key={text}>
-              <InstructionStep
-                number={index + 1}
-                done={doneSteps.includes(index)}
-                onToggle={() => toggleStep(index)}
-              >
-                {text}
-              </InstructionStep>
-            </li>
-          ))}
-        </ol>
-
-        <div className="mt-8 flex flex-wrap gap-4">
-          <Button size="lg" href="/">
-            Close emergency mode
-          </Button>
-          <Button variant="secondary" size="lg" onClick={() => setStep(3)}>
-            Back to steps
-          </Button>
-        </div>
-
-        <p className="mt-4 t-caption text-muted">
-          Simulated alert — nothing is transmitted from this device.
-        </p>
-      </div>
-    </div>
+    <Suspense
+      fallback={
+        <div className="p-6 text-sm text-muted">Loading emergency protocols...</div>
+      }
+    >
+      <EmergencyFlowInner />
+    </Suspense>
   );
 }

@@ -1,294 +1,345 @@
 "use client";
 
-/**
- * Central client-side data store.
- *
- * Responsibilities:
- * - Hold all recorded health data (check-ins, measurements, mood logs,
- *   emergency logs, reports, coach history).
- * - Persist to localStorage for frontend demo persistence.
- * - Keep mock/demo data clearly separated from user-recorded data via the
- *   `source` field ("recorded" vs "demo").
- *
- * This module is the single service layer the UI talks to, so backend APIs
- * can replace these actions later without touching components.
- */
-
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useReducer,
+  useState,
 } from "react";
-import { makeId } from "@/lib/utils/format";
-import { buildDemoDataset } from "@/lib/data/demo";
+import * as api from "@/lib/api";
 
-const STORAGE_KEY = "crewpulse:v1";
-
-const EMPTY_STATE = {
-  /** Full check-ins: reaction time, sleep, mood. */
-  checkIns: [],
-  /** Quick mood taps from the Today dashboard. */
-  moodLogs: [],
-  /** Blood pressure measurements. */
-  measurements: [],
-  /** Emergency events and their logged timeline. */
-  emergencyLogs: [],
-  /** Health summaries shared (or queued) with Earth. */
-  reports: [],
-  /** AI Health Coach conversation history. */
-  coachMessages: [],
-  hydrated: false,
+const STORAGE_KEYS = {
+  protocol: "crewpulse:cache:protocol",
+  bpGuide: "crewpulse:cache:bpGuide",
+  routines: "crewpulse:cache:routines",
+  emergencySelf: "crewpulse:cache:emergency:self",
+  emergencyCrewmate: "crewpulse:cache:emergency:crewmate",
+  outbox: "crewpulse:outbox",
+  emergencyLog: "crewpulse:emergencyLog",
+  coachMessages: "crewpulse:coachMessages",
 };
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "HYDRATE":
-      return { ...EMPTY_STATE, ...action.payload, hydrated: true };
+const TREND_CODES = [
+  "reaction-speed",
+  "sleep-hours",
+  "bp-systolic",
+  "bp-diastolic",
+];
 
-    case "ADD_CHECKIN":
-      return { ...state, checkIns: [action.payload, ...state.checkIns] };
+const FALLBACK_MISSION = {
+  name: "Mars Transit Sim",
+  profile: "mars-transit",
+  launchDate: "2026-10-01",
+  missionDay: 1,
+  commsDelay: { oneWayMinMinutes: 3, oneWayMaxMinutes: 22 },
+  crew: [{ id: "sara", name: "Sara", role: "Commander" }],
+};
 
-    case "ADD_MOOD":
-      return { ...state, moodLogs: [action.payload, ...state.moodLogs] };
+function readCache(key, fallback = null) {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
-    case "ADD_MEASUREMENT":
-      return { ...state, measurements: [action.payload, ...state.measurements] };
-
-    case "ADD_EMERGENCY":
-      return { ...state, emergencyLogs: [action.payload, ...state.emergencyLogs] };
-
-    case "UPDATE_EMERGENCY":
-      return {
-        ...state,
-        emergencyLogs: state.emergencyLogs.map((log) =>
-          log.id === action.payload.id
-            ? { ...log, ...action.payload.patch }
-            : log
-        ),
-      };
-
-    case "ADD_REPORT":
-      return { ...state, reports: [action.payload, ...state.reports] };
-
-    case "UPDATE_REPORT":
-      return {
-        ...state,
-        reports: state.reports.map((report) =>
-          report.id === action.payload.id
-            ? { ...report, ...action.payload.patch }
-            : report
-        ),
-      };
-
-    case "ADD_COACH_MESSAGE":
-      return { ...state, coachMessages: [...state.coachMessages, action.payload] };
-
-    case "RESET_COACH":
-      return { ...state, coachMessages: [] };
-
-    case "LOAD_DEMO":
-      // Demo records are merged in and flagged with source: "demo".
-      return {
-        ...state,
-        checkIns: [...action.payload.checkIns, ...state.checkIns],
-        moodLogs: [...action.payload.moodLogs, ...state.moodLogs],
-        measurements: [...action.payload.measurements, ...state.measurements],
-      };
-
-    case "REMOVE_DEMO": {
-      const notDemo = (record) => record.source !== "demo";
-      return {
-        ...state,
-        checkIns: state.checkIns.filter(notDemo),
-        moodLogs: state.moodLogs.filter(notDemo),
-        measurements: state.measurements.filter(notDemo),
-      };
-    }
-
-    case "CLEAR_ALL":
-      return { ...EMPTY_STATE, hydrated: true };
-
-    default:
-      return state;
+function writeCache(key, value) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignore quota errors
   }
 }
 
 const StoreContext = createContext(null);
 
-function readStorage() {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
 export function StoreProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, EMPTY_STATE);
+  const [hydrated, setHydrated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [backendOnline, setBackendOnline] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Hydrate from localStorage after mount (avoids SSR/client mismatch).
-  useEffect(() => {
-    const stored = readStorage();
-    dispatch({ type: "HYDRATE", payload: stored || {} });
+  const [mission, setMission] = useState(FALLBACK_MISSION);
+  const [today, setToday] = useState(null);
+  const [protocol, setProtocol] = useState(null);
+  const [bpGuide, setBpGuide] = useState(null);
+  const [routines, setRoutines] = useState([]);
+  const [reminders, setReminders] = useState(null);
+  const [emergencySelf, setEmergencySelf] = useState([]);
+  const [emergencyCrewmate, setEmergencyCrewmate] = useState([]);
+  const [trends, setTrends] = useState({});
+  const [trendsByRange, setTrendsByRange] = useState({});
+
+  const [lastCheckinResult, setLastCheckinResult] = useState(null);
+  const [lastBpResult, setLastBpResult] = useState(null);
+  const [coachMessages, setCoachMessages] = useState([]);
+  const [outbox, setOutbox] = useState([]);
+  const [emergencyLog, setEmergencyLog] = useState([]);
+
+  const loadTrend = useCallback(async (code, days = 30) => {
+    const trend = await api.getTrends(code, days);
+    setTrends((prev) => ({ ...prev, [code]: trend }));
+    setTrendsByRange((prev) => ({ ...prev, [`${code}:${days}`]: trend }));
+    return trend;
   }, []);
 
-  // Persist on every change once hydrated.
+  const refreshDynamicState = useCallback(async () => {
+    const [missionRes, todayRes, remindersRes, ...trendResults] =
+      await Promise.all([
+        api.getMission(),
+        api.getToday(),
+        api.getReminders().catch(() => null),
+        ...TREND_CODES.map((code) => api.getTrends(code, 30)),
+      ]);
+
+    setMission(missionRes);
+    setToday(todayRes);
+    if (todayRes?.checkin) setLastCheckinResult(todayRes.checkin);
+    if (todayRes?.bp) setLastBpResult(todayRes.bp);
+    if (remindersRes) setReminders(remindersRes);
+
+    const nextTrends = {};
+    const nextByRange = {};
+    TREND_CODES.forEach((code, idx) => {
+      if (trendResults[idx]) {
+        nextTrends[code] = trendResults[idx];
+        nextByRange[`${code}:30`] = trendResults[idx];
+      }
+    });
+    setTrends((prev) => ({ ...prev, ...nextTrends }));
+    setTrendsByRange((prev) => ({ ...prev, ...nextByRange }));
+    setBackendOnline(true);
+    setError(null);
+  }, []);
+
   useEffect(() => {
-    if (!state.hydrated) return;
-    const { hydrated, ...persisted } = state;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
-    } catch {
-      // Storage full or unavailable — the app still works in-memory.
+    let active = true;
+
+    async function bootstrap() {
+      await Promise.resolve();
+      if (!active) return;
+
+      const cachedProtocol = readCache(STORAGE_KEYS.protocol, null);
+      const cachedBpGuide = readCache(STORAGE_KEYS.bpGuide, null);
+      const cachedRoutines = readCache(STORAGE_KEYS.routines, []);
+      const cachedSelf = readCache(STORAGE_KEYS.emergencySelf, []);
+      const cachedCrew = readCache(STORAGE_KEYS.emergencyCrewmate, []);
+      const cachedOutbox = readCache(STORAGE_KEYS.outbox, []);
+      const cachedEmergencyLog = readCache(STORAGE_KEYS.emergencyLog, []);
+      const cachedCoach = readCache(STORAGE_KEYS.coachMessages, []);
+
+      if (cachedProtocol) setProtocol(cachedProtocol);
+      if (cachedBpGuide) setBpGuide(cachedBpGuide);
+      if (Array.isArray(cachedRoutines)) setRoutines(cachedRoutines);
+      if (Array.isArray(cachedSelf)) setEmergencySelf(cachedSelf);
+      if (Array.isArray(cachedCrew)) setEmergencyCrewmate(cachedCrew);
+      if (Array.isArray(cachedOutbox)) setOutbox(cachedOutbox);
+      if (Array.isArray(cachedEmergencyLog)) setEmergencyLog(cachedEmergencyLog);
+      if (Array.isArray(cachedCoach)) setCoachMessages(cachedCoach);
+      setHydrated(true);
+
+      try {
+        await refreshDynamicState();
+        const [protoRes, bpGuideRes, routinesRes, selfRes, crewRes] =
+          await Promise.all([
+            api.getCheckinProtocol(),
+            api.getBpGuide(),
+            api.getRoutines().catch(() => ({ routines: [] })),
+            api.getEmergencyProcedures("self"),
+            api.getEmergencyProcedures("crewmate"),
+          ]);
+        if (!active) return;
+
+        setProtocol(protoRes);
+        writeCache(STORAGE_KEYS.protocol, protoRes);
+
+        setBpGuide(bpGuideRes);
+        writeCache(STORAGE_KEYS.bpGuide, bpGuideRes);
+
+        const routineList = routinesRes?.routines || [];
+        setRoutines(routineList);
+        writeCache(STORAGE_KEYS.routines, routineList);
+
+        const selfList = selfRes?.procedures || [];
+        setEmergencySelf(selfList);
+        writeCache(STORAGE_KEYS.emergencySelf, selfList);
+
+        const crewList = crewRes?.procedures || [];
+        setEmergencyCrewmate(crewList);
+        writeCache(STORAGE_KEYS.emergencyCrewmate, crewList);
+      } catch (err) {
+        if (!active) return;
+        setBackendOnline(false);
+        setError(err?.message || "Unable to reach CrewPulse backend.");
+      } finally {
+        if (active) setLoading(false);
+      }
     }
-  }, [state]);
 
-  const addCheckIn = useCallback((record) => {
-    dispatch({
-      type: "ADD_CHECKIN",
-      payload: {
-        id: makeId("chk"),
-        timestamp: record.timestamp || new Date().toISOString(),
-        source: "recorded",
-        ...record,
-      },
+    bootstrap();
+    return () => {
+      active = false;
+    };
+  }, [refreshDynamicState]);
+
+  const submitCheckin = useCallback(
+    async (payload) => {
+      const result = await api.submitCheckin(payload);
+      setLastCheckinResult(result);
+      await refreshDynamicState();
+      return result;
+    },
+    [refreshDynamicState],
+  );
+
+  const submitBpMeasurement = useCallback(
+    async (payload) => {
+      const result = await api.submitBpMeasurement(payload);
+      setLastBpResult(result);
+      await refreshDynamicState();
+      return result;
+    },
+    [refreshDynamicState],
+  );
+
+  const askCoach = useCallback(async ({ question, cardId }) => {
+    return api.askCoach({ question, cardId });
+  }, []);
+
+  const addCoachMessage = useCallback((message) => {
+    setCoachMessages((prev) => {
+      const next = [...prev, message];
+      writeCache(STORAGE_KEYS.coachMessages, next);
+      return next;
     });
   }, []);
 
-  const addMoodLog = useCallback((record) => {
-    dispatch({
-      type: "ADD_MOOD",
-      payload: {
-        id: makeId("mood"),
-        timestamp: record.timestamp || new Date().toISOString(),
-        source: "recorded",
-        ...record,
-      },
+  const clearCoachMessages = useCallback(() => {
+    setCoachMessages([]);
+    writeCache(STORAGE_KEYS.coachMessages, []);
+  }, []);
+
+  const previewShare = useCallback(async (payload) => {
+    return api.previewShare(payload);
+  }, []);
+
+  const sendShare = useCallback(async (payload) => {
+    const queued = await api.sendShare(payload);
+    setOutbox((prev) => {
+      const next = [queued, ...prev];
+      writeCache(STORAGE_KEYS.outbox, next);
+      return next;
+    });
+    return queued;
+  }, []);
+
+  const saveReminders = useCallback(async (schedule) => {
+    const updated = await api.updateReminders(schedule);
+    setReminders(updated);
+    const todayRes = await api.getToday().catch(() => null);
+    if (todayRes) setToday(todayRes);
+    return updated;
+  }, []);
+
+  const recordEmergencyAlert = useCallback((entry) => {
+    setEmergencyLog((prev) => {
+      const next = [entry, ...prev];
+      writeCache(STORAGE_KEYS.emergencyLog, next);
+      return next;
     });
   }, []);
 
-  const addMeasurement = useCallback((record) => {
-    dispatch({
-      type: "ADD_MEASUREMENT",
-      payload: {
-        id: makeId("bp"),
-        timestamp: record.timestamp || new Date().toISOString(),
-        source: "recorded",
-        ...record,
-      },
-    });
-  }, []);
-
-  const addEmergencyLog = useCallback((record) => {
-    dispatch({
-      type: "ADD_EMERGENCY",
-      payload: {
-        id: makeId("emg"),
-        timestamp: record.timestamp || new Date().toISOString(),
-        source: "recorded",
-        events: [],
-        ...record,
-      },
-    });
-  }, []);
-
-  const updateEmergencyLog = useCallback((id, patch) => {
-    dispatch({ type: "UPDATE_EMERGENCY", payload: { id, patch } });
-  }, []);
-
-  const addReport = useCallback((record) => {
-    dispatch({
-      type: "ADD_REPORT",
-      payload: {
-        id: makeId("rep"),
-        timestamp: record.timestamp || new Date().toISOString(),
-        source: "recorded",
-        ...record,
-      },
-    });
-  }, []);
-
-  const updateReport = useCallback((id, patch) => {
-    dispatch({ type: "UPDATE_REPORT", payload: { id, patch } });
-  }, []);
-
-  const addCoachMessage = useCallback((record) => {
-    dispatch({
-      type: "ADD_COACH_MESSAGE",
-      payload: {
-        id: makeId("msg"),
-        timestamp: record.timestamp || new Date().toISOString(),
-        ...record,
-      },
-    });
-  }, []);
-
-  const resetCoachMessages = useCallback(() => dispatch({ type: "RESET_COACH" }), []);
-
-  /** Explicit user action: merge in the clearly-labelled demo dataset. */
-  const loadDemoData = useCallback(() => {
-    dispatch({ type: "LOAD_DEMO", payload: buildDemoDataset() });
-  }, []);
-
-  const removeDemoData = useCallback(() => dispatch({ type: "REMOVE_DEMO" }), []);
-
-  const clearAllData = useCallback(() => dispatch({ type: "CLEAR_ALL" }), []);
+  const routinesById = useMemo(() => {
+    const map = {};
+    for (const r of routines) {
+      map[r.id] = r;
+    }
+    return map;
+  }, [routines]);
 
   const value = useMemo(
     () => ({
-      hydrated: state.hydrated,
-      checkIns: state.checkIns,
-      moodLogs: state.moodLogs,
-      measurements: state.measurements,
-      emergencyLogs: state.emergencyLogs,
-      reports: state.reports,
-      coachMessages: state.coachMessages,
-      addCheckIn,
-      addMoodLog,
-      addMeasurement,
-      addEmergencyLog,
-      updateEmergencyLog,
-      addReport,
-      updateReport,
+      hydrated,
+      loading,
+      backendOnline,
+      error,
+      mission,
+      today,
+      protocol,
+      bpGuide,
+      routines,
+      routinesById,
+      reminders,
+      emergencySelf,
+      emergencyCrewmate,
+      trends,
+      trendsByRange,
+      lastCheckinResult,
+      lastBpResult,
+      coachMessages,
+      outbox,
+      emergencyLog,
+      refreshAll: refreshDynamicState,
+      loadTrend,
+      submitCheckin,
+      submitBpMeasurement,
+      askCoach,
       addCoachMessage,
-      resetCoachMessages,
-      loadDemoData,
-      removeDemoData,
-      clearAllData,
-      hasDemoData:
-        state.checkIns.some((r) => r.source === "demo") ||
-        state.measurements.some((r) => r.source === "demo"),
+      clearCoachMessages,
+      previewShare,
+      sendShare,
+      saveReminders,
+      recordEmergencyAlert,
     }),
     [
-      state,
-      addCheckIn,
-      addMoodLog,
-      addMeasurement,
-      addEmergencyLog,
-      updateEmergencyLog,
-      addReport,
-      updateReport,
+      hydrated,
+      loading,
+      backendOnline,
+      error,
+      mission,
+      today,
+      protocol,
+      bpGuide,
+      routines,
+      routinesById,
+      reminders,
+      emergencySelf,
+      emergencyCrewmate,
+      trends,
+      trendsByRange,
+      lastCheckinResult,
+      lastBpResult,
+      coachMessages,
+      outbox,
+      emergencyLog,
+      refreshDynamicState,
+      loadTrend,
+      submitCheckin,
+      submitBpMeasurement,
+      askCoach,
       addCoachMessage,
-      resetCoachMessages,
-      loadDemoData,
-      removeDemoData,
-      clearAllData,
-    ]
+      clearCoachMessages,
+      previewShare,
+      sendShare,
+      saveReminders,
+      recordEmergencyAlert,
+    ],
   );
 
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
+  );
 }
 
 export function useStore() {
   const ctx = useContext(StoreContext);
   if (!ctx) {
-    throw new Error("useStore must be used within <StoreProvider>");
+    throw new Error("useStore must be used inside <StoreProvider>");
   }
   return ctx;
 }

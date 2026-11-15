@@ -1,95 +1,103 @@
 "use client";
 
-/**
- * Chat message bubble (user right / coach left).
- * Coach replies carry a clear "placeholder" marker when mock.
- */
-
-import { Bot, User } from "lucide-react";
+import Link from "next/link";
+import Icon from "@/components/ui/Icon";
+import StatusBadge from "@/components/ui/StatusBadge";
 import { formatTime } from "@/lib/utils/format";
 
-export default function ChatMessage({ message }) {
-  const isUser = message.role === "user";
-  const isPlaceholder = message.placeholder === true;
-
+export function TypingIndicator() {
   return (
-    <li
-      className={`flex w-full gap-3 ${isUser ? "justify-end" : "justify-start"}`}
-    >
-      {!isUser ? (
-        <span
-          className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-nasa-blue-soft text-nasa-blue"
-          aria-hidden="true"
-        >
-          <Bot className="h-4 w-4" />
-        </span>
-      ) : null}
-
-      <div
-        className={`max-w-[85%] rounded-2xl px-4 py-3 sm:max-w-[75%] ${
-          isUser
-            ? "rounded-tr-sm bg-nasa-blue text-white"
-            : isPlaceholder
-              ? "rounded-tl-sm border border-line bg-raised"
-              : "rounded-tl-sm border border-line bg-surface shadow-card"
-        }`}
-      >
-        {isPlaceholder && !isUser ? (
-          <p className="mb-1.5 inline-flex items-center gap-1 rounded border border-line bg-surface px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent">
-            Placeholder response
-          </p>
-        ) : null}
-
-        <p
-          className={`text-sm leading-relaxed ${
-            isUser ? "text-white" : "text-ink"
-          }`}
-        >
-          {message.content}
-        </p>
-
-        <p
-          className={`mt-1.5 text-right font-mono text-[10px] ${
-            isUser ? "text-white/60" : "text-muted"
-          }`}
-        >
-          {formatTime(message.timestamp)}
-        </p>
+    <div className="flex items-start gap-3">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-raised text-accent">
+        <Icon name="smart_toy" size={18} />
+      </span>
+      <div className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-muted">
+        Checking verified rules and knowledge base...
       </div>
-
-      {isUser ? (
-        <span
-          className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-raised text-secondary"
-          aria-hidden="true"
-        >
-          <User className="h-4 w-4" />
-        </span>
-      ) : null}
-    </li>
+    </div>
   );
 }
 
-/** Typing indicator shown while a mock reply is "thinking". */
-export function TypingIndicator() {
-  return (
-    <li className="flex w-full gap-3">
-      <span
-        className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-nasa-blue-soft text-nasa-blue"
-        aria-hidden="true"
-      >
-        <Bot className="h-4 w-4" />
-      </span>
-      <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-line bg-surface px-4 py-4 shadow-card">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="h-2 w-2 animate-bounce rounded-full bg-nasa-blue"
-            style={{ animationDelay: `${i * 0.15}s`, animationDuration: "1s" }}
-            aria-hidden="true"
-          />
-        ))}
-        <span className="sr-only">Coach is typing</span>
+export default function ChatMessage({ message }) {
+  const isUser = message.role === "user";
+
+  if (isUser) {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[82%] rounded-lg bg-accent px-4 py-3 text-sm text-on-status">
+          <p className="whitespace-pre-wrap">{message.content}</p>
+          {message.createdAt ? (
+            <p className="mt-1 text-right text-[11px] opacity-80">
+              {formatTime(message.createdAt)}
+            </p>
+          ) : null}
+        </div>
       </div>
-    </li>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-accent">
+        <Icon name="smart_toy" size={18} />
+      </span>
+
+      <div className="max-w-[88%] space-y-2.5 rounded-lg border border-line bg-surface p-4 text-sm text-primary">
+        {message.banner ? (
+          <div
+            role="alert"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-emergency bg-emergency/15 px-3 py-2 text-xs font-semibold text-primary"
+          >
+            <span className="flex items-center gap-1.5">
+              <Icon name="emergency" filled size={16} className="text-emergency" />
+              {message.banner.label}
+            </span>
+            <Link
+              href="/emergency"
+              className="rounded bg-emergency px-2.5 py-1 text-white hover:bg-emergency-hover"
+            >
+              Open Emergency
+            </Link>
+          </div>
+        ) : null}
+
+        <p className="whitespace-pre-wrap leading-6">{message.content}</p>
+
+        {Array.isArray(message.citations) && message.citations.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2 border-t border-line pt-2.5 text-xs">
+            <span className="text-muted">Sources:</span>
+            {message.citations.map((src) => (
+              <a
+                key={src.id}
+                href={src.url}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-pill border border-line bg-raised px-2.5 py-0.5 text-accent hover:bg-hover hover:underline"
+              >
+                {src.title}
+              </a>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted">
+          <div className="flex items-center gap-2">
+            {message.grounded !== undefined ? (
+              <StatusBadge
+                tone={message.grounded ? "ok" : "warn"}
+                dot={false}
+                className="px-2 py-0.5 text-[10px]"
+              >
+                {message.grounded ? "Rule-grounded" : "Unverified outside handbook"}
+              </StatusBadge>
+            ) : null}
+            {message.provider ? (
+              <span className="font-mono uppercase">{message.provider}</span>
+            ) : null}
+          </div>
+          {message.disclaimer ? <span>{message.disclaimer}</span> : null}
+        </div>
+      </div>
+    </div>
   );
 }

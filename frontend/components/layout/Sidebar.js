@@ -1,21 +1,11 @@
 "use client";
 
-/**
- * Desktop sidebar — handoff "Sidebar" (240 wide, bg-surface, right border,
- * user footer).
- *
- *   Today → 01, Check-in → 02, Measure → 05, user row → 14 Profile.
- *   Active item = bg-raised + 4px accent bar on the left edge, filled icon in
- *   accent-primary.
- *
- * `variant` is "fixed" (always visible) or "drawer" (mobile sheet).
- */
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import { NAV_ITEMS, SECTION_FOR_PATH, sectionForPath } from "@/lib/data/nav";
-import { useSession } from "@/lib/data/session";
+import { useStore } from "@/lib/data/store";
+import { getCommander } from "@/lib/data/mission";
 
 export function NavList({ onNavigate }) {
   const pathname = usePathname();
@@ -31,25 +21,17 @@ export function NavList({ onNavigate }) {
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            className={[
-              "relative flex h-12 items-center gap-3 rounded-md pl-4 pr-3",
-              "text-base font-medium transition-colors",
+            className={`group flex min-h-11 items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-medium transition-colors ${
               active
-                ? "bg-raised text-primary"
-                : "text-secondary hover:bg-hover hover:text-primary",
-            ].join(" ")}
+                ? "bg-raised text-primary border border-line-strong"
+                : "text-secondary border border-transparent hover:bg-hover hover:text-primary"
+            }`}
           >
-            {active ? (
-              <span
-                aria-hidden="true"
-                className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-pill bg-accent"
-              />
-            ) : null}
             <Icon
               name={item.icon}
               filled={active}
-              size={24}
-              className={active ? "text-accent" : "text-secondary"}
+              size={20}
+              className={active ? "text-accent" : "text-muted group-hover:text-secondary"}
             />
             <span className="truncate">{item.label}</span>
           </Link>
@@ -59,55 +41,48 @@ export function NavList({ onNavigate }) {
   );
 }
 
-function UserRow({ onNavigate }) {
-  const { profile } = useSession();
-  const pathname = usePathname();
-  const active = sectionForPath(pathname) === "profile";
-
-  const name = profile?.name || "Crew member";
-  const role = profile?.role || "Not signed in";
+export function UserRow() {
+  const { mission, backendOnline } = useStore();
+  const commander = getCommander(mission);
+  const initials = (commander.name || "S")
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
-    <Link
-      href="/profile"
-      onClick={onNavigate}
-      aria-current={active ? "page" : undefined}
-      className={`inline-flex items-center gap-3 rounded-md p-3 transition-colors ${
-        active ? "bg-raised" : "hover:bg-hover"
-      }`}
-    >
-      <span
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-          active ? "bg-hover" : "bg-raised"
-        }`}
-      >
-        <Icon name="person" size={24} className="text-muted" />
+    <div className="flex items-center gap-3 rounded-md border border-line bg-surface px-3.5 py-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-raised text-sm font-semibold text-primary">
+        {initials}
       </span>
-      <span className="min-w-0">
-        <span className="block truncate text-sm font-semibold leading-5 text-primary">
-          {name}
-        </span>
-        <span className="block truncate text-xs leading-4 text-muted">
-          {role}
-        </span>
-      </span>
-    </Link>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-primary">
+          {commander.name}
+        </p>
+        <p className="truncate text-xs text-muted">
+          {commander.role} · {backendOnline ? "Local API ready" : "Offline cache"}
+        </p>
+      </div>
+    </div>
   );
 }
 
 export default function Sidebar({ className = "" }) {
   return (
     <aside
-      className={`sticky top-[72px] hidden h-[calc(100vh-72px)] w-60 shrink-0 flex-col border-r border-line bg-surface lg:flex ${className}`}
+      className={`hidden md:flex md:w-64 md:shrink-0 md:flex-col md:justify-between md:border-r md:border-line md:bg-canvas md:p-5 ${className}`}
     >
-      <div className="flex flex-col px-3 pt-6">
+      <div>
+        <p className="mb-3 px-3.5 text-xs font-semibold uppercase tracking-wider text-muted">
+          Crew workspace
+        </p>
         <NavList />
       </div>
-      <div className="mt-auto px-3 pb-3">
+
+      <div className="pt-6">
         <UserRow />
       </div>
     </aside>
   );
 }
-
-export { UserRow };

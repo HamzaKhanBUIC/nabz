@@ -404,3 +404,15 @@
 .recharts-line-dots circle {
   stroke: var(--color-surface);
 }
+
+
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  background-color: rgba(5, 8, 15, 0.72);
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}

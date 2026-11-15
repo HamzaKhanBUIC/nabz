@@ -1,16 +1,5 @@
 "use client";
 
-/**
- * Application shell.
- *
- * Three chrome modes, matching the handoff:
- *   1. Sign in (screen 00) — no shell at all.
- *   2. Emergency (screens 10–13) — red Emergency bar instead of the top bar,
- *      no sidebar, content padding 40/64.
- *   3. Everything else — Top bar (72) + Sidebar (240) + content area
- *      (padding 40/48, max width 1104).
- */
-
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -19,23 +8,36 @@ import Sidebar from "@/components/layout/Sidebar";
 import MobileNavigation from "@/components/layout/MobileNavigation";
 import Icon from "@/components/ui/Icon";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { useSession } from "@/lib/data/session";
+import { useClientTime } from "@/lib/hooks/useClientTime";
+import { formatElapsed } from "@/lib/utils/format";
 
 function EmergencyBar() {
+  const [enteredAt] = useState(() =>
+    typeof window !== "undefined" ? Date.now() : null,
+  );
+  const now = useClientTime(1000);
+  const elapsedMs = now && enteredAt ? Math.max(0, now.getTime() - enteredAt) : 0;
+
   return (
     <header className="sticky top-0 z-40 flex h-[72px] items-center justify-between gap-3 bg-emergency px-4 sm:px-6">
-      <div className="flex min-w-0 items-center gap-3">
-        <Icon name="emergency" filled size={24} className="text-white" />
-        <span className="t-h3 truncate text-white">Emergency mode</span>
+      <div className="flex min-w-0 items-center gap-2.5">
+        <Icon name="emergency" filled size={24} className="shrink-0 text-white" />
+        <div className="min-w-0">
+          <p className="t-h3 truncate text-white">Emergency mode</p>
+          <p className="hidden text-xs text-white/85 sm:block">
+            Offline procedures · Elapsed {formatElapsed(elapsedMs)}
+          </p>
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-3">
+
+      <div className="flex items-center gap-2 sm:gap-3">
         <ThemeToggle variant="on-emergency" />
         <Link
           href="/"
-          className="inline-flex h-11 items-center gap-2 rounded-md border border-white px-4 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+          className="inline-flex h-10 items-center gap-1.5 rounded-md bg-white/15 px-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/25"
         >
-          <Icon name="close" size={20} />
-          <span className="hidden sm:inline">Close</span>
+          <Icon name="close" size={18} />
+          <span>Exit</span>
         </Link>
       </div>
     </header>
@@ -45,58 +47,31 @@ function EmergencyBar() {
 export default function AppShell({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { isAuthenticated, hydrated } = useSession();
-
   const isEmergency = pathname === "/emergency";
-  const isHome = pathname === "/";
-  const isSignIn = isHome && !isAuthenticated;
-
-  // Screen 00 has no shell. The session is only known after mount, so hold a
-  // neutral canvas for that single frame instead of flashing the wrong chrome.
-  if (isHome && !hydrated) {
-    return <div className="min-h-screen bg-canvas" />;
-  }
-
-  if (isSignIn) {
-    return <div className="min-h-screen bg-canvas">{children}</div>;
-  }
 
   if (isEmergency) {
     return (
-      <div className="min-h-screen bg-canvas">
+      <div className="min-h-screen bg-canvas text-primary">
         <EmergencyBar />
-        <main
-          id="main-content"
-          className="px-4 pb-16 pt-10 sm:px-8 lg:px-16 lg:pb-0"
-        >
-          <div className="mx-auto w-full max-w-[1312px]">{children}</div>
+        <main className="mx-auto w-full max-w-[1376px] px-4 py-8 sm:px-8 lg:px-12">
+          {children}
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="flex min-h-screen flex-col bg-canvas text-primary">
       <TopBar onOpenMenu={() => setMenuOpen(true)} />
 
-      <div className="flex items-stretch">
+      <div className="flex flex-1">
         <Sidebar />
-
-        <main
-          id="main-content"
-          className="min-w-0 flex-1 px-6 pb-28 pt-10 sm:px-8 lg:px-12 lg:pb-10"
-        >
-          {/* Gutters live on <main> so the inner box is the full 1104px the
-              handoff measures (48px gutters inside a 1200px area). */}
-          <div className="mx-auto w-full max-w-[1104px]">{children}</div>
+        <main className="min-w-0 flex-1 px-4 pb-24 pt-6 sm:px-8 md:pb-12 lg:px-10">
+          <div className="mx-auto w-full max-w-[1120px]">{children}</div>
         </main>
       </div>
 
-      <MobileNavigation
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        tabsEnabled={!isSignIn}
-      />
+      <MobileNavigation open={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );
 }

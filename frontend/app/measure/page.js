@@ -1,161 +1,132 @@
 "use client";
 
-/**
- * ROUTE `/measure` — SCREEN 05 · Take a measurement.
- *
- * The four measurement items sit above the fold exactly as designed; recorded
- * history and the interactive body map follow underneath so the existing
- * functionality stays reachable without disturbing the specified screen.
- */
-
-import { useMemo, useState } from "react";
-import PageTransition from "@/components/ui/PageTransition";
-import { Card, CardBody, CardHeader } from "@/components/ui/Card";
-import EmptyState from "@/components/ui/EmptyState";
-import StatusBadge, { DemoBadge } from "@/components/ui/StatusBadge";
+import { useState } from "react";
+import Link from "next/link";
+import BackLink from "@/components/ui/BackLink";
+import { Card, CardHeader } from "@/components/ui/Card";
+import Icon from "@/components/ui/Icon";
+import StatusBadge from "@/components/ui/StatusBadge";
 import MeasurementItem from "@/components/measure/MeasurementItem";
 import { MEASUREMENTS } from "@/components/measure/MeasurementFlow";
-import AstronautBodyMap from "@/components/measure/AstronautBodyMap";
+import AstronautBodyMap, { BODY_REGIONS } from "@/components/measure/AstronautBodyMap";
 import { useStore } from "@/lib/data/store";
-import { formatDateTime, relativeTime } from "@/lib/utils/format";
-import Icon from "@/components/ui/Icon";
-
-function lastTakenLabel(timestamp) {
-  if (!timestamp) return "Not taken yet";
-  const then = new Date(timestamp);
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfThat = new Date(
-    then.getFullYear(),
-    then.getMonth(),
-    then.getDate()
-  );
-  const days = Math.round((startOfToday - startOfThat) / 86_400_000);
-  if (days === 0) return "Last taken today";
-  if (days === 1) return "Last taken yesterday";
-  if (days > 1 && days < 30) return `Last taken ${days} days ago`;
-  return `Last taken ${relativeTime(timestamp)}`;
-}
-
-function MeasurementHistory() {
-  const store = useStore();
-
-  const history = useMemo(
-    () =>
-      [...store.measurements].sort(
-        (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-      ),
-    [store.measurements]
-  );
-
-  return (
-    <Card>
-      <CardHeader
-        title="Measurement history"
-        subtitle={`Newest first · ${history.length} recorded`}
-      />
-      <CardBody>
-        {history.length === 0 ? (
-          <EmptyState
-            compact
-            icon={null}
-            title="No measurements yet"
-            description="Completed measurements appear here with the time they were taken."
-            actionLabel="Take a measurement"
-            actionHref="/measure"
-          />
-        ) : (
-          <ul className="flex flex-col gap-2.5">
-            {history.slice(0, 10).map((entry) => (
-              <li
-                key={entry.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-canvas px-4 py-3"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-raised text-accent">
-                    <Icon name="monitor_heart" size={20} />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-primary">
-                      {entry.systolic}
-                      <span className="text-muted"> / </span>
-                      {entry.diastolic}
-                      <span className="ml-1 text-xs font-normal text-muted">
-                        mmHg
-                      </span>
-                    </p>
-                    <p className="truncate text-xs text-muted">
-                      {formatDateTime(entry.timestamp)}
-                      {entry.pulse ? ` · ${entry.pulse} bpm` : ""}
-                      {entry.posture ? ` · ${entry.posture}` : ""}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  {entry.source === "demo" ? <DemoBadge /> : null}
-                  <StatusBadge tone="neutral" dot={false}>
-                    {relativeTime(entry.timestamp)}
-                  </StatusBadge>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardBody>
-    </Card>
-  );
-}
+import { formatDateTime } from "@/lib/utils/format";
+import { pointStatus } from "@/lib/utils/health";
 
 export default function MeasurePage() {
-  const store = useStore();
-  const [selectedRegion, setSelectedRegion] = useState(null);
+  const { today, trends } = useStore();
+  const [selectedRegion, setSelectedRegion] = useState("left-arm");
 
-  const lastBloodPressure = useMemo(() => {
-    const bp = store.measurements
-      .filter((entry) => entry.systolic != null)
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    return bp[0] || null;
-  }, [store.measurements]);
+  const sysPoints = trends?.["bp-systolic"]?.points || [];
+  const diaPoints = trends?.["bp-diastolic"]?.points || [];
+  const sysBand = trends?.["bp-systolic"]?.band || null;
+
+  const recentBp = sysPoints
+    .slice(-5)
+    .reverse()
+    .map((sysPt) => {
+      const matchDia = diaPoints.find(
+        (d) =>
+          d.missionDay === sysPt.missionDay &&
+          d.effectiveDateTime === sysPt.effectiveDateTime,
+      );
+      return {
+        missionDay: sysPt.missionDay,
+        effectiveDateTime: sysPt.effectiveDateTime,
+        systolic: Math.round(sysPt.value),
+        diastolic: matchDia ? Math.round(matchDia.value) : "—",
+        status: pointStatus(sysPt, sysBand),
+      };
+    });
+
+  const activeRegion =
+    BODY_REGIONS.find((r) => r.id === selectedRegion) || BODY_REGIONS[0];
 
   return (
-    <PageTransition>
-      <h1 className="t-h1 text-primary">Take a measurement</h1>
-      <p className="mt-2 t-body-md text-muted">
-        Choose what to measure. Each one guides you step by step.
-      </p>
+    <div className="space-y-6">
+      <BackLink href="/">Today</BackLink>
 
-      <div className="mt-9 flex flex-col gap-3">
-        {MEASUREMENTS.map((measurement) => (
+      <div>
+        <p className="t-label-md text-muted">Guided measurements</p>
+        <h1 className="t-h1 mt-1 text-primary">Take a measurement</h1>
+        <p className="mt-1 text-sm text-secondary">
+          Step-by-step protocol with resting countdown timers, AHA classification and symptom screening.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {MEASUREMENTS.map((m) => (
           <MeasurementItem
-            key={measurement.id}
-            href={`/measure/blood-pressure?metric=${measurement.id}`}
-            title={measurement.title}
-            subtitle={
-              measurement.id === "blood-pressure"
-                ? `${lastTakenLabel(lastBloodPressure?.timestamp)} · ${measurement.subtitle}`
-                : measurement.subtitle
-            }
-            icon={measurement.icon}
+            key={m.id}
+            href={m.href}
+            title={m.title}
+            subtitle={m.subtitle}
+            icon={m.icon}
           />
         ))}
       </div>
 
-      <div className="mt-10 flex flex-col gap-8">
-        <MeasurementHistory />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="Recent blood pressure history"
+            subtitle={
+              today?.bp
+                ? `Latest today: ${today.bp.average.systolic}/${today.bp.average.diastolic} mmHg (${today.bp.category})`
+                : "Last 5 systolic / diastolic sessions"
+            }
+            action={
+              <Link
+                href="/measure/blood-pressure"
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                New BP check
+              </Link>
+            }
+          />
+
+          <ul className="mt-4 space-y-2.5">
+            {recentBp.length === 0 ? (
+              <li className="rounded-md border border-line bg-raised p-4 text-sm text-muted">
+                No blood pressure readings available yet.
+              </li>
+            ) : (
+              recentBp.map((entry) => (
+                <li
+                  key={`${entry.missionDay}-${entry.effectiveDateTime}`}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-raised px-4 py-3"
+                >
+                  <div>
+                    <p className="font-mono text-sm font-semibold text-primary">
+                      {entry.systolic}/{entry.diastolic} mmHg
+                    </p>
+                    <p className="text-xs text-muted">
+                      Day {entry.missionDay} · {formatDateTime(entry.effectiveDateTime)}
+                    </p>
+                  </div>
+                  <StatusBadge tone={entry.status.badgeTone} dot={false}>
+                    <Icon name={entry.status.iconName} size={14} />
+                    <span>{entry.status.label}</span>
+                  </StatusBadge>
+                </li>
+              ))
+            )}
+          </ul>
+        </Card>
 
         <Card>
           <CardHeader
-            title="Body map"
-            subtitle="Interactive SVG — select a region"
+            title="Anatomical cuff & check-up guide"
+            subtitle={activeRegion ? `${activeRegion.label}: ${activeRegion.description}` : "Select a region"}
           />
-          <CardBody>
+          <div className="mt-4">
             <AstronautBodyMap
               selected={selectedRegion}
               onSelect={setSelectedRegion}
             />
-          </CardBody>
+          </div>
         </Card>
       </div>
-    </PageTransition>
+    </div>
   );
 }

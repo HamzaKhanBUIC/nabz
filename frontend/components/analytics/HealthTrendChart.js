@@ -1,176 +1,156 @@
 "use client";
 
-/**
- * Analytics trend chart with metric + date-range selection.
- * Plots real recorded values with the personal baseline band behind them.
- */
-
-import { useMemo } from "react";
 import {
-  CartesianGrid,
   Line,
   LineChart,
-  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { getBaseline, getRange } from "@/lib/data/selectors";
-import { useClientTime } from "@/lib/hooks/useClientTime";
-import { METRICS } from "@/lib/utils/health";
-import ChartTooltip from "@/components/charts/ChartTooltip";
+import { useStore } from "@/lib/data/store";
+import { METRICS, formatMetricValue } from "@/lib/utils/health";
+import { zoneToLabel } from "@/lib/api";
 
-function formatTick(date, days) {
-  if (days <= 7) {
-    return date.toLocaleDateString([], { weekday: "short" });
-  }
-  return date.toLocaleDateString([], { day: "numeric", month: "short" });
-}
-
-function formatTooltipDate(date) {
-  return date.toLocaleDateString([], {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-}
-
-export default function HealthTrendChart({ metricKey, rangeDays, store, height = 300 }) {
-  const metric = METRICS[metricKey];
-  // Range anchor — null until mounted (prerender-safe clock).
-  const now = useClientTime();
-
-  const data = useMemo(
-    () =>
-      getRange(metricKey, store, rangeDays, now).map((point) => ({
-        ...point,
-        tick: formatTick(point.date, rangeDays),
-        tooltipLabel: formatTooltipDate(point.date),
-      })),
-    [metricKey, rangeDays, store, now]
+function TrendTooltip({ active, payload, unit, code }) {
+  if (!active || !payload?.length) return null;
+  const pt = payload[0]?.payload;
+  if (!pt) return null;
+  return (
+    <div className="rounded-md border border-line-strong bg-surface px-3 py-2 text-xs shadow-lg">
+      <p className="font-semibold text-primary">Mission day {pt.missionDay}</p>
+      <p className="mt-1 text-secondary">
+        Value: <span className="font-mono font-semibold text-primary">{formatMetricValue(code, pt.value)} {unit}</span>
+      </p>
+      <p className="text-muted">
+        Z-score: {pt.z != null ? Number(pt.z).toFixed(2) : "—"} · {zoneToLabel(pt.zone)}
+      </p>
+    </div>
   );
+}
 
-  const baseline = useMemo(() => getBaseline(metricKey, store), [metricKey, store]);
+export default function HealthTrendChart({
+  metricKey,
+  rangeDays = 30,
+  store,
+  height = 300,
+}) {
+  const { hydrated } = useStore();
+  const metric = METRICS[metricKey];
+  const trend =
+    store?.trendsByRange?.[`${metricKey}:${rangeDays}`] ||
+    store?.trends?.[metricKey];
+  const points = trend?.points || [];
+  const band = trend?.band;
+  const referenceRange = trend?.referenceRange;
 
-  const { domain, baselineDomain } = useMemo(() => {
-    const values = data.map((p) => p.value);
-    const pad = metric?.axisDomainPad ?? 10;
-    let min = values.length ? Math.min(...values) : 0;
-    let max = values.length ? Math.max(...values) : 10;
-    if (baseline) {
-      min = Math.min(min, baseline.lower);
-      max = Math.max(max, baseline.upper);
-    }
-    if (metricKey === "mood") {
-      min = 1;
-      max = 5;
-    }
-    return {
-      domain: [Math.floor((min - pad) * 10) / 10, Math.ceil((max + pad) * 10) / 10],
-      baselineDomain: baseline
-        ? [
-            Math.floor((baseline.lower - pad) * 10) / 10,
-            Math.ceil((baseline.upper + pad) * 10) / 10,
-          ]
-        : null,
-    };
-  }, [data, baseline, metric, metricKey]);
+  if (!metric) return null;
 
-  if (data.length === 0) {
-    return (
-      <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-line bg-canvas/60 px-6 text-center">
-        <p className="text-sm text-muted">
-          No recorded {metric?.label.toLowerCase()} data in this range yet.
-        </p>
-      </div>
-    );
-  }
-
-  // Nova accent; the `.recharts-line-curve` rule in globals.css re-maps the
-  // stroke to the active theme, this value is the tooltip/legend fallback.
-  const lineColor = "var(--color-accent)";
+  const data = points.map((pt) => ({
+    day: `D${pt.missionDay}`,
+    missionDay: pt.missionDay,
+    value: Number(pt.value),
+    z: pt.z,
+    zone: pt.zone,
+  }));
 
   return (
-    <div style={{ height }} className="w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 10, right: 16, bottom: 4, left: -10 }}>
-          <CartesianGrid stroke="var(--color-line)" strokeDasharray="3 3" vertical={false} />
-          <XAxis
-            dataKey="tick"
-            tick={{ fontSize: 11, fill: "var(--color-muted)" }}
-            tickLine={false}
-            axisLine={{ stroke: "var(--color-line)" }}
-            interval="preserveStartEnd"
-            minTickGap={24}
-          />
-          <YAxis
-            domain={domain}
-            tick={{ fontSize: 11, fill: "var(--color-muted)", fontFamily: "monospace" }}
-            tickLine={false}
-            axisLine={false}
-            width={56}
-          />
-          {baseline && baselineDomain ? (
-            <ReferenceArea
-              y1={baselineDomain[0]}
-              y2={baselineDomain[1]}
-              fill={lineColor}
-              fillOpacity={0.07}
-              stroke="none"
-              ifOverflow="extendDomain"
-            />
-          ) : null}
-          {baseline ? (
-            <ReferenceLine
-              y={Number(baseline.mean.toFixed(1))}
-              stroke={lineColor}
-              strokeDasharray="5 4"
-              strokeOpacity={0.5}
-              label={{
-                value: "baseline",
-                position: "insideTopRight",
-                fill: "var(--color-muted)",
-                fontSize: 10,
-              }}
-            />
-          ) : null}
-          <Tooltip
-            cursor={{ stroke: "var(--color-line-strong)", strokeDasharray: "3 3" }}
-            content={
-              <ChartTooltip
-                unit={` ${metric?.unit || ""}`}
-                formatter={(value) =>
-                  metric?.integer ? Math.round(value) : Number(value).toFixed(1)
-                }
+    <div className="space-y-3">
+      <div style={{ height }} className="w-full">
+        {hydrated && data.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data} margin={{ top: 12, right: 16, bottom: 8, left: -8 }}>
+              <XAxis
+                dataKey="day"
+                tick={{ fill: "var(--color-muted)", fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
               />
-            }
-          />
-          <Line
-            type="monotone"
-            dataKey="value"
-            name={metric?.label || "Value"}
-            stroke={lineColor}
-            strokeWidth={2}
-            dot={(props) => {
-              const { cx, cy, payload } = props;
-              if (!cx || !cy) return null;
-              return (
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={payload.source === "demo" ? 3 : 3.5}
-                  fill={payload.source === "demo" ? "var(--color-attention)" : lineColor}
-                  stroke="var(--color-surface)"
-                  strokeWidth={1.5}
+              <YAxis
+                domain={["auto", "auto"]}
+                tick={{ fill: "var(--color-muted)", fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+                width={48}
+              />
+              <Tooltip
+                content={<TrendTooltip unit={metric.unit} code={metricKey} />}
+              />
+              {band?.ready && band.mean != null ? (
+                <ReferenceLine
+                  y={band.mean}
+                  stroke="var(--color-normal)"
+                  strokeDasharray="4 4"
+                  label={{
+                    value: "Mean",
+                    position: "insideTopLeft",
+                    fill: "var(--color-normal)",
+                    fontSize: 11,
+                  }}
                 />
-              );
-            }}
-            activeDot={{ r: 5.5, strokeWidth: 0 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+              ) : null}
+              {band?.ready && band.watchAt != null ? (
+                <ReferenceLine
+                  y={band.watchAt}
+                  stroke="var(--color-attention)"
+                  strokeDasharray="3 3"
+                  label={{
+                    value: "Watch",
+                    position: "insideTopLeft",
+                    fill: "var(--color-attention)",
+                    fontSize: 11,
+                  }}
+                />
+              ) : null}
+              {band?.ready && band.actAt != null ? (
+                <ReferenceLine
+                  y={band.actAt}
+                  stroke="var(--color-emergency)"
+                  strokeDasharray="3 3"
+                  label={{
+                    value: "Act",
+                    position: "insideBottomLeft",
+                    fill: "var(--color-emergency)",
+                    fontSize: 11,
+                  }}
+                />
+              ) : null}
+              {referenceRange ? (
+                <ReferenceLine
+                  y={referenceRange.high}
+                  stroke="var(--color-muted)"
+                  strokeDasharray="2 2"
+                />
+              ) : null}
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={metric.color}
+                strokeWidth={2.5}
+                dot={{ r: 3.5, fill: metric.color }}
+                activeDot={{ r: 6 }}
+                isAnimationActive={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center justify-center rounded-md border border-dashed border-line bg-raised text-sm text-muted">
+            {hydrated ? "No data points in this window." : "Loading chart..."}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+        <span>
+          Source: <strong className="text-secondary">{trend?.source || "simulated"}</strong> · Window: {rangeDays} days
+        </span>
+        {referenceRange ? (
+          <span>
+            Reference range: {referenceRange.low}–{referenceRange.high} {metric.unit}
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 }

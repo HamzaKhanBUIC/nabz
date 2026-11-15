@@ -1,181 +1,171 @@
 "use client";
 
-/**
- * DAILY CHECK-IN flow — screens 02 (Get ready) → 03 (Test) → 04 / 04b.
- *
- * 02 : instructions + "I'm ready"
- * 03 : 3 rounds on the reaction pad, then the average is recorded and the
- *      result screen opens automatically (the Primary button gets you there
- *      straight away).
- */
-
-import { useEffect, useRef, useState } from "react";
+import { useId, useState } from "react";
 import BackLink from "@/components/ui/BackLink";
+import { Card, CardHeader } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icon";
 import InstructionStep from "@/components/ui/InstructionStep";
-import { Card } from "@/components/ui/Card";
+import StepIndicator from "@/components/ui/StepIndicator";
 import ReactionPad from "@/components/check-in/ReactionPad";
 import CheckInResult from "@/components/check-in/CheckInResult";
-import { feelingById } from "@/components/dashboard/FeelingChips";
 import { useStore } from "@/lib/data/store";
 
-const ROUNDS = 3;
-
-const INSTRUCTIONS = [
-  "Sit somewhere stable and hold the screen at arm's length.",
-  "Use the same hand as every day.",
-  "When the circle turns blue, tap it as fast as you can.",
-];
-
 export default function CheckInFlow() {
-  const store = useStore();
+  const { protocol, submitCheckin } = useStore();
+  const [stage, setStage] = useState("intro"); // intro | test | result
+  const [includeSleep, setIncludeSleep] = useState(true);
+  const [sleepHours, setSleepHours] = useState("7.5");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [result, setResult] = useState(null);
 
-  const [phase, setPhase] = useState("ready");
-  const [round, setRound] = useState(1);
-  const [results, setResults] = useState([]);
-  const [record, setRecord] = useState(null);
+  const sleepToggleId = useId();
+  const sleepInputId = useId();
 
-  const advanceTimer = useRef(null);
+  const protoDurationSec = protocol?.durationMs
+    ? Math.round(protocol.durationMs / 1000)
+    : 180;
+  const isiMinSec = ((protocol?.isiMinMs ?? 1000) / 1000).toFixed(0);
+  const isiMaxSec = ((protocol?.isiMaxMs ?? 4000) / 1000).toFixed(0);
 
-  useEffect(
-    () => () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    },
-    []
-  );
-
-  const finish = (rounds) => {
-    const average = Math.round(
-      rounds.reduce((sum, value) => sum + value, 0) / rounds.length
-    );
-    const latestMood = store.moodLogs[0] || null;
-    const feeling = latestMood?.feeling ? feelingById(latestMood.feeling) : null;
-    const timestamp = new Date().toISOString();
-
-    store.addCheckIn({
-      timestamp,
-      reactionTimeMs: average,
-      reactionRounds: rounds,
-      mood: latestMood?.mood ?? null,
-      feeling: feeling?.id ?? null,
-      feelingLabel: feeling?.label ?? null,
-    });
-
-    setRecord({
-      timestamp,
-      average,
-      rounds,
-      feelingLabel: feeling?.label || "not recorded",
-    });
-    setPhase("result");
-  };
-
-  const handleResult = (ms) => {
-    const next = [...results, ms];
-    setResults(next);
-
-    if (next.length >= ROUNDS) {
-      advanceTimer.current = setTimeout(() => finish(next), 1400);
-    } else {
-      setRound(next.length + 1);
+  async function handleComplete(payload) {
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const response = await submitCheckin(payload);
+      setResult(response);
+      setStage("result");
+    } catch (err) {
+      setSubmitError(err?.message || "Could not submit check-in.");
+      setStage("intro");
+    } finally {
+      setSubmitting(false);
     }
-  };
-
-  const seeResult = () => {
-    if (advanceTimer.current) {
-      clearTimeout(advanceTimer.current);
-      advanceTimer.current = null;
-    }
-    if (results.length >= ROUNDS) finish(results);
-  };
-
-  const restart = () => {
-    if (advanceTimer.current) {
-      clearTimeout(advanceTimer.current);
-      advanceTimer.current = null;
-    }
-    setResults([]);
-    setRound(1);
-    setPhase("test");
-  };
-
-  const allDone = results.length >= ROUNDS;
-
-  /* ---------------- 04 / 04b ---------------- */
-  if (phase === "result" && record) {
-    return <CheckInResult record={record} />;
   }
 
-  /* ---------------- 02 · Get ready ---------------- */
-  if (phase === "ready") {
-    return (
-      <div>
-        <BackLink href="/">Today</BackLink>
-        <h1 className="mt-6 t-h1 text-primary">Reaction check-in</h1>
-        <p className="mt-2 t-body-md text-muted">
-          Three short rounds, about 2 minutes. The test starts only when you say
-          you are ready.
-        </p>
-
-        <div className="mt-9 flex flex-col gap-3">
-          {INSTRUCTIONS.map((text, index) => (
-            <InstructionStep key={text} number={index + 1}>
-              {text}
-            </InstructionStep>
-          ))}
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-4">
-          <Button
-            variant="primary"
-            size="lg"
-            arrow
-            onClick={() => setPhase("test")}
-          >
-            I&rsquo;m ready
-          </Button>
-          <Button href="/" variant="ghost" size="lg">
-            Not now
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  /* ---------------- 03 · Test ---------------- */
   return (
-    <div>
-      <BackLink href="/check-in" onClick={() => setPhase("ready")}>
-        Reaction check-in
-      </BackLink>
-      <h1 className="mt-6 t-h1 text-primary">Round {round} of {ROUNDS}</h1>
-      <p className="mt-2 t-body-md text-muted">
-        Tap the circle to start the round.
-      </p>
+    <div className="space-y-6">
+      <BackLink href="/">Today</BackLink>
 
-      <Card className="mt-9 overflow-hidden">
-        <ReactionPad
-          key={round}
-          round={round}
-          rounds={results}
-          onResult={handleResult}
-        />
-      </Card>
-
-      <div className="mt-8 flex flex-wrap gap-4">
-        <Button
-          variant="primary"
-          size="lg"
-          arrow
-          disabled={!allDone}
-          onClick={seeResult}
-        >
-          See my result
-        </Button>
-        <Button variant="ghost" size="lg" onClick={restart}>
-          Restart
-        </Button>
+      <div>
+        <p className="t-label-md text-muted">Daily readiness · PVT-B + Sleep</p>
+        <h1 className="t-h1 mt-1 text-primary">3-minute reaction check-in</h1>
+        <p className="mt-1 text-sm text-secondary">
+          Captures raw inter-stimulus gaps and millisecond reaction times for server scoring.
+        </p>
       </div>
+
+      <StepIndicator
+        step={stage === "intro" ? 1 : stage === "test" ? 2 : 3}
+        total={3}
+      />
+
+      {submitError ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-emergency/50 bg-emergency/10 px-4 py-3 text-sm text-primary"
+        >
+          {submitError}
+        </div>
+      ) : null}
+
+      {stage === "intro" ? (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader
+              title="Protocol rules"
+              subtitle={`Loaded from ${protocol ? "backend protocol" : "PVT-B defaults"} (${protoDurationSec}s session)`}
+            />
+            <div className="mt-4 space-y-3">
+              <InstructionStep number={1}>
+                Keep focus on the reaction box. Wait between {isiMinSec}–{isiMaxSec} s for each blue target.
+              </InstructionStep>
+              <InstructionStep number={2}>
+                Tap the pad or press Spacebar as quickly as possible after the target appears.
+              </InstructionStep>
+              <InstructionStep number={3}>
+                Avoid tapping early before the cue; false starts and lapses (&gt;= {protocol?.lapseMs ?? 355} ms) are logged.
+              </InstructionStep>
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader
+              title="Sleep before check-in (optional)"
+              subtitle="Helps the backend explain reaction speed shifts"
+            />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSubmitError("");
+                setStage("test");
+              }}
+              className="mt-4 space-y-4"
+            >
+              <div className="flex items-center gap-2.5">
+                <input
+                  id={sleepToggleId}
+                  type="checkbox"
+                  checked={includeSleep}
+                  onChange={(e) => setIncludeSleep(e.target.checked)}
+                  className="h-5 w-5 accent-[var(--color-accent)]"
+                />
+                <label htmlFor={sleepToggleId} className="text-sm font-medium text-primary">
+                  Include hours slept last rest period
+                </label>
+              </div>
+
+              {includeSleep ? (
+                <div>
+                  <label htmlFor={sleepInputId} className="block text-xs font-medium text-secondary">
+                    Hours slept (0 – 16 h)
+                  </label>
+                  <input
+                    id={sleepInputId}
+                    name="sleepHours"
+                    type="number"
+                    min={0}
+                    max={16}
+                    step={0.5}
+                    required
+                    value={sleepHours}
+                    onChange={(e) => setSleepHours(e.target.value)}
+                    className="mt-1.5 w-full max-w-[200px] rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+                  />
+                </div>
+              ) : null}
+
+              <div className="pt-2">
+                <Button type="submit" variant="primary" size="lg">
+                  <Icon name="play_arrow" size={20} />
+                  Start 3-minute reaction test
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      ) : null}
+
+      {stage === "test" ? (
+        <ReactionPad
+          protocol={protocol}
+          sleepHours={includeSleep ? sleepHours : undefined}
+          submitting={submitting}
+          onComplete={handleComplete}
+          onCancel={() => setStage("intro")}
+        />
+      ) : null}
+
+      {stage === "result" ? (
+        <CheckInResult
+          record={result}
+          onReset={() => {
+            setResult(null);
+            setStage("intro");
+          }}
+        />
+      ) : null}
     </div>
   );
 }

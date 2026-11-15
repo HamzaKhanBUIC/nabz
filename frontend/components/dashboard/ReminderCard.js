@@ -1,60 +1,227 @@
 "use client";
 
-/**
- * Reminder card on the Today dashboard — driven by mission config, not
- * hardcoded strings scattered through the UI.
- */
-
-import { AlarmClock, Info } from "lucide-react";
-import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { useId, useState } from "react";
+import Link from "next/link";
+import { Card, CardHeader } from "@/components/ui/Card";
+import Icon from "@/components/ui/Icon";
+import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { reminders } from "@/lib/data/mission";
-
-const TONE_MAP = {
-  warn: "warn",
-  info: "info",
-  danger: "danger",
-};
+import { useStore } from "@/lib/data/store";
+import { formatDateTime } from "@/lib/utils/format";
 
 export default function ReminderCard() {
+  const { reminders, saveReminders } = useStore();
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [enabled, setEnabled] = useState(true);
+  const [checkinTimeUtc, setCheckinTimeUtc] = useState("08:00");
+  const [bpIntervalDays, setBpIntervalDays] = useState(7);
+  const [bpTimeUtc, setBpTimeUtc] = useState("08:30");
+
+  const enabledId = useId();
+  const checkinId = useId();
+  const bpDaysId = useId();
+  const bpTimeId = useId();
+
+  function handleToggleEditing() {
+    if (!editing && reminders?.schedule) {
+      setEnabled(reminders.schedule.enabled);
+      setCheckinTimeUtc(reminders.schedule.checkinTimeUtc);
+      setBpIntervalDays(reminders.schedule.bpIntervalDays);
+      setBpTimeUtc(reminders.schedule.bpTimeUtc);
+    }
+    setEditing((prev) => !prev);
+    setErrorMessage("");
+    setStatusMessage("");
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSaving(true);
+    setErrorMessage("");
+    setStatusMessage("");
+    try {
+      await saveReminders({
+        enabled: Boolean(enabled),
+        checkinTimeUtc,
+        bpIntervalDays: Number(bpIntervalDays),
+        bpTimeUtc,
+      });
+      setStatusMessage("Reminder schedule saved.");
+      setEditing(false);
+    } catch (err) {
+      setErrorMessage(err?.message || "Failed to update reminders.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const items = reminders?.items || [];
+
   return (
     <Card>
       <CardHeader
-        title="Reminders"
-        subtitle="Scheduled for this mission day"
-        icon={AlarmClock}
-      />
-      <CardBody className="space-y-3">
-        {reminders.map((reminder) => (
-          <div
-            key={reminder.id}
-            className="flex items-start gap-3 rounded-lg border border-line bg-canvas/70 px-3 py-3"
+        title="Check-up schedule"
+        subtitle={
+          reminders?.nextDue
+            ? `Next due ${formatDateTime(reminders.nextDue)}`
+            : reminders?.schedule?.enabled === false
+              ? "Reminders paused"
+              : "Syncing reminder schedule"
+        }
+        action={
+          <button
+            type="button"
+            onClick={handleToggleEditing}
+            aria-expanded={editing}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-raised px-3 text-xs font-medium text-primary hover:bg-hover"
           >
-            <Info
-              className="mt-0.5 h-4 w-4 shrink-0 text-muted"
-              aria-hidden="true"
+            <Icon name={editing ? "close" : "edit_calendar"} size={16} />
+            {editing ? "Close" : "Schedule"}
+          </button>
+        }
+      />
+
+      {statusMessage ? (
+        <p role="status" className="mt-3 text-xs font-medium text-normal">
+          {statusMessage}
+        </p>
+      ) : null}
+
+      {editing ? (
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 rounded-md border border-line bg-raised p-4">
+          <div className="flex items-center gap-2.5">
+            <input
+              id={enabledId}
+              name="enabled"
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
+              className="h-5 w-5 accent-[var(--color-accent)]"
             />
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-medium text-navy">{reminder.title}</p>
-                {reminder.tone ? (
-                  <StatusBadge tone={TONE_MAP[reminder.tone] || "neutral"} dot={false}>
-                    {reminder.dueLabel}
-                  </StatusBadge>
-                ) : null}
-              </div>
-              <p className="mt-1 text-xs leading-relaxed text-muted">
-                {reminder.detail}
-              </p>
-              {!reminder.tone ? (
-                <p className="mt-1 font-mono text-[10px] text-muted">
-                  {reminder.dueLabel}
-                </p>
-              ) : null}
+            <label htmlFor={enabledId} className="text-sm font-medium text-primary">
+              Enable mission check-up reminders
+            </label>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <label htmlFor={checkinId} className="block text-xs font-medium text-secondary">
+                Daily check-in (UTC HH:MM)
+              </label>
+              <input
+                id={checkinId}
+                name="checkinTimeUtc"
+                type="text"
+                required
+                pattern="^(?:[01]\d|2[0-3]):[0-5]\d$"
+                value={checkinTimeUtc}
+                onChange={(e) => setCheckinTimeUtc(e.target.value)}
+                placeholder="08:00"
+                className="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+              />
+            </div>
+
+            <div>
+              <label htmlFor={bpDaysId} className="block text-xs font-medium text-secondary">
+                BP interval (days 1–30)
+              </label>
+              <input
+                id={bpDaysId}
+                name="bpIntervalDays"
+                type="number"
+                required
+                min={1}
+                max={30}
+                value={bpIntervalDays}
+                onChange={(e) => setBpIntervalDays(e.target.value)}
+                className="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+              />
+            </div>
+
+            <div>
+              <label htmlFor={bpTimeId} className="block text-xs font-medium text-secondary">
+                BP time (UTC HH:MM)
+              </label>
+              <input
+                id={bpTimeId}
+                name="bpTimeUtc"
+                type="text"
+                required
+                pattern="^(?:[01]\d|2[0-3]):[0-5]\d$"
+                value={bpTimeUtc}
+                onChange={(e) => setBpTimeUtc(e.target.value)}
+                placeholder="08:30"
+                className="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+              />
             </div>
           </div>
-        ))}
-      </CardBody>
+
+          {errorMessage ? (
+            <p role="alert" className="text-xs font-medium text-emergency">
+              {errorMessage}
+            </p>
+          ) : null}
+
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" size="sm" disabled={saving}>
+              {saving ? "Saving..." : "Save schedule"}
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <ul className="mt-4 space-y-2.5">
+          {items.length === 0 ? (
+            <li className="rounded-md border border-line bg-raised p-4 text-sm text-muted">
+              No scheduled check-up items active.
+            </li>
+          ) : (
+            items.map((item) => {
+              const href = item.kind === "bp" ? "/measure/blood-pressure" : "/check-in";
+              return (
+                <li key={item.kind}>
+                  <Link
+                    href={href}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line bg-raised p-4 transition-colors hover:bg-hover"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Icon
+                          name={item.kind === "bp" ? "monitor_heart" : "touch_app"}
+                          size={18}
+                          className="text-accent"
+                        />
+                        <p className="text-sm font-semibold text-primary">
+                          {item.label}
+                        </p>
+                      </div>
+                      <p className="mt-1 text-xs text-secondary">{item.reason}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <StatusBadge tone={item.overdue ? "warn" : "ok"} dot={false}>
+                        {item.overdue ? "Due now" : formatDateTime(item.dueAt)}
+                      </StatusBadge>
+                      <Icon name="chevron_right" size={18} className="text-muted" />
+                    </div>
+                  </Link>
+                </li>
+              );
+            })
+          )}
+        </ul>
+      )}
     </Card>
   );
 }

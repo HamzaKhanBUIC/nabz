@@ -150,3 +150,11 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
   `PASS npx eslint .`
   `PASS npx vitest run`
   `GATE: PASS`
+
+## 2026-11-15: Frontend–backend integration on `feat/crewpulse-frontend-pr`
+- Merged `origin/main` (`a53c8d6`) cleanly into `feat/crewpulse-frontend-pr`.
+- Removed off-contract/mock views and utilities (`SignInScreen.js`, `app/profile/`, `MoodSelector.js`, `FeelingChips.js`, `DemoData*.js`, `lib/data/demo.js`, orphaned dashboard/wizard drafts) and removed `next/font/google` from `frontend/app/layout.js` for strict offline operation.
+- Added `frontend/lib/api.js` covering all 14 contract endpoints against `NEXT_PUBLIC_API_URL || "http://localhost:8787"`, rewrote `frontend/lib/data/*` and `frontend/lib/utils/health.js` so all scoring, zones, action cards, and disclaimers come verbatim from backend responses, and cached static reference data in `localStorage`.
+- Wired all active views and Should (`S01`–`S05`) workflows across `/`, `/check-in` (3-min PVT-B protocol + 64-trial QC-passing sample), `/normal-zone`, `/measure` & `/measure/blood-pressure` (guided 8-step cuff workflow), `/emergency` (`for=self` & `for=crewmate` + 110 bpm CPR metronome), `/coach`, `/send-to-earth` & `/sent`, `RoutineModal.js`, and `ReminderCard.js`.
+- Fixed production CSS compilation by changing `frontend/package.json` `"build"` from `next build --webpack` to `next build` so `@tailwindcss/turbopack` compiles Tailwind v4 utilities (`frontend/.next/static/chunks/*.css`).
+- Verified offline `npm run lint`, `npm run build` (12 static routes), `python scripts/gate.py` (`GATE: PASS`), and live browser visual styling + 64-trial check-in (`POST /api/checkins` 204, scored `Below your normal` at `3.71 resp/s` / `273 ms` median RT, action card `Slower than your personal normal`, 0 console/network errors); removed temporary `data/runtime/sara.json`.

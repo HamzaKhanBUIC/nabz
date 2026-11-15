@@ -1,212 +1,187 @@
 "use client";
 
-/**
- * SCREEN 01 — Today dashboard.
- *
- * left  : Display greeting + last check-in line, feeling chips, primary and
- *         secondary actions.
- * right : Normal zone widget (560) + latest action card (560).
- *
- * Below the specified content sits a small secondary strip that keeps the
- * legacy screens (Normal Zone, Coach, Send to Earth) reachable without adding
- * sidebar tabs, plus the explicit demo-data control.
- */
-
-import { useMemo } from "react";
-import Button from "@/components/ui/Button";
+import Link from "next/link";
 import Icon from "@/components/ui/Icon";
-import { Card, CardBody, CardEyebrow } from "@/components/ui/Card";
+import MetricTile from "@/components/ui/MetricTile";
+import StatusBadge from "@/components/ui/StatusBadge";
+import ClinicalActionCard from "@/components/dashboard/ClinicalActionCard";
 import NormalZoneWidget from "@/components/dashboard/NormalZoneWidget";
-import FeelingChips, { feelingById } from "@/components/dashboard/FeelingChips";
-import DemoDataNotice from "@/components/ui/DemoDataNotice";
+import ReminderCard from "@/components/dashboard/ReminderCard";
 import { useStore } from "@/lib/data/store";
-import { useSession } from "@/lib/data/session";
-import { classifyValue } from "@/lib/utils/health";
-import { getBaseline } from "@/lib/data/selectors";
+import { getCommander } from "@/lib/data/mission";
+import { getOverallStatus } from "@/lib/data/selectors";
+import { formatMetricValue } from "@/lib/utils/health";
 import { useClientTime } from "@/lib/hooks/useClientTime";
-import { formatDateTime, formatTime } from "@/lib/utils/format";
-
-function greetingFor(hour) {
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-}
-
-function dayWord(timestamp, now) {
-  const then = new Date(timestamp);
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfThat = new Date(
-    then.getFullYear(),
-    then.getMonth(),
-    then.getDate()
-  );
-  const days = Math.round((startOfToday - startOfThat) / 86_400_000);
-  if (days === 0) return "today";
-  if (days === 1) return "yesterday";
-  return then.toLocaleDateString([], { day: "numeric", month: "short" });
-}
-
-function LatestActionCard() {
-  const store = useStore();
-
-  const latest = useMemo(() => {
-    const all = [...store.checkIns].sort(
-      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-    );
-    return all[0] || null;
-  }, [store.checkIns]);
-
-  const baseline = useMemo(
-    () => getBaseline("reaction", store),
-    [store]
-  );
-
-  let title = "Nothing to act on";
-  let body = "Your last check-in was inside your normal. Keep your routine.";
-
-  if (!latest) {
-    title = "Nothing to act on";
-    body = "Your last check-in was inside your normal. Keep your routine.";
-  } else if (latest.reactionTimeMs == null || !baseline) {
-    title = "Nothing to act on";
-    body = "Complete a check-in to compare today against your own normal.";
-  } else if (classifyValue(latest.reactionTimeMs, baseline) === "in-range") {
-    title = "Nothing to act on";
-    body = "Your last check-in was inside your normal. Keep your routine.";
-  } else {
-    title = "Act today";
-    body =
-      "Your last check-in was outside your normal. Review what changed before you start the day.";
-  }
-
-  return (
-    <Card className="min-h-[140px]">
-      <CardBody className="flex h-full flex-col justify-center">
-        <CardEyebrow>Latest action card</CardEyebrow>
-        <h2 className="mt-2 t-h2 text-primary">{title}</h2>
-        <p className="mt-2 t-body-md text-secondary">{body}</p>
-      </CardBody>
-    </Card>
-  );
-}
-
-function SecondaryStrip() {
-  const links = [
-    { href: "/normal-zone", label: "Normal Zone", icon: "monitoring" },
-    { href: "/coach", label: "Coach", icon: "smart_toy" },
-    { href: "/send-to-earth", label: "Send to Earth", icon: "send" },
-  ];
-
-  return (
-    <div className="flex flex-col gap-4 border-t border-line pt-6">
-      <nav aria-label="More" className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 t-caption uppercase tracking-[0.14em] text-muted">
-          More
-        </span>
-        {links.map((link) => (
-          <Button
-            key={link.href}
-            href={link.href}
-            variant="ghost"
-            size="md"
-            icon={link.icon}
-          >
-            {link.label}
-          </Button>
-        ))}
-      </nav>
-      <DemoDataNotice />
-    </div>
-  );
-}
+import { formatTime, greetingFor } from "@/lib/utils/format";
 
 export default function TodayDashboard() {
-  const store = useStore();
-  const { profile } = useSession();
-  const now = useClientTime();
+  const { mission, today, loading, backendOnline, error } = useStore();
+  const now = useClientTime(60_000);
+  const commander = getCommander(mission);
+  const overall = getOverallStatus(today);
 
-  const firstName = (profile?.name || "Sara").split(" ")[0];
-
-  const lastCheckIn = useMemo(
-    () =>
-      [...store.checkIns].sort(
-        (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-      )[0] || null,
-    [store.checkIns]
+  const greeting = now ? greetingFor(now) : "Mission brief";
+  const latestCheckin = today?.checkin;
+  const latestBp = today?.bp;
+  const secondaryCards = (today?.cards || []).filter(
+    (c) => c.id !== today?.card?.id,
   );
 
-  const greeting = now ? greetingFor(now.getHours()) : "Good morning";
-
-  let subtitle = "No check-in recorded yet.";
-  if (lastCheckIn) {
-    subtitle = now
-      ? `Your last check-in was ${dayWord(lastCheckIn.timestamp, now)} at ${formatTime(lastCheckIn.timestamp)}.`
-      : `Last check-in ${formatDateTime(lastCheckIn.timestamp)}.`;
-  }
-
-  // The answer is stored as a quick mood tap and picked up by the next
-  // check-in (screen 04 shows it back as "You said you feel …").
-  const latestMood = store.moodLogs[0] || null;
-  const selectedFeeling =
-    latestMood && latestMood.feeling ? latestMood.feeling : null;
-
-  const handleFeeling = (feelingId) => {
-    const feeling = feelingById(feelingId);
-    if (!feeling) return;
-    store.addMoodLog({
-      mood: feeling.mood,
-      feeling: feeling.id,
-      label: feeling.label,
-      timestamp: new Date().toISOString(),
-    });
-  };
-
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)]">
-        {/* Left column */}
-        <div className="flex min-w-0 flex-col">
-          <div className="flex flex-col gap-2">
-            <h1 className="t-display text-primary">
-              {greeting}, {firstName}.
-            </h1>
-            <p className="t-body-md text-muted">{subtitle}</p>
+    <div className="space-y-6">
+      {!backendOnline && error ? (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-attention/50 bg-attention/10 px-4 py-3 text-sm text-primary"
+        >
+          <div className="flex items-center gap-2.5">
+            <Icon name="cloud_off" size={20} className="text-attention" />
+            <span>
+              Backend unavailable ({error}). Start <code className="font-mono">npm run dev</code> on port 8787. Offline Emergency guides remain ready.
+            </span>
           </div>
-
-          <h2 className="mt-8 t-h3 text-primary">How do you feel today?</h2>
-          <FeelingChips
-            className="mt-5"
-            value={selectedFeeling}
-            onChange={handleFeeling}
-          />
-
-          <div className="mt-8 flex flex-col gap-3">
-            <Button href="/check-in" variant="primary" size="lg" arrow className="w-full sm:w-auto">
-              Start check-in
-            </Button>
-            <p className="t-body-sm text-muted">
-              3 short rounds · about 2 minutes
-            </p>
-          </div>
-
-          <Button
-            href="/measure"
-            variant="secondary"
-            size="lg"
-            className="mt-8 w-full sm:w-auto"
+          <Link
+            href="/emergency"
+            className="font-semibold text-emergency underline-offset-2 hover:underline"
           >
-            Take a measurement
-          </Button>
+            Open Emergency
+          </Link>
+        </div>
+      ) : null}
+
+      <section className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="t-label-md text-muted">
+            Day {today?.missionDay ?? mission?.missionDay ?? 1} · {mission?.name || "Mars Transit Sim"}
+          </p>
+          <h1 className="t-h1 mt-1 text-primary">
+            {greeting}, {commander.name}
+          </h1>
+          <p className="t-body-md mt-1 text-secondary">
+            Daily reaction speed, sleep, blood pressure and personal baseline overview.
+          </p>
         </div>
 
-        {/* Right column */}
-        <div className="flex min-w-0 flex-col gap-6">
-          <NormalZoneWidget />
-          <LatestActionCard />
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusBadge tone={overall.badgeTone} dot={false} className="py-1.5 text-sm">
+            <Icon name={overall.iconName} size={16} />
+            <span>{loading && !today ? "Syncing..." : overall.label}</span>
+          </StatusBadge>
         </div>
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href="/check-in"
+          className="flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent px-5 py-4 text-on-status transition-colors hover:bg-accent-hover"
+        >
+          <div>
+            <p className="text-sm font-semibold">3-min check-in</p>
+            <p className="text-xs opacity-90">PVT-B reaction + sleep</p>
+          </div>
+          <Icon name="touch_app" size={24} />
+        </Link>
+
+        <Link
+          href="/measure/blood-pressure"
+          className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary transition-colors hover:bg-hover"
+        >
+          <div>
+            <p className="text-sm font-semibold">Blood pressure</p>
+            <p className="text-xs text-muted">Guided 8-step cuff check</p>
+          </div>
+          <Icon name="monitor_heart" size={24} className="text-accent" />
+        </Link>
+
+        <Link
+          href="/coach"
+          className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary transition-colors hover:bg-hover"
+        >
+          <div>
+            <p className="text-sm font-semibold">Offline coach</p>
+            <p className="text-xs text-muted">Ask why a card triggered</p>
+          </div>
+          <Icon name="smart_toy" size={24} className="text-accent" />
+        </Link>
+
+        <Link
+          href="/send-to-earth"
+          className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-5 py-4 text-primary transition-colors hover:bg-hover"
+        >
+          <div>
+            <p className="text-sm font-semibold">Send to Earth</p>
+            <p className="text-xs text-muted">Preview & queue downlink</p>
+          </div>
+          <Icon name="send" size={24} className="text-accent" />
+        </Link>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <MetricTile
+          label="Today's reaction speed"
+          value={
+            latestCheckin
+              ? formatMetricValue("reaction-speed", latestCheckin.metrics.meanSpeed)
+              : "—"
+          }
+          unit={latestCheckin ? "resp/s" : undefined}
+          helper={
+            latestCheckin
+              ? `Median RT ${Math.round(latestCheckin.metrics.medianRtMs ?? 0)} ms · ${formatTime(latestCheckin.effectiveDateTime)}`
+              : "No check-in logged today yet"
+          }
+        />
+
+        <MetricTile
+          label="Today's sleep"
+          value={
+            latestCheckin?.sleepHours != null
+              ? formatMetricValue("sleep-hours", latestCheckin.sleepHours)
+              : "—"
+          }
+          unit={latestCheckin?.sleepHours != null ? "hours" : undefined}
+          helper={
+            latestCheckin?.sleepHours != null
+              ? "Logged with check-in"
+              : "Add hours slept during check-in"
+          }
+        />
+
+        <MetricTile
+          label="Today's blood pressure"
+          value={
+            latestBp
+              ? `${latestBp.average.systolic}/${latestBp.average.diastolic}`
+              : "—"
+          }
+          unit={latestBp ? "mmHg" : undefined}
+          helper={
+            latestBp
+              ? `Category: ${latestBp.category} · ${formatTime(latestBp.effectiveDateTime)}`
+              : "No reading logged today yet"
+          }
+        />
+      </section>
+
+      <ClinicalActionCard card={today?.card} heading="Today's priority guidance" />
+
+      {secondaryCards.length > 0 ? (
+        <div className="space-y-4">
+          {secondaryCards.map((card) => (
+            <ClinicalActionCard
+              key={card.id}
+              card={card}
+              heading="Additional guidance today"
+              compact
+            />
+          ))}
+        </div>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <NormalZoneWidget />
+        <ReminderCard />
       </div>
-
-      <SecondaryStrip />
     </div>
   );
 }

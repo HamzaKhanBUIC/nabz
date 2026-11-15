@@ -1,240 +1,228 @@
 "use client";
 
-/**
- * AI Health Coach conversation interface.
- *
- * Frontend only: replies come from a clearly-labelled mock response mechanism
- * (lib/data/demo.js). The message pipeline is structured so a real
- * backend/LLM API can replace `generateMockReply` later without UI changes.
- *
- * Never presents itself as a medical diagnosis.
- */
-
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Bot,
-  RefreshCcw,
-  SendHorizonal,
-} from "lucide-react";
+import { Suspense, useEffect, useId, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icon";
 import ChatMessage, { TypingIndicator } from "@/components/coach/ChatMessage";
-import { buttonClassName } from "@/components/ui/Button";
 import { useStore } from "@/lib/data/store";
-import { DEMO_COACH_RESPONSES } from "@/lib/data/demo";
-import { coachDisclaimer, crewProfile } from "@/lib/data/mission";
+import { coachDisclaimer } from "@/lib/data/mission";
+import { makeId } from "@/lib/utils/format";
 
-const SUGGESTED_QUESTIONS = [
-  "Is this serious?",
-  "What if it gets worse?",
-  "Should I tell Earth?",
+const DEFAULT_SUGGESTIONS = [
+  "Why did this card show up?",
+  "How serious is this right now?",
+  "Should I rest or run a routine?",
+  "What should I tell ground control?",
 ];
 
-/**
- * Mock reply routing — the single integration point for a future API.
- * All replies are explicitly marked as placeholders.
- */
-function generateMockReply(text) {
-  const normalized = text.toLowerCase();
-  if (normalized.includes("serious")) return DEMO_COACH_RESPONSES.serious;
-  if (
-    normalized.includes("worse") ||
-    normalized.includes("get worse") ||
-    normalized.includes("worsen")
-  ) {
-    return DEMO_COACH_RESPONSES.worse;
+function ChatInterfaceInner() {
+  const searchParams = useSearchParams();
+  const queryCardId = searchParams.get("cardId");
+  const {
+    today,
+    coachMessages,
+    askCoach,
+    addCoachMessage,
+    clearCoachMessages,
+  } = useStore();
+
+  const [customCardId, setCustomCardId] = useState("");
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTIONS);
+  const listEndRef = useRef(null);
+  const contextSelectId = useId();
+  const questionInputId = useId();
+
+  const selectedCardId = customCardId || queryCardId || today?.card?.id || "";
+
+  useEffect(() => {
+    listEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [coachMessages.length, sending]);
+
+  const activeCards = today?.cards || (today?.card ? [today.card] : []);
+
+  async function submitQuestion(text) {
+    const trimmed = text.trim();
+    if (trimmed.length < 2 || sending) {
+      if (trimmed.length < 2) {
+        setErrorMsg("Enter at least 2 characters to ask the coach.");
+      }
+      return;
+    }
+
+    setErrorMsg("");
+    setInput("");
+    addCoachMessage({
+      id: makeId("msg"),
+      role: "user",
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+    });
+
+    setSending(true);
+    try {
+      const response = await askCoach({
+        question: trimmed,
+        cardId: selectedCardId || undefined,
+      });
+
+      addCoachMessage({
+        id: makeId("msg"),
+        role: "assistant",
+        content: response.answer,
+        grounded: response.grounded,
+        citations: response.citations,
+        banner: response.banner,
+        provider: response.provider,
+        disclaimer: response.disclaimer,
+        createdAt: new Date().toISOString(),
+      });
+
+      if (
+        Array.isArray(response.suggestedQuestions) &&
+        response.suggestedQuestions.length > 0
+      ) {
+        setSuggestions(response.suggestedQuestions);
+      }
+    } catch (err) {
+      setErrorMsg(err?.message || "Coach request failed.");
+    } finally {
+      setSending(false);
+    }
   }
-  if (
-    normalized.includes("earth") ||
-    normalized.includes("tell") ||
-    normalized.includes("share")
-  ) {
-    return DEMO_COACH_RESPONSES.earth;
-  }
-  return DEMO_COACH_RESPONSES.default;
+
+  return (
+    <div className="flex flex-col rounded-lg border border-line bg-canvas">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Icon name="smart_toy" size={20} className="text-accent" />
+          <span className="text-sm font-semibold text-primary">
+            Offline health coach
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {activeCards.length > 0 ? (
+            <div className="flex items-center gap-2">
+              <label htmlFor={contextSelectId} className="text-xs text-muted">
+                Context card:
+              </label>
+              <select
+                id={contextSelectId}
+                value={selectedCardId}
+                onChange={(e) => setCustomCardId(e.target.value)}
+                className="max-w-[220px] rounded-md border border-line bg-canvas px-2.5 py-1 text-xs text-primary"
+              >
+                {activeCards.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
+          {coachMessages.length > 0 ? (
+            <button
+              type="button"
+              onClick={clearCoachMessages}
+              className="rounded-md border border-line px-2.5 py-1 text-xs text-secondary hover:bg-hover hover:text-primary"
+            >
+              Clear thread
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="h-[420px] space-y-4 overflow-y-auto p-4">
+        {coachMessages.length === 0 ? (
+          <div className="rounded-lg border border-line bg-surface p-5 text-sm text-secondary">
+            <p className="font-semibold text-primary">
+              Ask about today&apos;s server-scored action card or readings.
+            </p>
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Answers are deterministically grounded in verified CrewPulse source snippets—zero cloud dependency, and red-flag questions surface emergency links immediately.
+            </p>
+          </div>
+        ) : (
+          coachMessages.map((msg) => <ChatMessage key={msg.id} message={msg} />)
+        )}
+
+        {sending ? <TypingIndicator /> : null}
+        <div ref={listEndRef} />
+      </div>
+
+      <div className="border-t border-line bg-surface p-4 space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {suggestions.map((q) => (
+            <button
+              key={q}
+              type="button"
+              onClick={() => submitQuestion(q)}
+              disabled={sending}
+              className="rounded-pill border border-line bg-raised px-3 py-1 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary disabled:opacity-50"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+
+        {errorMsg ? (
+          <p role="alert" className="text-xs font-medium text-emergency">
+            {errorMsg}
+          </p>
+        ) : null}
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitQuestion(input);
+          }}
+          className="flex flex-wrap gap-2"
+        >
+          <label htmlFor={questionInputId} className="sr-only">
+            Ask a question
+          </label>
+          <input
+            id={questionInputId}
+            name="question"
+            type="text"
+            maxLength={400}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey && e.nativeEvent.isComposing) {
+                e.preventDefault();
+              }
+            }}
+            placeholder="Ask why your card triggered, what to watch, or when to recheck..."
+            className="min-w-[200px] flex-1 rounded-md border border-line bg-canvas px-3.5 py-2.5 text-sm text-primary placeholder:text-muted"
+          />
+          <Button type="submit" variant="primary" disabled={sending}>
+            <Icon name="send" size={18} />
+            {sending ? "Sending..." : "Ask coach"}
+          </Button>
+        </form>
+
+        <p className="text-[11px] text-muted">{coachDisclaimer}</p>
+      </div>
+    </div>
+  );
 }
 
 export default function ChatInterface() {
-  const router = useRouter();
-  const store = useStore();
-  const [input, setInput] = useState("");
-  const [pending, setPending] = useState(false);
-  const scrollRef = useRef(null);
-  const pendingTimerRef = useRef(null);
-
-  // Seed conversation once when empty.
-  const seededRef = useRef(false);
-  useEffect(() => {
-    if (store.hydrated && !seededRef.current && store.coachMessages.length === 0) {
-      seededRef.current = true;
-      store.addCoachMessage({
-        role: "coach",
-        content: `Hi ${crewProfile.firstName} — I'm your AI Health Coach. Ask me about your readings, sleep, mood or reaction time. I can only give general guidance until the medical backend is connected.`,
-        placeholder: false,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.hydrated]);
-
-  // Keep scrolled to the newest message.
-  useEffect(() => {
-    const node = scrollRef.current;
-    if (node) node.scrollTop = node.scrollHeight;
-  }, [store.coachMessages.length, pending]);
-
-  useEffect(() => () => clearTimeout(pendingTimerRef.current), []);
-
-  const canSend = input.trim().length > 0 && !pending;
-
-  const send = (text) => {
-    const content = (text ?? input).trim();
-    if (!content || pending) return;
-
-    store.addCoachMessage({ role: "user", content });
-    setInput("");
-    setPending(true);
-
-    // Simulated latency for the mock response.
-    pendingTimerRef.current = setTimeout(() => {
-      store.addCoachMessage({
-        role: "coach",
-        content: generateMockReply(content),
-        placeholder: true,
-      });
-      setPending(false);
-    }, 1100);
-  };
-
-  // Suggested questions from the context panel dispatch this event.
-  useEffect(() => {
-    const onCoachQuestion = (event) => {
-      const question = event.detail?.question;
-      if (question) send(question);
-    };
-    window.addEventListener("crewpulse:coach-question", onCoachQuestion);
-    return () => window.removeEventListener("crewpulse:coach-question", onCoachQuestion);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending]);
-
-  const suggestionList = useMemo(
-    () =>
-      SUGGESTED_QUESTIONS.filter(
-        (question) =>
-          !store.coachMessages.some((m) => m.role === "user" && m.content === question)
-      ),
-    [store.coachMessages]
-  );
-
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      {/* Conversation */}
-      <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-line bg-surface shadow-card">
-        <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-nasa-blue text-white">
-              <Bot className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-navy">AI Health Coach</p>
-              <p className="flex items-center gap-1.5 text-[11px] text-muted">
-                <span className="h-1.5 w-1.5 rounded-full bg-warn" aria-hidden="true" />
-                Demo mode — mock responses
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => store.resetCoachMessages()}
-              className="flex h-9 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs font-medium text-muted transition-colors hover:bg-canvas hover:text-navy"
-              title="Clear conversation"
-            >
-              <RefreshCcw className="h-3.5 w-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">Clear</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/")}
-              className="flex h-9 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs font-medium text-navy transition-colors hover:bg-canvas"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">Back to dashboard</span>
-            </button>
-          </div>
+    <Suspense
+      fallback={
+        <div className="rounded-lg border border-line bg-surface p-6 text-sm text-muted">
+          Loading offline coach...
         </div>
-
-        {/* Messages */}
-        <div
-          ref={scrollRef}
-          className="min-h-[320px] flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5"
-          style={{ maxHeight: "min(58vh, 560px)" }}
-          aria-live="polite"
-        >
-          <ul className="space-y-4">
-            {store.coachMessages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            {pending ? <TypingIndicator /> : null}
-          </ul>
-        </div>
-
-        {/* Suggested prompts */}
-        {suggestionList.length > 0 && !pending ? (
-          <div className="border-t border-line px-4 py-3 sm:px-5">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
-              Suggested questions
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {suggestionList.map((question) => (
-                <button
-                  key={question}
-                  type="button"
-                  onClick={() => send(question)}
-                  className="rounded-lg border border-accent/40 bg-accent-subtle px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-hover"
-                >
-                  {question}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {/* Input */}
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            send();
-          }}
-          className="border-t border-line px-4 py-3 sm:px-5"
-        >
-          <label htmlFor="coach-input" className="sr-only">
-            Message the AI Health Coach
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              id="coach-input"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask about your sleep, mood or reaction time…"
-              autoComplete="off"
-              className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-canvas px-3.5 text-sm text-navy outline-none transition-colors placeholder:text-muted/70 focus:border-nasa-blue focus:bg-surface"
-            />
-            <button
-              type="submit"
-              disabled={!canSend}
-              aria-label="Send message"
-              className={`${buttonClassName("primary", "icon")} shrink-0`}
-            >
-              <SendHorizonal className="h-4.5 w-4.5" aria-hidden="true" />
-            </button>
-          </div>
-          <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed text-muted">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            {coachDisclaimer}
-          </p>
-        </form>
-      </div>
-    </div>
+      }
+    >
+      <ChatInterfaceInner />
+    </Suspense>
   );
 }

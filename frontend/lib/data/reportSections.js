@@ -1,40 +1,30 @@
-/**
- * Sections a crew member can share with the ground team.
- *
- * Shared by `/send-to-earth` (the picker + preview) and `/sent` (the
- * confirmation), so the labels can never drift apart between the two screens.
- */
-
 export const REPORT_SECTIONS = [
   {
-    key: "reaction",
-    label: "Reaction trend",
-    icon: "trending_up",
-    hint: "Response time history from check-ins",
+    key: "includeReaction",
+    label: "Reaction check-ins",
+    description: "PVT-B speed, lapses & normal-zone status",
+    icon: "touch_app",
   },
   {
-    key: "sleep",
-    label: "Sleep hours",
+    key: "includeSleep",
+    label: "Sleep duration",
+    description: "Reported hours slept before check-in",
     icon: "bedtime",
-    hint: "Recorded sleep duration per check-in",
   },
   {
-    key: "mood",
-    label: "Mood",
-    icon: "sentiment_satisfied",
-    hint: "Self-rated mood, 1 to 5",
+    key: "includeBp",
+    label: "Blood pressure",
+    description: "Resting readings, category & symptom screen",
+    icon: "monitor_heart",
   },
   {
-    key: "bloodPressure",
-    label: "Blood pressure reading",
-    icon: "bloodtype",
-    hint: "Latest systolic and diastolic values",
+    key: "includeCards",
+    label: "Action cards",
+    description: "Server-triggered guidance cards & sources",
+    icon: "assignment",
   },
 ];
 
-/** Labels for the section keys a report carries, in display order. */
-export function sectionLabels(sections = {}) {
-  return REPORT_SECTIONS.filter((section) => sections[section.key]).map(
-    (section) => section.label
-  );
+export function sectionLabels(selection = {}) {
+  return REPORT_SECTIONS.filter((s) => selection[s.key]).map((s) => s.label);
 }

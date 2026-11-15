@@ -12,11 +12,8 @@
  * out of instant-navigation validation.
  */
 
-import SignInScreen from "@/components/auth/SignInScreen";
 import TodayDashboard from "@/components/dashboard/TodayDashboard";
-import { useSession } from "@/lib/data/session";
 
 export default function HomePage() {
-  const { isAuthenticated } = useSession();
-  return isAuthenticated ? <TodayDashboard /> : <SignInScreen />;
+  return <TodayDashboard />;
 }

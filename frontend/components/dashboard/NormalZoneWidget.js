@@ -1,180 +1,157 @@
 "use client";
 
-/**
- * "Normal zone" widget (handoff: 560px card — title, status pill, chart).
- * Band = personal normal range in `accent-subtle`, line + today dot in accent.
- *
- * Everything is derived from recorded values via the existing selectors —
- * nothing is fabricated when the crew has no history yet.
- */
-
-import { useMemo } from "react";
+import Link from "next/link";
 import {
-  Area,
-  AreaChart,
-  CartesianGrid,
+  Line,
+  LineChart,
   ReferenceArea,
-  ReferenceDot,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { Card, CardEyebrow } from "@/components/ui/Card";
-import { StatusPill } from "@/components/ui/StatusBadge";
+import { Card, CardHeader } from "@/components/ui/Card";
+import Icon from "@/components/ui/Icon";
+import StatusBadge from "@/components/ui/StatusBadge";
 import ChartTooltip from "@/components/charts/ChartTooltip";
-import EmptyState from "@/components/ui/EmptyState";
 import { useStore } from "@/lib/data/store";
-import { getBaseline, getRange } from "@/lib/data/selectors";
-import { classifyValue } from "@/lib/utils/health";
-import { useClientTime } from "@/lib/hooks/useClientTime";
+import { METRICS, formatMetricValue, pointStatus } from "@/lib/utils/health";
 
-const METRIC_KEY = "reaction";
-const RANGE_DAYS = 28;
-
-function formatDay(date) {
-  return date.toLocaleDateString([], { day: "numeric", month: "short" });
+export function useNormalZoneStatus(code = "reaction-speed") {
+  const store = useStore();
+  const trend = store.trends?.[code];
+  const points = trend?.points || [];
+  const latest = points.length > 0 ? points[points.length - 1] : null;
+  const band = trend?.band || null;
+  return {
+    metric: METRICS[code],
+    trend,
+    points,
+    latest,
+    band,
+    status: pointStatus(latest, band),
+  };
 }
 
-export function useNormalZoneStatus() {
-  const store = useStore();
-  const now = useClientTime();
-  const points = useMemo(
-    () => getRange(METRIC_KEY, store, RANGE_DAYS, now),
-    [store, now]
-  );
-  const baseline = useMemo(() => getBaseline(METRIC_KEY, store), [store]);
-  const latest = points.length ? points[points.length - 1] : null;
-  const classification = latest
-    ? classifyValue(latest.value, baseline)
-    : "unknown";
+export default function NormalZoneWidget({ className = "", code = "reaction-speed" }) {
+  const { hydrated } = useStore();
+  const { metric, points, latest, band, status } = useNormalZoneStatus(code);
 
-  return { points, baseline, latest, classification, now };
-}
+  const chartData = points.map((pt) => ({
+    day: `D${pt.missionDay}`,
+    missionDay: pt.missionDay,
+    value: Number(pt.value),
+    zone: pt.zone,
+  }));
 
-export default function NormalZoneWidget({ className = "" }) {
-  const store = useStore();
-  const now = useClientTime();
-
-  const data = useMemo(
-    () =>
-      getRange(METRIC_KEY, store, RANGE_DAYS, now).map((point) => ({
-        ...point,
-        day: formatDay(point.date),
-      })),
-    [store, now]
-  );
-  const baseline = useMemo(() => getBaseline(METRIC_KEY, store), [store]);
-
-  const latest = data.length ? data[data.length - 1] : null;
-  const classification = latest ? classifyValue(latest.value, baseline) : "unknown";
-  const inside = classification === "in-range";
-  const status = !baseline || classification === "unknown" ? "normal" : inside ? "normal" : "attention";
-  const statusLabel = !baseline
-    ? "Building baseline"
-    : classification === "unknown"
-      ? "No reading today"
-      : inside
-        ? "Inside"
-        : "Outside";
+  const hasWatch = band?.ready && band.mean != null && band.watchAt != null;
+  const hasAct = band?.ready && band.actAt != null;
+  const bandLow = hasAct ? Math.min(band.mean, band.actAt) : hasWatch ? Math.min(band.mean, band.watchAt) : null;
+  const bandHigh = hasWatch ? Math.max(band.mean, band.watchAt) : null;
 
   return (
-    <Card className={`flex flex-col ${className}`}>
-      <div className="flex items-start justify-between gap-4 px-6 pt-6">
-        <div className="min-w-0">
-          <CardEyebrow>Normal zone</CardEyebrow>
-          <h2 className="mt-1 t-h3 text-primary">Reaction time</h2>
-        </div>
-        <StatusPill status={status} className="shrink-0">
-          {statusLabel}
-        </StatusPill>
+    <Card className={className}>
+      <CardHeader
+        title="Your normal zone"
+        subtitle={
+          latest
+            ? `Latest ${metric.shortLabel.toLowerCase()}: ${formatMetricValue(code, latest.value)} ${metric.unit} (Day ${latest.missionDay})`
+            : "30-day personal baseline"
+        }
+        action={
+          <StatusBadge tone={status.badgeTone} dot={false}>
+            <Icon name={status.iconName} size={14} />
+            <span>{status.label}</span>
+          </StatusBadge>
+        }
+      />
+
+      <div className="mt-4 h-[220px] w-full">
+        {hydrated && chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 10, right: 12, bottom: 4, left: -12 }}>
+              <XAxis
+                dataKey="day"
+                tick={{ fill: "var(--color-muted)", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                domain={["auto", "auto"]}
+                tick={{ fill: "var(--color-muted)", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                width={44}
+              />
+              <Tooltip
+                content={
+                  <ChartTooltip
+                    unit={` ${metric.unit}`}
+                    formatter={(v) => formatMetricValue(code, v)}
+                  />
+                }
+              />
+              {hasWatch && bandHigh != null ? (
+                <ReferenceArea
+                  y1={band.watchAt}
+                  y2={bandHigh + (band.sd || 0)}
+                  fill="var(--color-normal)"
+                  fillOpacity={0.08}
+                />
+              ) : null}
+              {band?.ready && band.mean != null ? (
+                <ReferenceLine
+                  y={band.mean}
+                  stroke="var(--color-normal)"
+                  strokeDasharray="4 4"
+                />
+              ) : null}
+              {hasWatch ? (
+                <ReferenceLine
+                  y={band.watchAt}
+                  stroke="var(--color-attention)"
+                  strokeDasharray="3 3"
+                />
+              ) : null}
+              {hasAct && bandLow != null ? (
+                <ReferenceLine
+                  y={band.actAt}
+                  stroke="var(--color-emergency)"
+                  strokeDasharray="3 3"
+                />
+              ) : null}
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={metric.color}
+                strokeWidth={2.5}
+                dot={{ r: 3, fill: metric.color }}
+                activeDot={{ r: 5 }}
+                isAnimationActive={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center justify-center rounded-md border border-dashed border-line bg-raised text-sm text-muted">
+            {hydrated ? "Loading trend points..." : "Preparing chart..."}
+          </div>
+        )}
       </div>
 
-      <div className="min-h-[200px] flex-1 px-6 pb-6 pt-4">
-        {data.length === 0 ? (
-          <EmptyState
-            compact
-            icon={null}
-            title="No recorded reaction times yet"
-            description="Your Normal Zone is drawn from your own check-ins. Complete one to start the chart."
-            actionLabel="Start check-in"
-            actionHref="/check-in"
-          />
-        ) : (
-          <>
-            <div className="h-[196px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={data}
-                  margin={{ top: 8, right: 10, bottom: 0, left: -18 }}
-                >
-                  <defs>
-                    <linearGradient id="nzFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.28} />
-                      <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    stroke="var(--color-line)"
-                    strokeDasharray="3 3"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="day"
-                    tick={{ fontSize: 11, fill: "var(--color-muted)" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "var(--color-line)" }}
-                    interval="preserveStartEnd"
-                    minTickGap={28}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "var(--color-muted)" }}
-                    tickLine={false}
-                    axisLine={false}
-                    width={54}
-                  />
-                  {baseline ? (
-                    <ReferenceArea
-                      y1={Math.round(baseline.lower)}
-                      y2={Math.round(baseline.upper)}
-                      fill="var(--color-accent-subtle)"
-                      fillOpacity={1}
-                      stroke="none"
-                      ifOverflow="extendDomain"
-                    />
-                  ) : null}
-                  <Tooltip
-                    cursor={{ stroke: "var(--color-accent)", strokeDasharray: "3 3" }}
-                    content={<ChartTooltip unit=" ms" />}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    name="Reaction time"
-                    stroke="var(--color-accent)"
-                    strokeWidth={2}
-                    fill="url(#nzFill)"
-                    dot={false}
-                    activeDot={{ r: 4.5, fill: "var(--color-accent-hover)", strokeWidth: 0 }}
-                  />
-                  {latest ? (
-                    <ReferenceDot
-                      x={latest.day}
-                      y={latest.value}
-                      r={5}
-                      fill="var(--color-accent-hover)"
-                      stroke="var(--color-surface)"
-                      strokeWidth={2}
-                    />
-                  ) : null}
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="mt-3 border-t border-line pt-3 text-xs text-muted">
-              Shaded band = your personal Normal Zone (recorded data only).
-            </p>
-          </>
-        )}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3 text-xs text-muted">
+        <span>
+          {band?.ready && band.mean != null
+            ? `Baseline mean ${formatMetricValue(code, band.mean)} ${metric.unit} (watch ${formatMetricValue(code, band.watchAt)}, act ${formatMetricValue(code, band.actAt)})`
+            : "Building personal baseline (minimum 3 valid sessions)."}
+        </span>
+        <Link
+          href="/normal-zone"
+          className="inline-flex items-center gap-1 font-medium text-accent hover:underline"
+        >
+          <span>Explore all 4 metrics</span>
+          <Icon name="arrow_forward" size={14} />
+        </Link>
       </div>
     </Card>
   );

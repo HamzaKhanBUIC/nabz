@@ -1,339 +1,700 @@
 "use client";
 
-/**
- * Measurement stepper — screen 06 (blood pressure, the designed flow) plus
- * the same stepper pattern for the other three measurement items.
- *
- * Every step: Back link · H1 · Step indicator · H2 step title · content ·
- * Primary/Secondary buttons · Safety banner.
- *
- * Blood pressure copy is verbatim from screens.md. The other metrics reuse
- * the same pattern with generic, non-medical device instructions — no
- * procedures or thresholds are invented for them.
- */
-
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
 import BackLink from "@/components/ui/BackLink";
 import Button from "@/components/ui/Button";
+import { Card, CardHeader } from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
-import StepIndicator from "@/components/ui/StepIndicator";
 import InstructionStep from "@/components/ui/InstructionStep";
 import MetricTile from "@/components/ui/MetricTile";
-import { StatusPill } from "@/components/ui/StatusBadge";
+import StatusBadge from "@/components/ui/StatusBadge";
+import StepIndicator from "@/components/ui/StepIndicator";
+import CuffPlacementIllustration from "@/components/measure/CuffPlacementIllustration";
+import ClinicalActionCard from "@/components/dashboard/ClinicalActionCard";
+import { iconNameForKey, statusToBadgeTone } from "@/lib/api";
 import { useStore } from "@/lib/data/store";
-
-/** Normal range shown on the blood-pressure result (from the handoff). */
-const BP_NORMAL = { systolic: [110, 125], diastolic: [70, 82] };
-
-const GENERIC_PREP = [
-  "Sit comfortably and relax for a moment.",
-  "Keep the device within reach.",
-  "Take readings at the same time of day when you can.",
-];
-
-const GENERIC_DEVICE = [
-  "Turn on the device and wait for it to settle.",
-  "Follow the instructions on its display.",
-  "Make sure the sensor is steady before you start.",
-];
+import { makeId } from "@/lib/utils/format";
 
 export const MEASUREMENTS = [
   {
     id: "blood-pressure",
     title: "Blood pressure",
-    icon: "blood_pressure",
-    subtitle: "4 steps",
-    fields: [
-      { key: "systolic", label: "Systolic", unit: "mmHg", value: "118" },
-      { key: "diastolic", label: "Diastolic", unit: "mmHg", value: "76" },
-      { key: "pulse", label: "Pulse", unit: "bpm", value: "68" },
-    ],
-    steps: [
-      {
-        title: "Get ready",
-        instructions: [
-          "Sit still with both feet on the floor for 5 minutes",
-          "Rest your left arm on the table at heart level",
-          "Do not talk or move during the measurement",
-        ],
-      },
-      {
-        title: "Put on the cuff",
-        instructions: [
-          "Wrap the cuff about 2 cm above the elbow",
-          "The tube runs down the inside of your arm",
-          "Snug, with room for one finger under it",
-        ],
-      },
-      {
-        title: "Measure and enter",
-        intro: "Press Start on the monitor and keep your arm still.",
-      },
-      { title: "Your reading" },
-    ],
-  },
-  {
-    id: "heart-rate-oxygen",
-    title: "Heart rate & oxygen",
-    icon: "ecg_heart",
-    subtitle: "4 steps",
-    fields: [
-      { key: "pulse", label: "Heart rate", unit: "bpm", value: "" },
-      { key: "spo2", label: "Oxygen", unit: "%", value: "" },
-    ],
-    steps: [
-      { title: "Get ready", instructions: GENERIC_PREP },
-      { title: "Prepare the device", instructions: GENERIC_DEVICE },
-      { title: "Measure and enter", intro: "Start the measurement and keep still until it finishes." },
-      { title: "Your reading" },
-    ],
-  },
-  {
-    id: "body-temperature",
-    title: "Body temperature",
-    icon: "device_thermostat",
-    subtitle: "4 steps",
-    fields: [{ key: "temperature", label: "Temperature", unit: "°C", value: "" }],
-    steps: [
-      { title: "Get ready", instructions: GENERIC_PREP },
-      { title: "Prepare the device", instructions: GENERIC_DEVICE },
-      { title: "Measure and enter", intro: "Take the reading and wait for the value to settle." },
-      { title: "Your reading" },
-    ],
-  },
-  {
-    id: "blood-sugar",
-    title: "Blood sugar",
-    icon: "glucose",
-    subtitle: "4 steps",
-    fields: [{ key: "glucose", label: "Blood sugar", unit: "mmol/L", value: "" }],
-    steps: [
-      { title: "Get ready", instructions: GENERIC_PREP },
-      { title: "Prepare the device", instructions: GENERIC_DEVICE },
-      { title: "Measure and enter", intro: "Take the reading and wait for the value to settle." },
-      { title: "Your reading" },
-    ],
+    subtitle: "8-step AHA/microgravity guided protocol, 5-min rest timer & symptom screen",
+    icon: "monitor_heart",
+    href: "/measure/blood-pressure",
   },
 ];
 
 export function measurementById(id) {
-  return MEASUREMENTS.find((m) => m.id === id) || MEASUREMENTS[0];
+  return MEASUREMENTS.find((m) => m.id === id) || null;
 }
 
-function NumberField({ field, value, onChange }) {
-  return (
-    <label className="block">
-      <span className="block t-label-md text-secondary">{field.label}</span>
-      <span className="mt-2 flex h-14 items-center rounded-md border border-line bg-surface px-4 transition-shadow focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-focus">
-        <input
-          type="number"
-          inputMode="decimal"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="—"
-          className="min-w-0 flex-1 bg-transparent text-2xl font-semibold leading-8 text-primary outline-none placeholder:text-muted"
-        />
-        <span className="shrink-0 pl-3 text-sm text-muted">{field.unit}</span>
-      </span>
-    </label>
-  );
+const BP_CATEGORY_LABELS = {
+  low: "Low (< 90 / < 60 mmHg)",
+  normal: "Normal (< 120 and < 80 mmHg)",
+  elevated: "Elevated (120–129 / < 80 mmHg)",
+  stage1: "Stage 1 high (130–139 or 80–89 mmHg)",
+  stage2: "Stage 2 high (>= 140 or >= 90 mmHg)",
+  severe: "Severe high (> 180 or > 120 mmHg)",
+};
+
+function formatClock(totalSeconds) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-function SafetyBanner() {
+function CountdownControl({ initialSeconds, label }) {
+  const [remaining, setRemaining] = useState(initialSeconds);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (!running || remaining <= 0) return undefined;
+    const id = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev <= 1) {
+          setRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running, remaining]);
+
   return (
-    <div className="mt-8 flex flex-col gap-4 rounded-lg bg-raised px-6 py-4 sm:flex-row sm:items-center sm:gap-6">
-      <div className="flex min-w-0 flex-1 items-start gap-3">
-        <Icon name="warning" size={24} className="shrink-0 text-secondary" />
-        <p className="t-body-md text-secondary">
-          If something feels wrong, stop and open Emergency mode.
-        </p>
-      </div>
-      <Button
-        href="/emergency"
-        variant="danger"
-        size="md"
-        icon="emergency"
-        iconFilled
-        className="shrink-0"
+    <div className="mt-2 flex flex-wrap items-center gap-2">
+      <span
+        aria-live="polite"
+        className="inline-flex items-center gap-1.5 rounded-pill border border-line bg-canvas px-3 py-1 font-mono text-xs font-semibold text-primary"
       >
-        Emergency
-      </Button>
-    </div>
-  );
-}
-
-function Flow() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const store = useStore();
-
-  const metric = measurementById(searchParams.get("metric"));
-  const [step, setStep] = useState(1);
-  const [values, setValues] = useState(() =>
-    Object.fromEntries(metric.fields.map((f) => [f.key, f.value]))
-  );
-
-  const stepDef = metric.steps[step - 1];
-  const isLast = step === metric.steps.length;
-  const requiredKeys = metric.fields.map((f) => f.key);
-  const canAdvance = requiredKeys.every(
-    (key) => String(values[key] ?? "").trim() !== ""
-  );
-
-  const save = () => {
-    const record = {
-      metric: metric.id,
-      timestamp: new Date().toISOString(),
-      values: { ...values },
-    };
-    if (metric.id === "blood-pressure") {
-      store.addMeasurement({
-        systolic: Number(values.systolic),
-        diastolic: Number(values.diastolic),
-        pulse: values.pulse === "" ? null : Number(values.pulse),
-        posture: "Seated, resting 5 min",
-        timestamp: record.timestamp,
-      });
-    } else {
-      store.addMeasurement({
-        metric: metric.id,
-        values: { ...values },
-        timestamp: record.timestamp,
-      });
-    }
-    router.push("/");
-  };
-
-  const backHref = "/measure";
-
-  return (
-    <div>
-      <BackLink href={backHref}>Measure</BackLink>
-      <h1 className="mt-6 t-h1 text-primary">{metric.title}</h1>
-
-      <StepIndicator step={step} total={4} className="mt-8" />
-      <h2 className="mt-[30px] t-h2 text-primary">{stepDef.title}</h2>
-
-      {/* Steps 1–2: instruction list */}
-      {stepDef.instructions ? (
-        <div className="mt-6 flex flex-col gap-3">
-          {stepDef.instructions.map((text, index) => (
-            <InstructionStep key={text} number={index + 1}>
-              {text}
-            </InstructionStep>
-          ))}
-        </div>
+        <Icon name="timer" size={14} className="text-accent" />
+        {remaining === 0 ? `${label}: Complete` : `${label}: ${formatClock(remaining)}`}
+      </span>
+      <button
+        type="button"
+        onClick={() => setRunning((r) => !r)}
+        disabled={remaining === 0}
+        className="rounded-md border border-line bg-raised px-2.5 py-1 text-xs font-medium text-primary hover:bg-hover disabled:opacity-50"
+      >
+        {running ? "Pause" : remaining === initialSeconds ? "Start timer" : "Resume"}
+      </button>
+      {remaining !== initialSeconds ? (
+        <button
+          type="button"
+          onClick={() => {
+            setRunning(false);
+            setRemaining(initialSeconds);
+          }}
+          className="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-secondary hover:bg-hover"
+        >
+          Reset
+        </button>
       ) : null}
-
-      {/* Step 3: intro + number fields */}
-      {stepDef.intro ? (
-        <div className="mt-6 max-w-[752px]">
-          <p className="t-body-md text-muted">{stepDef.intro}</p>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {metric.fields.map((field) => (
-              <NumberField
-                key={field.key}
-                field={field}
-                value={values[field.key]}
-                onChange={(next) =>
-                  setValues((prev) => ({ ...prev, [field.key]: next }))
-                }
-              />
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      {/* Step 4: the reading */}
-      {isLast ? (
-        <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-center">
-          <MetricTile
-            className="w-full max-w-[340px]"
-            label={metric.title}
-            value={
-              metric.id === "blood-pressure"
-                ? `${values.systolic} / ${values.diastolic}`
-                : metric.fields
-                    .map((f) => values[f.key] || "—")
-                    .join(" / ")
-            }
-            unit={
-              metric.id === "blood-pressure"
-                ? "mmHg"
-                : metric.fields[0]?.unit
-            }
-            helper={
-              metric.id === "blood-pressure"
-                ? "Your normal: 110–125 / 70–82"
-                : "Saved to your log"
-            }
-          />
-          <div className="flex flex-col gap-6">
-            {metric.id === "blood-pressure" ? (
-              <StatusPill status="normal">Normal</StatusPill>
-            ) : (
-              <StatusPill status="normal">Recorded</StatusPill>
-            )}
-            <p className="t-label-lg text-primary">
-              {metric.id === "blood-pressure"
-                ? "Inside your normal. Saved to your log."
-                : "Saved to your log."}
-            </p>
-          </div>
-        </div>
-      ) : null}
-
-      {/* Buttons */}
-      <div className="mt-8 flex flex-wrap gap-4">
-        {isLast ? (
-          <>
-            <Button variant="primary" size="lg" onClick={save}>
-              Done
-            </Button>
-            <Button href="/measure" variant="secondary" size="lg">
-              Measure something else
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="primary"
-              size="lg"
-              arrow
-              disabled={!canAdvance}
-              onClick={() => setStep((current) => current + 1)}
-            >
-              Next
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() =>
-                step === 1 ? router.push(backHref) : setStep((c) => c - 1)
-              }
-            >
-              Back
-            </Button>
-          </>
-        )}
-      </div>
-
-      {!isLast && !canAdvance ? (
-        <p className="mt-3 t-body-sm text-muted" aria-live="polite">
-          Enter a value for every field to continue.
-        </p>
-      ) : null}
-
-      <SafetyBanner />
     </div>
   );
 }
 
 export default function MeasurementFlow() {
+  const { bpGuide, submitBpMeasurement } = useStore();
+  const [step, setStep] = useState(1); // 1: Prep | 2: Readings | 3: Symptoms | 4: Result
+  const [doneSteps, setDoneSteps] = useState({});
+  const [readings, setReadings] = useState([
+    { key: "r1", systolic: "118", diastolic: "76", pulse: "68" },
+  ]);
+  const [symptoms, setSymptoms] = useState([]);
+  const [retestOf, setRetestOf] = useState(undefined);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [result, setResult] = useState(null);
+
+  const stepHeadingRef = useRef(null);
+  const baseId = useId();
+
+  useEffect(() => {
+    stepHeadingRef.current?.focus();
+  }, [step]);
+
+  const guideSteps = bpGuide?.steps || [];
+  const prepSteps = guideSteps.slice(0, 6);
+  const readingStepOne = guideSteps.find((s) => s.id === "reading-1");
+  const readingStepTwo = guideSteps.find((s) => s.id === "reading-2");
+  const severeSymptoms = bpGuide?.severeSymptoms || [];
+  const lowSymptoms = bpGuide?.lowSymptoms || [];
+
+  const toggleStepDone = (id) => {
+    setDoneSteps((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const updateReading = (idx, field, value) => {
+    setReadings((prev) =>
+      prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)),
+    );
+  };
+
+  const addReading = () => {
+    if (readings.length >= 3) return;
+    setReadings((prev) => [
+      ...prev,
+      { key: makeId("r"), systolic: "", diastolic: "", pulse: "" },
+    ]);
+  };
+
+  const removeReading = (idx) => {
+    if (readings.length <= 1) return;
+    setReadings((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const toggleSymptom = (id) => {
+    setSymptoms((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
+  };
+
+  const validateReadings = () => {
+    const parsed = [];
+    for (let i = 0; i < readings.length; i += 1) {
+      const r = readings[i];
+      const sys = Number(r.systolic);
+      const dia = Number(r.diastolic);
+      const pul = r.pulse === "" ? undefined : Number(r.pulse);
+
+      if (!Number.isInteger(sys) || sys < 40 || sys > 300) {
+        return { error: `Reading ${i + 1}: Systolic must be a whole number (40–300 mmHg).` };
+      }
+      if (!Number.isInteger(dia) || dia < 20 || dia > 200) {
+        return { error: `Reading ${i + 1}: Diastolic must be a whole number (20–200 mmHg).` };
+      }
+      if (pul !== undefined && (!Number.isInteger(pul) || pul < 20 || pul > 250)) {
+        return { error: `Reading ${i + 1}: Pulse must be a whole number (20–250 bpm).` };
+      }
+      parsed.push(
+        pul === undefined
+          ? { systolic: sys, diastolic: dia }
+          : { systolic: sys, diastolic: dia, pulse: pul },
+      );
+    }
+    return { parsed };
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const check = validateReadings();
+    if (check.error) {
+      setErrorMessage(check.error);
+      setStep(2);
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage("");
+    try {
+      const payload = {
+        takenAt: new Date().toISOString(),
+        readings: check.parsed,
+        symptoms,
+        ...(retestOf ? { retestOf } : {}),
+      };
+      const res = await submitBpMeasurement(payload);
+      setResult(res);
+      setStep(4);
+    } catch (err) {
+      setErrorMessage(err?.message || "Failed to record blood pressure.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
-    <Suspense fallback={null}>
-      <Flow />
-    </Suspense>
+    <div className="space-y-6">
+      <BackLink href="/measure">Measurements</BackLink>
+
+      <div>
+        <p className="t-label-md text-muted">
+          {retestOf ? `Follow-up retest (${retestOf})` : "Guided resting measurement"}
+        </p>
+        <h1 className="t-h1 mt-1 text-primary">Blood pressure guide</h1>
+        <p className="mt-1 text-sm text-secondary">
+          Follow the AHA + microgravity preparation steps, log 1–3 readings, and check acute symptoms.
+        </p>
+      </div>
+
+      <StepIndicator step={step} total={4} />
+
+      {errorMessage ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-emergency/50 bg-emergency/10 px-4 py-3 text-sm text-primary"
+        >
+          {errorMessage}
+        </div>
+      ) : null}
+
+      {step === 1 ? (
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <Card>
+            <CardHeader
+              title={
+                <span ref={stepHeadingRef} tabIndex={-1}>
+                  Step 1: Prepare & rest 5 minutes
+                </span>
+              }
+              subtitle="Tap each preparation step to check it off before inflating the cuff."
+            />
+
+            <div className="mt-4 space-y-3">
+              {prepSteps.length === 0 ? (
+                <p className="text-sm text-muted">Loading BP guide from backend...</p>
+              ) : (
+                prepSteps.map((s, index) => (
+                  <div key={s.id} className="space-y-1.5">
+                    <InstructionStep
+                      number={index + 1}
+                      done={Boolean(doneSteps[s.id])}
+                      onToggle={() => toggleStepDone(s.id)}
+                    >
+                      <span>{s.text}</span>
+                    </InstructionStep>
+                    <div className="pl-4">
+                      {s.detail ? (
+                        <p className="text-xs leading-5 text-secondary">{s.detail}</p>
+                      ) : null}
+                      {s.adaptation ? (
+                        <span className="mt-1 inline-block rounded-pill border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] font-medium text-accent">
+                          Microgravity adaptation
+                        </span>
+                      ) : null}
+                      {s.timerSeconds ? (
+                        <CountdownControl
+                          key={`${s.id}:${s.timerSeconds}`}
+                          initialSeconds={s.timerSeconds}
+                          label="Quiet rest timer"
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {bpGuide ? (
+              <div className="mt-5 border-t border-line pt-4 text-xs text-muted">
+                <p className="font-medium">{bpGuide.disclaimer}</p>
+                <div className="mt-1.5 flex flex-wrap gap-3">
+                  {bpGuide.sources?.map((src) => (
+                    <a
+                      key={src.id}
+                      href={src.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-accent hover:underline"
+                    >
+                      {src.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-6 flex justify-end">
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => {
+                  setErrorMessage("");
+                  setStep(2);
+                }}
+              >
+                Continue to readings
+                <Icon name="arrow_forward" size={18} />
+              </Button>
+            </div>
+          </Card>
+
+          <div className="space-y-4">
+            <CuffPlacementIllustration variant="correct" />
+            <p className="text-xs leading-5 text-muted">
+              Bare skin cuff 2–3 cm above the elbow crease, supported at heart level.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {step === 2 ? (
+        <Card>
+          <CardHeader
+            title={
+              <span ref={stepHeadingRef} tabIndex={-1}>
+                Step 2: Record 1–3 readings
+              </span>
+            }
+            subtitle={
+              readingStepOne?.text ||
+              "Take your first reading. If possible, wait 1 minute and add a second reading to average."
+            }
+          />
+
+          {readingStepTwo?.timerSeconds ? (
+            <div className="mt-4 rounded-md border border-line bg-raised p-4">
+              <p className="text-xs font-medium text-secondary">
+                {readingStepTwo.text}
+              </p>
+              <CountdownControl
+                key={`reading2:${readingStepTwo.timerSeconds}`}
+                initialSeconds={readingStepTwo.timerSeconds}
+                label="Wait between readings"
+              />
+            </div>
+          ) : null}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const check = validateReadings();
+              if (check.error) {
+                setErrorMessage(check.error);
+                return;
+              }
+              setErrorMessage("");
+              setStep(3);
+            }}
+            className="mt-5 space-y-4"
+          >
+            {readings.map((row, idx) => (
+              <fieldset
+                key={row.key}
+                className="rounded-md border border-line bg-raised p-4"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <legend className="text-sm font-semibold text-primary">
+                    Reading {idx + 1}
+                  </legend>
+                  {readings.length > 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => removeReading(idx)}
+                      className="text-xs font-medium text-muted hover:text-emergency"
+                    >
+                      Remove
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <label
+                      htmlFor={`${baseId}-sys-${idx}`}
+                      className="block text-xs font-medium text-secondary"
+                    >
+                      Systolic (mmHg) *
+                    </label>
+                    <input
+                      id={`${baseId}-sys-${idx}`}
+                      name={`systolic_${idx}`}
+                      type="number"
+                      min={40}
+                      max={300}
+                      step={1}
+                      required
+                      value={row.systolic}
+                      onChange={(e) => updateReading(idx, "systolic", e.target.value)}
+                      className="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor={`${baseId}-dia-${idx}`}
+                      className="block text-xs font-medium text-secondary"
+                    >
+                      Diastolic (mmHg) *
+                    </label>
+                    <input
+                      id={`${baseId}-dia-${idx}`}
+                      name={`diastolic_${idx}`}
+                      type="number"
+                      min={20}
+                      max={200}
+                      step={1}
+                      required
+                      value={row.diastolic}
+                      onChange={(e) => updateReading(idx, "diastolic", e.target.value)}
+                      className="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor={`${baseId}-pul-${idx}`}
+                      className="block text-xs font-medium text-secondary"
+                    >
+                      Pulse (bpm, optional)
+                    </label>
+                    <input
+                      id={`${baseId}-pul-${idx}`}
+                      name={`pulse_${idx}`}
+                      type="number"
+                      min={20}
+                      max={250}
+                      step={1}
+                      value={row.pulse}
+                      onChange={(e) => updateReading(idx, "pulse", e.target.value)}
+                      className="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-primary"
+                    />
+                  </div>
+                </div>
+              </fieldset>
+            ))}
+
+            {readings.length < 3 ? (
+              <button
+                type="button"
+                onClick={addReading}
+                className="inline-flex items-center gap-1.5 rounded-md border border-line bg-raised px-3.5 py-2 text-xs font-semibold text-accent hover:bg-hover"
+              >
+                <Icon name="add" size={16} />
+                Add reading {readings.length + 1} (recommended average)
+              </button>
+            ) : null}
+
+            <div className="flex flex-wrap justify-between gap-3 pt-2">
+              <Button type="button" variant="secondary" onClick={() => setStep(1)}>
+                Back to preparation
+              </Button>
+              <Button type="submit" variant="primary">
+                Next: Check symptoms
+                <Icon name="arrow_forward" size={18} />
+              </Button>
+            </div>
+          </form>
+        </Card>
+      ) : null}
+
+      {step === 3 ? (
+        <Card>
+          <CardHeader
+            title={
+              <span ref={stepHeadingRef} tabIndex={-1}>
+                Step 3: Acute symptom check
+              </span>
+            }
+            subtitle="Select any symptoms present right now. Leave all unchecked if none."
+          />
+
+          <form onSubmit={handleSubmit} className="mt-5 space-y-6">
+            <fieldset className="space-y-3">
+              <legend className="text-sm font-semibold text-primary">
+                Target-organ / severe high BP symptoms
+              </legend>
+              <div className="grid gap-2.5 sm:grid-cols-2">
+                {severeSymptoms.map((sym) => {
+                  const cid = `${baseId}-${sym.id}`;
+                  const checked = symptoms.includes(sym.id);
+                  return (
+                    <label
+                      key={sym.id}
+                      htmlFor={cid}
+                      className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-md border p-3.5 text-sm transition-colors ${
+                        checked
+                          ? "border-emergency bg-emergency/10 text-primary"
+                          : "border-line bg-raised text-secondary hover:bg-hover"
+                      }`}
+                    >
+                      <input
+                        id={cid}
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleSymptom(sym.id)}
+                        className="h-5 w-5 accent-[var(--color-emergency)]"
+                      />
+                      <span>{sym.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <fieldset className="space-y-3">
+              <legend className="text-sm font-semibold text-primary">
+                Low BP / shock warning signs
+              </legend>
+              <div className="grid gap-2.5 sm:grid-cols-2">
+                {lowSymptoms.map((sym) => {
+                  const cid = `${baseId}-${sym.id}`;
+                  const checked = symptoms.includes(sym.id);
+                  return (
+                    <label
+                      key={sym.id}
+                      htmlFor={cid}
+                      className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-md border p-3.5 text-sm transition-colors ${
+                        checked
+                          ? "border-attention bg-attention/10 text-primary"
+                          : "border-line bg-raised text-secondary hover:bg-hover"
+                      }`}
+                    >
+                      <input
+                        id={cid}
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleSymptom(sym.id)}
+                        className="h-5 w-5 accent-[var(--color-attention)]"
+                      />
+                      <span>{sym.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <div className="flex flex-wrap justify-between gap-3 border-t border-line pt-4">
+              <Button type="button" variant="secondary" onClick={() => setStep(2)}>
+                Back to readings
+              </Button>
+              <Button type="submit" variant="primary" disabled={submitting}>
+                {submitting ? "Scoring on server..." : "Submit BP measurement"}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      ) : null}
+
+      {step === 4 && result ? (
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="t-label-md text-muted">
+                Day {result.missionDay} · {result.readings?.length} reading(s) averaged
+              </p>
+              <h2 ref={stepHeadingRef} tabIndex={-1} className="t-h1 mt-1 text-primary">
+                Blood pressure recorded
+              </h2>
+            </div>
+
+            <StatusBadge
+              tone={statusToBadgeTone(result.zone?.status?.level)}
+              dot={false}
+              className="py-1.5 text-sm"
+            >
+              <Icon name={iconNameForKey(result.zone?.status?.iconKey)} size={16} />
+              <span>{result.zone?.status?.label}</span>
+            </StatusBadge>
+          </div>
+
+          {result.nextAction?.type === "alert_crew" ? (
+            <div
+              role="alert"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-lg border-2 border-emergency bg-emergency/15 p-5"
+            >
+              <div className="flex items-start gap-3">
+                <Icon name="emergency" filled size={28} className="mt-0.5 text-emergency" />
+                <div>
+                  <p className="text-base font-bold text-primary">
+                    Alert crew now
+                  </p>
+                  <p className="mt-0.5 text-sm text-secondary">
+                    Severe reading or acute warning symptoms were reported. Open offline emergency guidance immediately.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/emergency"
+                className="inline-flex h-11 items-center gap-2 rounded-md bg-emergency px-5 text-sm font-semibold text-white hover:bg-emergency-hover"
+              >
+                <Icon name="emergency" filled size={18} />
+                Open Emergency mode
+              </Link>
+            </div>
+          ) : null}
+
+          {result.nextAction?.type === "retest" ? (
+            <div className="rounded-lg border border-attention/50 bg-attention/10 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="text-base font-semibold text-primary">
+                    Retest recommended
+                  </p>
+                  <p className="mt-0.5 text-sm text-secondary">
+                    Sit or anchor quietly and recheck to confirm whether this severe reading persists.
+                  </p>
+                  {result.nextAction.afterSeconds ? (
+                    <CountdownControl
+                      key={`retest:${result.id}:${result.nextAction.afterSeconds}`}
+                      initialSeconds={result.nextAction.afterSeconds}
+                      label="Retest countdown"
+                    />
+                  ) : null}
+                </div>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => {
+                    setRetestOf(result.id);
+                    setReadings([{ key: makeId("r"), systolic: "", diastolic: "", pulse: "" }]);
+                    setErrorMessage("");
+                    setStep(2);
+                  }}
+                >
+                  Log retest now
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <MetricTile
+              label="Average blood pressure"
+              value={`${result.average.systolic}/${result.average.diastolic}`}
+              unit="mmHg"
+              helper={
+                result.average.pulse != null
+                  ? `Pulse ${result.average.pulse} bpm`
+                  : "Pulse not entered"
+              }
+            />
+            <MetricTile
+              label="AHA/ACC category"
+              value={result.category.toUpperCase()}
+              helper={BP_CATEGORY_LABELS[result.category] || result.category}
+            />
+            <MetricTile
+              label="Personal systolic baseline"
+              value={
+                result.zone?.baseline?.ready && result.zone.baseline.mean != null
+                  ? `${Math.round(result.zone.baseline.mean)}`
+                  : "Building"
+              }
+              unit={result.zone?.baseline?.ready ? "mmHg" : undefined}
+              helper={`${result.zone?.baseline?.n ?? 0} sessions in window`}
+            />
+          </div>
+
+          <ClinicalActionCard card={result.card} heading="Blood pressure action card" />
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/normal-zone"
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-on-status hover:bg-accent-hover"
+            >
+              <Icon name="monitoring" size={18} />
+              View trends
+            </Link>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setResult(null);
+                setRetestOf(undefined);
+                setSymptoms([]);
+                setDoneSteps({});
+                setStep(1);
+              }}
+            >
+              New measurement
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
