@@ -1,0 +1,418 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Nova design tokens — source of truth: handoff/tokens.css + tokens.json.
+   Dark is the default (and the only theme the handoff ships screens for);
+   the light overrides below are provided for parity with the token file.
+   ========================================================================= */
+@theme {
+  /* Typography — Inter only, weights 400 / 500 / 600 / 700 */
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Backgrounds */
+  --color-canvas: #070b14; /* --color-bg-canvas  */
+  --color-surface: #0d1320; /* --color-bg-surface */
+  --color-raised: #131a2a; /* --color-bg-raised  */
+  --color-hover: #1a2336; /* --color-bg-hover   */
+
+  /* Borders */
+  --color-line: #263049; /* --color-border-default */
+  --color-line-strong: #3a4561; /* --color-border-strong  */
+
+  /* Text */
+  --color-primary: #f7f8fb; /* --color-text-primary   */
+  --color-soft: #d6dae5; /* --color-text (gray-200) */
+  --color-secondary: #b4bbce; /* --color-text-secondary */
+  --color-muted: #8a93ad; /* --color-text-muted     */
+  --color-on-accent: #ffffff; /* --color-text-on-accent */
+  --color-on-status: #070b14; /* --color-text-on-status */
+
+  /* Accent */
+  --color-accent: #4d8dff; /* --color-accent-primary       */
+  --color-accent-hover: #7aaaff; /* --color-accent-primary-hover */
+  --color-accent-subtle: #0f2552; /* --color-accent-subtle        */
+
+  /* Status */
+  --color-normal: #5ad08f; /* --color-status-normal      */
+  --color-normal-bg: #0e3a24; /* --color-status-normal-bg   */
+  --color-attention: #f6c266; /* --color-status-attention   */
+  --color-attention-bg: #3d2a0a; /* --color-status-attention-bg*/
+  --color-emergency: #f04e4e; /* --color-status-emergency   */
+  /* Hover shade for Danger controls — derived from status-emergency
+     (the handoff does not ship a separate hover token). */
+  --color-emergency-hover: #d93a3a;
+  --color-emergency-bg: #3f1212; /* --color-status-emergency-bg*/
+  --color-focus: #7aaaff; /* --color-focus-ring         */
+
+  /* Radius (handoff: radius-sm / md / lg / pill) */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Depth — restrained on a dark surface */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28);
+
+  /* ---- Legacy aliases -----------------------------------------------
+     Older screens (coach, normal zone, send-to-earth) that are still
+     routable but no longer part of the nav use the pre-Nova class names.
+     They are remapped onto the Nova palette so nothing renders off-theme. */
+  --color-navy: #f7f8fb;
+  --color-ink: #f7f8fb;
+  --color-nasa-blue: #4d8dff;
+  --color-nasa-blue-hover: #7aaaff;
+  --color-nasa-blue-soft: #131a2a;
+  --color-nasa-red: #f04e4e;
+  --color-nasa-red-hover: #ff7a7a;
+  --color-nasa-red-soft: #3f1212;
+  --color-ok: #5ad08f;
+  --color-ok-soft: #0e3a24;
+  --color-warn: #f6c266;
+  --color-warn-soft: #3d2a0a;
+  --color-bad: #ff7a7a;
+  --color-bad-soft: #3f1212;
+}
+
+/* Native form controls, scrollbars and selection follow the active theme. */
+:root {
+  color-scheme: dark;
+}
+
+/* Light theme overrides (parity with handoff/tokens.css). Dark is default. */
+[data-theme="light"] {
+  color-scheme: light;
+  /* --color-bg-canvas → nova-gray-50 */
+  --color-canvas: #f7f8fb;
+  --color-surface: #ffffff;
+  --color-raised: #edeff5;
+  --color-hover: #edeff5;
+  --color-line: #d6dae5;
+  --color-line-strong: #b4bbce;
+  --color-primary: #070b14;
+  /* Not a handoff token: dark-mode #d6dae5 would be invisible on white. */
+  --color-soft: #070b14;
+  --color-secondary: #3a4561;
+  --color-muted: #5b6684;
+  --color-accent: #2f6bff;
+  --color-accent-hover: #4d8dff;
+  --color-accent-subtle: #e3ecff;
+  --color-normal: #1e9e5a;
+  --color-normal-bg: #ddf5e8;
+  --color-attention: #c98512;
+  --color-attention-bg: #fdf0d9;
+  --color-emergency: #d93a3a;
+  --color-emergency-hover: #b92f2f;
+  --color-emergency-bg: #fde2e2;
+  --color-focus: #2f6bff;
+  --color-on-status: #ffffff;
+  --color-navy: #070b14;
+  --color-ink: #070b14;
+  --color-nasa-blue: #2f6bff;
+  --color-nasa-blue-hover: #4d8dff;
+  --color-nasa-blue-soft: #e3ecff;
+  --color-nasa-red: #d93a3a;
+  --color-nasa-red-hover: #f04e4e;
+  --color-nasa-red-soft: #fde2e2;
+  --color-ok: #1e9e5a;
+  --color-ok-soft: #ddf5e8;
+  --color-warn: #c98512;
+  --color-warn-soft: #fdf0d9;
+  --color-bad: #d93a3a;
+  --color-bad-soft: #fde2e2;
+}
+
+/* ============================================================================
+   Material Symbols — self-hosted (offline-safe) static instances.
+   Outlined = default / inactive. Filled = active nav item, selected choice,
+   health status and emergency. Always rendered next to a text label.
+   ========================================================================= */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/MaterialSymbolsOutlined.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Material Symbols Filled";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/MaterialSymbolsFilled.woff2") format("woff2");
+}
+
+/* Base icon box (ligature text is the icon name). */
+.ms,
+.ms-filled {
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.ms {
+  font-family: "Material Symbols Outlined";
+}
+
+.ms-filled {
+  font-family: "Material Symbols Filled";
+}
+
+/* Optically size icons the way the handoff does (24px default). */
+.ms-20 {
+  font-size: 20px;
+}
+
+.ms-18 {
+  font-size: 18px;
+}
+
+.ms-16 {
+  font-size: 16px;
+}
+
+.ms-26 {
+  font-size: 26px;
+}
+
+.ms-32 {
+  font-size: 32px;
+}
+
+.ms-40 {
+  font-size: 40px;
+}
+
+/* ============================================================================
+   Type ramp — handoff/tokens.css (--text-*, --tracking-*).
+   ========================================================================= */
+@layer components {
+  .t-display {
+    font-family: var(--font-heading);
+    font-size: 40px;
+    line-height: 48px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+  }
+
+  .t-h1 {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+
+  .t-h2 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .t-h3 {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .t-body-lg {
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 400;
+  }
+
+  .t-body-md {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+
+  .t-body-sm {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+
+  .t-label-lg {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  .t-label-md {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+
+  .t-caption {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  .t-metric {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    line-height: 56px;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+
+  /* Mobile: keep every heading inside the viewport (no clipping). */
+  @media (max-width: 640px) {
+    .t-display {
+      font-size: 30px;
+      line-height: 38px;
+      letter-spacing: -0.6px;
+    }
+
+    .t-h1 {
+      font-size: 26px;
+      line-height: 34px;
+    }
+
+    .t-h2 {
+      font-size: 20px;
+      line-height: 28px;
+    }
+
+    .t-metric {
+      font-size: 36px;
+      line-height: 44px;
+    }
+
+    .t-body-lg {
+      font-size: 16px;
+      line-height: 26px;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+  }
+
+  /* Focus is always visible — 2px focus ring, offset 2px. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Number inputs: no spinners (fields are free-text entry with a unit). */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  ::selection {
+    background: var(--color-accent-subtle);
+    color: var(--color-primary);
+  }
+
+  /* Dark-theme scrollbars */
+  * {
+    scrollbar-color: var(--color-line-strong) transparent;
+    scrollbar-width: thin;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================================
+   Recharts → theme tokens.
+   Charts are SVG: presentation attributes lose to any CSS rule, so these
+   re-map Recharts' built-in classes onto the Nova tokens and the charts
+   follow the active theme. Series colours stay in the components.
+   ========================================================================= */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--color-line);
+}
+
+.recharts-axis-line,
+.recharts-cartesian-axis-tick line {
+  stroke: var(--color-line);
+}
+
+.recharts-cartesian-axis-tick text {
+  fill: var(--color-muted);
+}
+
+.recharts-tooltip-cursor {
+  stroke: var(--color-line-strong);
+}
+
+.recharts-line-curve {
+  stroke: var(--color-accent);
+}
+
+.recharts-active-dot {
+  fill: var(--color-accent);
+}
+
+/* Dot halo matches the chart's background in both themes. */
+.recharts-line-dots circle {
+  stroke: var(--color-surface);
+}
+
+
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  background-color: rgba(5, 8, 15, 0.72);
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
