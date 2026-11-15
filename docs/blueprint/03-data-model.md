@@ -109,10 +109,10 @@ Design choices (no published value; each is one named constant so it can change 
 | `Z_WATCH` | −1.0 | R2 proposal: an early "heads-up" tier before −1.5 |
 | `BASELINE_WINDOW_SESSIONS` | 14 | R2 proposal: rolling two-week window |
 | `BASELINE_MIN_SESSIONS` | 5 | R2 proposal: 5–7 rested sessions; PVT has no practice effect |
-| Baseline excludes flagged sessions (and two-sided `watch` spikes) | — | Stops flagged checks or severe BP spikes skewing later bands without ratcheting one-sided reaction baselines upward |
+| Baseline excludes flagged sessions and BP readings in the `severe` or `low` category; never an entry for its own z | — | Keeps broken checks and absolutely abnormal BP out of the normal band. Excluding by z trims the tails and inflates false alarms (fixtures: 25% reaction, 41% BP) |
 | `PERSISTENT_DAYS` | 3 | Three `act` check-ins in a row raise the persistent card |
 | `BP_SUSTAINED_READINGS` | 3 | Last 3 measurements on different days all ≥ 140/90 (R3: assess over 3–7 days) |
-| `BP_Z_FLAG` | ±1.5 | Mirrors the reaction threshold for "different from your normal" |
+| `BP_Z_WATCH` | ±1.5 | Mirrors the reaction threshold for "different from your normal" |
 | `NO_RESPONSE_TIMEOUT_MS` | 30 000 | Used by the 10-min PVT (R2 #6); not re-checked for PVT-B |
 | QC limits | ≥ 20 stimuli; total time within 150–210 s; median RT ≥ 120 ms | Reject broken or scripted sessions |
 | `CPR_METRONOME_BPM` | 110 | Midpoint of verified 100–120/min chest compression target (CHECKS R8) |

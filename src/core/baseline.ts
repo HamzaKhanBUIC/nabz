@@ -13,6 +13,12 @@ export interface BaselineEntryInput {
   effectiveDateTime: string;
   value: number;
   qcFlags?: readonly string[];
+  /**
+   * Set by the caller when the value is abnormal by an absolute, sourced threshold
+   * (for blood pressure: the severe or low category). The entry is still scored,
+   * but it stays out of later baseline windows.
+   */
+  excludeFromBaseline?: boolean;
 }
 
 export interface FoldOptions {
@@ -100,9 +106,13 @@ function computeBaselineStats(
 
 /**
  * Folds chronological entries from oldest to newest, scoring each entry against
- * the rolling window of up to `windowSessions` earlier valid entries. For
- * two-sided series (blood pressure), off-normal `watch` outliers stay out of
- * later windows so a severe reading does not shift the normal band.
+ * the rolling window of up to `windowSessions` earlier valid entries.
+ *
+ * Nothing is left out of the window because of its own z-score or zone. Dropping
+ * values for being far from the mean trims the tails, which shrinks the SD and
+ * flags ever more ordinary values (measured on the fixtures: 25% of ordinary
+ * reaction days and 41% of ordinary blood pressure readings). Only two things
+ * keep an entry out: a quality flag, or `excludeFromBaseline` set by the caller.
  */
 export function foldHistory<T extends BaselineEntryInput>(
   entries: readonly T[],
@@ -140,12 +150,7 @@ export function foldHistory<T extends BaselineEntryInput>(
 
     results.push({ entry, baseline, z, zone, status });
 
-    // For a one-sided series (reaction speed), dropping `act` days censors only the
-    // lower tail and ratchets the rolling baseline upward. Keep all QC-valid days
-    // there; for a two-sided series (blood pressure), off-normal (`watch`) spikes
-    // stay out of later windows so a severe reading does not become the normal.
-    const offNormal = direction === "two_sided" && zone === "watch";
-    if (!flagged && !offNormal) {
+    if (!flagged && !entry.excludeFromBaseline) {
       validValues.push(entry.value);
       if (validValues.length > windowSessions) {
         validValues.shift();

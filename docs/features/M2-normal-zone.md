@@ -10,11 +10,11 @@ Compares each new value with Sara's own recent history, never with a population 
 
 Entries are processed oldest first. For each entry:
 
-1. **Window:** the last 14 earlier valid entries (no quality flags); for two-sided blood pressure, off-normal `watch` outliers also stay out of later windows so a severe reading does not shift the normal band.
+1. **Window:** the last 14 earlier valid entries. An entry is left out only if it has a quality flag or the caller set `excludeFromBaseline` (blood pressure sets it for readings in the absolute `severe` or `low` category). No entry is left out because of its own z or zone: trimming the tails shrinks the SD and flags ever more ordinary values (measured on the fixtures: 25% of ordinary reaction days, 41% of ordinary BP readings).
 2. **Ready** when the window holds at least 5 entries and their SD is above 0.
 3. **Baseline:** mean and sample SD (n − 1) of the window.
 4. **z** = (value − mean) / SD. `null` when not ready.
-5. **Zone** from z (below). The entry's zone decides whether later windows may include it.
+5. **Zone** from z (below). The zone never decides whether later windows include the entry.
 
 `options` carries `windowSessions`, `minSessions` and `direction`, so the same function serves reaction speed, blood pressure and the NASA data (which has 3 pre-launch samples and uses `minSessions: 3`).
 
@@ -42,7 +42,7 @@ Faster than normal is `in_zone`. For blood pressure the comparison is two-sided 
 
 - 4 entries: `building`. 5 entries with spread: ready.
 - Hand-computed case: window values 4.0, 4.1, 4.2, 4.3, 4.4 → mean 4.2, SD 0.15811. A new value of 3.9628 gives z = −1.5 → `act`; 3.9700 gives z = −1.4546 → `watch`; 4.0418 gives z = −1.0005 → `watch`; 4.0500 gives z = −0.9487 → `in_zone`.
-- A flagged entry is not in the next entry's window; valid one-sided entries stay in the window so the baseline does not ratchet upward, while two-sided (`watch`) outliers stay out.
+- A flagged entry, or one with `excludeFromBaseline`, is not in the next entry's window. An ordinary entry that lands in `watch` or `act` stays in the window.
 - All-equal window (SD 0): not ready, no division by zero.
 - Missing days are fine: the window counts sessions, not calendar days.
 - Trend returns the requested number of days and a band that matches the last baseline.

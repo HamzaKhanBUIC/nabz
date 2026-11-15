@@ -2,7 +2,8 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["node_modules/", "dist/", "coverage/", "logs/", "data/", "contract/", "content/", "tools/console/", ".claude/"],
+    // frontend/ is a separate app with its own package.json and lint config; CI lints it in its own job.
+    ignores: ["node_modules/", "dist/", "coverage/", "logs/", "data/", "contract/", "content/", "tools/console/", ".claude/", "frontend/"],
   },
   ...tseslint.configs.recommended,
   {
