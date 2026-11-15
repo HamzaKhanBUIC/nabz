@@ -16,7 +16,7 @@ const example = (name: string): object =>
   JSON.parse(readFileSync(new URL(`../../contract/examples/${name}`, import.meta.url), "utf8"));
 
 function setup() {
-  const app = createApp({ runtimeDir: mkdtempSync(path.join(tmpdir(), "crewpulse-env-")), pinnedNow: NOW });
+  const app = createApp({ runtimeDir: mkdtempSync(path.join(tmpdir(), "nabz-env-")), pinnedNow: NOW });
   const as = async (crewId: string) => {
     const res = await request(app).post("/api/session").send({ crewId, code: CODES[crewId] });
     expect(res.status).toBe(201);

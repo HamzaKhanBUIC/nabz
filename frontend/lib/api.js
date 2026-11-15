@@ -1,14 +1,14 @@
 /**
- * Client for the local CrewPulse Express 5 backend.
+ * Client for the local Nabz Express 5 backend.
  * Zero client-side clinical scoring: the server computes zones, categories, cards and bands.
  */
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8787";
 
-const TOKEN_STORAGE_KEY = "crewpulse:token";
-const CREW_STORAGE_KEY = "crewpulse:crew";
-const SESSION_EVENT = "crewpulse:session";
+const TOKEN_STORAGE_KEY = "nabz:token";
+const CREW_STORAGE_KEY = "nabz:crew";
+const SESSION_EVENT = "nabz:session";
 
 let unauthorizedHandler = null;
 

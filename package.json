@@ -1,5 +1,5 @@
 {
-  "name": "crewpulse",
+  "name": "nabz",
   "version": "0.1.0",
   "private": true,
   "description": "Backend for a private daily health check-in for astronauts (NASA Space Apps 2026).",

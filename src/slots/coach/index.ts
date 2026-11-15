@@ -70,7 +70,7 @@ export class OllamaCoachProvider implements CoachProvider {
 
     try {
       const systemPrompt = [
-        "You are crewpulse's onboard explanation assistant on a Mars transit ship.",
+        "You are nabz's onboard explanation assistant on a Mars transit ship.",
         "Explain ONLY using the provided Action Card facts and Verified Snippets.",
         "Never diagnose, invent numbers, or contradict the card severity.",
         "Keep the answer to 2-3 concise, practical sentences.",

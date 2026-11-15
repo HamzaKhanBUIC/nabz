@@ -1,7 +1,7 @@
 import { Router, type RequestHandler } from "express";
 import { CURIOSITY_CRUISE_MSV_PER_DAY, estimateDose } from "../../core";
 import { EnvironmentInput, EnvironmentState, HazardList, RadiationEstimate, type Environment } from "../../schemas";
-import type { CrewPulseStore } from "../../store";
+import type { NabzStore } from "../../store";
 import type { MissionState } from "../../store/mission-state";
 import { sessionOf } from "../session";
 
@@ -10,12 +10,12 @@ export const COMMANDER_ROLE = "Commander";
 
 export interface EnvironmentRouterDeps {
   auth: RequestHandler;
-  store: CrewPulseStore;
+  store: NabzStore;
   missionState: MissionState;
 }
 
 /** Returns the active environment; falls back to the first one only if content lost the saved id. */
-export function activeEnvironment(store: CrewPulseStore, missionState: MissionState): Environment {
+export function activeEnvironment(store: NabzStore, missionState: MissionState): Environment {
   const all = store.getEnvironments();
   const id = missionState.getEnvironmentId();
   return all.find((e) => e.id === id) ?? all[0]!;

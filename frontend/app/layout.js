@@ -21,8 +21,8 @@ export const viewport = {
 
 export const metadata = {
   title: {
-    default: "CrewPulse | Crew Health Monitoring",
-    template: "%s · CrewPulse",
+    default: "Nabz | Crew Health Monitoring",
+    template: "%s · Nabz",
   },
   description:
     "Onboard crew health monitor for reaction speed, sleep, blood pressure, baseline trends, and offline emergency steps.",

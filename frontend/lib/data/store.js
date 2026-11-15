@@ -14,15 +14,15 @@ import * as api from "@/lib/api";
 import { isPublicRoute, useSession } from "@/lib/data/session";
 
 const STORAGE_KEYS = {
-  protocol: "crewpulse:cache:protocol",
-  bpGuide: "crewpulse:cache:bpGuide",
-  routines: "crewpulse:cache:routines",
-  hazards: "crewpulse:cache:hazards",
-  emergencySelf: "crewpulse:cache:emergency:self",
-  emergencyCrewmate: "crewpulse:cache:emergency:crewmate",
-  outbox: "crewpulse:outbox",
-  emergencyLog: "crewpulse:emergencyLog",
-  coachMessages: "crewpulse:coachMessages",
+  protocol: "nabz:cache:protocol",
+  bpGuide: "nabz:cache:bpGuide",
+  routines: "nabz:cache:routines",
+  hazards: "nabz:cache:hazards",
+  emergencySelf: "nabz:cache:emergency:self",
+  emergencyCrewmate: "nabz:cache:emergency:crewmate",
+  outbox: "nabz:outbox",
+  emergencyLog: "nabz:emergencyLog",
+  coachMessages: "nabz:coachMessages",
 };
 
 const TREND_CODES = [
@@ -228,7 +228,7 @@ export function StoreProvider({ children }) {
       } catch (err) {
         if (!active) return;
         setBackendOnline(false);
-        setError(err?.message || "Unable to reach CrewPulse backend.");
+        setError(err?.message || "Unable to reach Nabz backend.");
       }
     }
 
@@ -295,7 +295,7 @@ export function StoreProvider({ children }) {
       } catch (err) {
         if (!active) return;
         setBackendOnline(false);
-        setError(err?.message || "Unable to reach CrewPulse backend.");
+        setError(err?.message || "Unable to reach Nabz backend.");
       } finally {
         if (active) setLoading(false);
       }

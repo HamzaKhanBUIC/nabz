@@ -1,6 +1,6 @@
 # Brief A: data simulator (feature F02)
 
-You are a worker on the crewpulse backend. Build one thing: a seeded generator that writes 120 days of sample health data.
+You are a worker on the nabz backend. Build one thing: a seeded generator that writes 120 days of sample health data.
 
 ## Read first
 

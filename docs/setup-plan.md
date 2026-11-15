@@ -74,7 +74,7 @@ NASA_HACK_COMPTETION/        ← one git repo, private on GitHub
   .github/workflows/ci.yml   ← runs the checks on every push
 ```
 
-Change from earlier: one repo for the whole folder, instead of a `crewpulse/` subfolder. Research and tracking files live at the root, so this is simpler. Claude's memory also stays tied to this folder.
+Change from earlier: one repo for the whole folder, instead of a `nabz/` subfolder. Research and tracking files live at the root, so this is simpler. Claude's memory also stays tied to this folder.
 
 **Not committed:** `.env`, `node_modules/`, `.playwright-mcp/` logs, and the workshop `.docx` / `.png` files (team-private). This last one is easy to change.
 

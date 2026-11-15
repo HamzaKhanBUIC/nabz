@@ -29,7 +29,7 @@ const NOW = "2026-11-15T08:00:00+00:00";
 const tempDirs: string[] = [];
 
 function makeTempDir(): string {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "crewpulse-should-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "nabz-should-"));
   tempDirs.push(dir);
   return dir;
 }

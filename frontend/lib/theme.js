@@ -24,7 +24,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
-export const THEME_STORAGE_KEY = "crewpulse:theme";
+export const THEME_STORAGE_KEY = "nabz:theme";
 
 const ThemeContext = createContext({
   theme: "dark",

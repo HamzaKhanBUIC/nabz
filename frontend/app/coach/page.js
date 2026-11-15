@@ -22,7 +22,7 @@ export default function CoachPage() {
       <BackLink href="/">Today</BackLink>
 
       <div>
-        <h1 className="t-h1 mt-1 text-primary">CrewPulse coach</h1>
+        <h1 className="t-h1 mt-1 text-primary">Nabz coach</h1>
         <p className="mt-1 text-sm text-secondary">{coachDisclaimer}</p>
       </div>
 

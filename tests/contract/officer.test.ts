@@ -11,7 +11,7 @@ const NOW = "2026-11-15T08:00:00+00:00";
 const CODES: Record<string, string> = { sara: "4120", mateo: "7316", elena: "2468", kenji: "9053" };
 
 function setup() {
-  const app = createApp({ runtimeDir: mkdtempSync(path.join(tmpdir(), "crewpulse-officer-")), pinnedNow: NOW });
+  const app = createApp({ runtimeDir: mkdtempSync(path.join(tmpdir(), "nabz-officer-")), pinnedNow: NOW });
   const as = async (crewId: string) => {
     const res = await request(app).post("/api/session").send({ crewId, code: CODES[crewId] });
     expect(res.status).toBe(201);

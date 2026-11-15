@@ -76,7 +76,7 @@ export interface CreateStoreOptions {
 /** The mission as the store knows it; the API adds the active environment (E06). */
 export type MissionCore = Omit<Mission, "environment">;
 
-export interface CrewPulseStore {
+export interface NabzStore {
   getMission(): MissionCore;
   getToday(): Today;
   getProtocol(): Protocol;
@@ -127,7 +127,7 @@ function missionDateForDay(launchDate: string, missionDay: number): string {
 }
 
 /** Creates a file-backed store initialized from seeded fixtures, verified content, and runtime logs. */
-export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
+export function createStore(options: CreateStoreOptions = {}): NabzStore {
   const root = process.cwd();
   const dataDir = options.dataDir ?? path.join(root, "data");
   const fixturesDir = path.join(dataDir, "fixtures");

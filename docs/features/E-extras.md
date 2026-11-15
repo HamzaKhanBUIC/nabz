@@ -72,7 +72,7 @@ Each lane ends with the gate, its own `verify` steps from `features.json`, a fro
 
 **Screen:**
 - A hazard chip on each action card, with label and icon (not colour alone), linking to the hazard.
-- A "5 hazards" section showing each hazard, what CrewPulse watches for it, and NASA's page.
+- A "5 hazards" section showing each hazard, what Nabz watches for it, and NASA's page.
 
 **Tests:**
 - the content test fails if any card has no hazard or uses an unknown hazard id;

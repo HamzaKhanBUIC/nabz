@@ -24,7 +24,7 @@ export const Hazard = z.strictObject({
   url: z.url(),
   /** HRP risk IDs (Human Research Roadmap). Our grouping: a design choice, see CHECKS R11. */
   hrpRiskIds: z.array(z.number().int().positive()).min(1),
-  /** What CrewPulse watches for this hazard, in plain words. */
+  /** What Nabz watches for this hazard, in plain words. */
   watches: z.string().min(1),
 });
 export type Hazard = z.infer<typeof Hazard>;

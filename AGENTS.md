@@ -1,4 +1,4 @@
-# crewpulse — agent rules
+# nabz — agent rules
 
 Backend, data and AI for the NOVA TRIO Space Apps 2026 entry. Tier C · hackathon · Node.
 The frontend in `frontend/` started as Mariam's work; Hamza took it over on 2026-11-15 and it is now built by Claude and agents. `docs/api-contract.md` stays the contract between `frontend/` and the API.

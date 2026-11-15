@@ -1,6 +1,6 @@
 import { Router, type RequestHandler } from "express";
 import { ConsentInput, CrewOverview, type CrewMember } from "../../schemas";
-import type { CrewPulseStore } from "../../store";
+import type { NabzStore } from "../../store";
 import { sessionOf } from "../session";
 import type { z } from "zod";
 
@@ -10,7 +10,7 @@ export const MEDICAL_OFFICER_ROLE = "Medical officer";
 export interface CrewRouterDeps {
   auth: RequestHandler;
   crew: readonly z.infer<typeof CrewMember>[];
-  storeFor: (subjectId: string) => CrewPulseStore;
+  storeFor: (subjectId: string) => NabzStore;
   nowIso: () => string;
 }
 

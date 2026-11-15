@@ -14,7 +14,7 @@ const CODES = { sara: "4120", mateo: "7316" } as const;
 function setup() {
   let clock = Date.parse(NOW);
   const sessions = createSessionStore({ now: () => clock });
-  const app = createApp({ runtimeDir: mkdtempSync(path.join(tmpdir(), "crewpulse-session-")), pinnedNow: NOW, sessions });
+  const app = createApp({ runtimeDir: mkdtempSync(path.join(tmpdir(), "nabz-session-")), pinnedNow: NOW, sessions });
   return { app, advance: (ms: number) => (clock += ms) };
 }
 

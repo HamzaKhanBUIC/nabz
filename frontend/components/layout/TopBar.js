@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
+import BrandLogo from "@/components/ui/BrandLogo";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useStore } from "@/lib/data/store";
 import { getCrewInitials, useSession } from "@/lib/data/session";
@@ -146,10 +147,9 @@ export default function TopBar({ onOpenMenu }) {
         <Link
           href={isAuthenticated ? "/" : "/real-data"}
           aria-label={`${APP_NAME} home`}
-          className="group hidden shrink-0 items-center gap-2.5 sm:flex"
+          className="group hidden shrink-0 items-center sm:flex lg:w-[15.375rem]"
         >
-          <Icon name="pulse_alert" size={28} className="shrink-0 text-accent" />
-          <span className="t-h3 hidden text-primary sm:inline lg:w-[12.5rem]">{APP_NAME}</span>
+          <BrandLogo />
         </Link>
 
         <span aria-hidden="true" className="hidden h-8 w-px shrink-0 bg-line sm:block lg:hidden" />

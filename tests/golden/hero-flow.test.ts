@@ -21,7 +21,7 @@ import {
 const tempDirs: string[] = [];
 
 function makeTempRuntimeDir(): string {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "crewpulse-hero-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "nabz-hero-"));
   tempDirs.push(dir);
   return dir;
 }

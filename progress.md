@@ -196,3 +196,8 @@ Append-only, newest at the bottom: date, feature, what changed, what's next.
 - NASA brand guidelines checked: no NASA insignia, logotype, seal or look-alike, and no wording that implies endorsement. NASA appears only as a source credit.
 - Checks: tasteskill lint 10 FAIL / 72 WARN before, 0 FAIL / 12 WARN after (remaining: overlay shadows, clock zero-padding, missing-value dashes); inspector on the production build 0 FAIL on sign-in, hazards, emergency; frontend lint and next build pass; gate PASS. Browser check at 375, 900 and 1280 px, dark and light.
 - Sign-in page: added "CrewPulse is a NASA Space Apps Challenge 2026 project built with public NASA data. It is not affiliated with or endorsed by NASA." under the card (Hamza approved). 7.15:1 contrast; no sideways scroll at 375 px.
+
+## 2026-11-15: rename CrewPulse to Nabz and add logo
+- On 2026-11-15 the project was renamed from CrewPulse to Nabz across code, tests, localStorage keys, package names, and current docs, and the Nabz logo and favicon were added to the frontend.
+- Captured three 1280x800 screenshots in `docs/assets/screenshots/` (`today.png`, `bp-action-card.png`, `real-data.png`) and rewrote root `README.md`.
+- Work done by a Gemini 4 Hydrogen worker (agy), verified by Claude.
