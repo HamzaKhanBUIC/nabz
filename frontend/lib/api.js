@@ -3,8 +3,9 @@
  * Zero client-side clinical scoring: the server computes zones, categories, cards and bands.
  */
 
+// An empty NEXT_PUBLIC_API_URL means "same origin": the hosted build proxies /api to the backend.
 export const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8787";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
 
 const TOKEN_STORAGE_KEY = "nabz:token";
 const CREW_STORAGE_KEY = "nabz:crew";
