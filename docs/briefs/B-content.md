@@ -1,6 +1,6 @@
 # Brief B: verified content (feature F07)
 
-You are a worker on the crewpulse backend. Build one thing: the content JSON the app shows. You write words, not logic.
+You are a worker on the nabz backend. Build one thing: the content JSON the app shows. You write words, not logic.
 
 ## Read first
 

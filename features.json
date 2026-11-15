@@ -1,5 +1,5 @@
 {
-  "project": "crewpulse",
+  "project": "nabz",
   "outcome_metric": "With the network off, a day-120 check-in for Sara returns zone 'act' and the short-sleep action card with sources, the 120-day trend returns her personal band, and python scripts/gate.py exits 0 in under 60 seconds.",
   "features": [
     {
@@ -278,7 +278,7 @@
     {
       "id": "E03",
       "priority": "P3",
-      "description": "Every action card names the NASA hazard and HRP risk it relates to, and a '5 hazards' section shows what CrewPulse watches for each.",
+      "description": "Every action card names the NASA hazard and HRP risk it relates to, and a '5 hazards' section shows what Nabz watches for each.",
       "design": "docs/features/E-extras.md",
       "owner": "Antigravity lane",
       "verify": [

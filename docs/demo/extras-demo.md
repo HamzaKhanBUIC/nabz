@@ -62,13 +62,13 @@ Record the browser window at 1280 wide or more. Speak slowly; the team will watc
 
 | # | Time | On screen | Say |
 |---|---|---|---|
-| 1 | 0:00 | Sign-in page | "This is CrewPulse with the six extras. First, sign-in. Each crew member has their own code." Type a wrong code, show the error, then sign in as Sara. |
+| 1 | 0:00 | Sign-in page | "This is Nabz with the six extras. First, sign-in. Each crew member has their own code." Type a wrong code, show the error, then sign in as Sara. |
 | 2 | 0:20 | Today | "Sara is the Commander, day 120 of a Mars transit. Her data is private to her now." Point at "Today's checks" and the mission line at the top. |
 | 3 | 0:35 | Today, radiation card | "This card estimates her mission radiation dose from published NASA-funded measurements, against the 600 millisievert career limit. It says Estimate, and it lists its sources." |
 | 4 | 0:55 | Blood pressure, 186 / 122 | "Say she logs a high blood pressure reading." Submit. "The rules pick the card, not the AI. The card now names the NASA hazard it relates to and tells her who to contact from where she is." |
 | 5 | 1:20 | Environment page, switch to ISS | "The Commander can change the mission environment." Save, go back to Today. "On the station, the contact line and the dose change. The medical advice doesn't, because thresholds never change with location." |
 | 6 | 1:45 | Emergency screen | "Emergency steps open without a sign-in, and they show the same contact line." Switch back to Mars transit afterwards. |
-| 7 | 2:00 | Hazards page | "This page lists NASA's five hazards of spaceflight, quoted from NASA, with what CrewPulse watches for each." |
+| 7 | 2:00 | Hazards page | "This page lists NASA's five hazards of spaceflight, quoted from NASA, with what Nabz watches for each." |
 | 8 | 2:15 | Real data page | "This chart is real astronaut data: blood counts from the Inspiration4 crew, NASA dataset OSD-569." |
 | 9 | 2:30 | Privacy page | "Sara chooses whether the Medical Officer sees her daily summary." Turn sharing on. |
 | 10 | 2:40 | Sign in as Elena, Crew health | "Elena is the Medical Officer. She sees Sara's summary. Crewmates who haven't shared stay hidden, and every view is logged." |
@@ -99,6 +99,6 @@ Close notifications first (Focus mode), and zoom the browser to 110% so text is 
 > - The header is one line: mission day, where the crew is, Earth delay and gravity. The crew member is in a small account button.
 > - Today starts with "Today's checks": the check-in and blood pressure, each marked Done, Not scored, Due now or Not due, with one button for the next step.
 > - Calmer look: neutral dark colours instead of navy, one font, no glows or decorative boxes. Colour is kept for health status and data.
-> - The sign-in page says CrewPulse is a Space Apps project, not affiliated with or endorsed by NASA. We don't use any NASA logo (NASA's brand rules forbid it).
+> - The sign-in page says Nabz is a Space Apps project, not affiliated with or endorsed by NASA. We don't use any NASA logo (NASA's brand rules forbid it).
 >
 > Nothing else is added beyond this list. Every number has a source in research/CHECKS.md, and all tests pass. Please reply with OK for all of it, OK for some (say which), or no.

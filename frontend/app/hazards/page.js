@@ -63,7 +63,7 @@ export default function HazardsPage() {
         <h1 className="t-h1 text-primary">5 hazards of human spaceflight</h1>
         <p className="max-w-2xl text-sm leading-6 text-secondary">
           NASA&apos;s Human Research Program groups the health risks of deep-space flight
-          into five hazards. Each CrewPulse action card names the hazard it relates to.
+          into five hazards. Each Nabz action card names the hazard it relates to.
         </p>
       </div>
 
@@ -141,7 +141,7 @@ export default function HazardsPage() {
 
                   <div className="text-sm">
                     <p className="t-label-md text-muted">
-                      What CrewPulse watches
+                      What Nabz watches
                     </p>
                     <p className="mt-1 leading-relaxed text-primary">
                       {hazard.watches}

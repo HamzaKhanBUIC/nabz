@@ -8,6 +8,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import MobileNavigation from "@/components/layout/MobileNavigation";
 import AuthGuard from "@/components/layout/AuthGuard";
 import Icon from "@/components/ui/Icon";
+import BrandLogo from "@/components/ui/BrandLogo";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import PageTransition from "@/components/ui/PageTransition";
 import { useClientTime } from "@/lib/hooks/useClientTime";
@@ -53,9 +54,12 @@ function SignInBar() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-canvas">
       <div className="mx-auto flex min-h-[64px] max-w-[1120px] items-center justify-between gap-2 px-4 py-2 sm:min-h-[72px] sm:gap-3 sm:px-6 lg:px-8">
-        <Link href="/sign-in" className="flex min-w-0 items-center gap-2.5 group">
-          <Icon name="pulse_alert" size={28} className="shrink-0 text-accent" />
-          <span className="t-h3 truncate text-primary">{APP_NAME}</span>
+        <Link
+          href="/sign-in"
+          aria-label={`${APP_NAME} sign in`}
+          className="flex min-w-0 items-center group"
+        >
+          <BrandLogo />
         </Link>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">

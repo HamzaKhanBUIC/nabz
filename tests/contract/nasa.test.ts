@@ -9,7 +9,7 @@ import { ErrorBody, NasaCatalog, Trend } from "../../src/schemas";
 const tempDirs: string[] = [];
 
 function makeTempRuntimeDir(): string {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "crewpulse-nasa-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "nabz-nasa-"));
   tempDirs.push(dir);
   return dir;
 }

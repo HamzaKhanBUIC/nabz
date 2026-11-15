@@ -346,7 +346,7 @@ export default function SignInPage() {
       </Card>
 
       <p className="px-1 text-center text-xs leading-5 text-muted">
-        CrewPulse is a NASA Space Apps Challenge 2026 project built with public NASA data. It is
+        Nabz is a NASA Space Apps Challenge 2026 project built with public NASA data. It is
         not affiliated with or endorsed by NASA.
       </p>
     </div>

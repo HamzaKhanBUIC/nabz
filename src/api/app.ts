@@ -13,7 +13,7 @@ import {
   TrendQuery,
 } from "../schemas";
 import { withEscalation } from "../core";
-import { createStore, type CrewPulseStore } from "../store";
+import { createStore, type NabzStore } from "../store";
 import { createMissionState } from "../store/mission-state";
 import { loadCrewAccess, verifyCode } from "../store/access";
 import { createCrewRouter } from "./routes/crew";
@@ -25,7 +25,7 @@ import { bearerToken, createSessionStore, requireSession, sessionOf, type Sessio
 const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
 
 export interface CreateAppOptions {
-  store?: CrewPulseStore;
+  store?: NabzStore;
   runtimeDir?: string;
   pinnedNow?: string;
   consoleDir?: string;
@@ -38,9 +38,9 @@ export interface CreateAppOptions {
 export function createApp(options: CreateAppOptions = {}): Express {
   // One store per crew member, created on first use. Content and mission come from Sara's
   // store; personal data always comes from the signed-in person's own store.
-  const stores = new Map<string, CrewPulseStore>();
+  const stores = new Map<string, NabzStore>();
   if (options.store) stores.set("sara", options.store);
-  const storeFor = (subjectId: string): CrewPulseStore => {
+  const storeFor = (subjectId: string): NabzStore => {
     let s = stores.get(subjectId);
     if (!s) {
       s = createStore({ runtimeDir: options.runtimeDir, pinnedNow: options.pinnedNow, subjectId });
@@ -53,7 +53,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
   const access = loadCrewAccess(options.accessFile);
   const sessions = options.sessions ?? createSessionStore();
   const auth = requireSession(sessions);
-  const mine = (locals: Record<string, unknown>): CrewPulseStore => storeFor(sessionOf(locals).crew.id);
+  const mine = (locals: Record<string, unknown>): NabzStore => storeFor(sessionOf(locals).crew.id);
   // E06: the active environment is mission-level state, shared by the whole crew.
   const missionState = createMissionState(options.runtimeDir ?? path.join(process.cwd(), "data", "runtime"));
   const env = () => activeEnvironment(store, missionState);

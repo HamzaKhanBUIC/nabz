@@ -22,7 +22,7 @@ import {
 const tempDirs: string[] = [];
 
 function makeTempRuntimeDir(): string {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "crewpulse-api-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "nabz-api-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -240,7 +240,7 @@ describe("F08 API contract and JSON store", () => {
 
     const htmlRes = await request(app).get("/dev/").set(SARA_AUTH);
     expect(htmlRes.status).toBe(200);
-    expect(htmlRes.text).toContain("crewpulse dev console");
+    expect(htmlRes.text).toContain("nabz dev console");
     expect(htmlRes.text).toContain("/dev/console.js");
 
     const jsRes = await request(app).get("/dev/console.js").set(SARA_AUTH);

@@ -356,7 +356,7 @@ export function buildDeterministicCoachAnswer(ctx: CoachContext): CoachAnswer {
   if (intents.has("worsening")) {
     segments.push(
       card.ruleId.startsWith("RT-")
-        ? "If slow scores continue for 3 consecutive days (RT-PERSISTENT), crewpulse escalates priority and advises delaying critical work and checking blood pressure. If new symptoms appear, alert a crewmate immediately."
+        ? "If slow scores continue for 3 consecutive days (RT-PERSISTENT), nabz escalates priority and advises delaying critical work and checking blood pressure. If new symptoms appear, alert a crewmate immediately."
         : "If readings stay at or above 140/90 mmHg across 3 days (BP-SUSTAINED-HIGH), stay above 180/120 mmHg on retest, or pair with red-flag symptoms, alert a crewmate immediately.",
     );
   }

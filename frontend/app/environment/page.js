@@ -226,7 +226,7 @@ export default function EnvironmentPage() {
           <Card>
             <CardHeader
               title="Available environments"
-              subtitle="All 5 mission profiles supported by CrewPulse"
+              subtitle="All 5 mission profiles supported by Nabz"
             />
             <CardBody className="space-y-4">
               {isCommander ? (

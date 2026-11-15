@@ -13,7 +13,7 @@ const NOW = "2026-11-15T08:00:00+00:00"; // mission day 120
 const tempDirs: string[] = [];
 
 function makeApp() {
-  const runtimeDir = mkdtempSync(path.join(os.tmpdir(), "crewpulse-regress-"));
+  const runtimeDir = mkdtempSync(path.join(os.tmpdir(), "nabz-regress-"));
   tempDirs.push(runtimeDir);
   return createApp({ runtimeDir, pinnedNow: NOW });
 }

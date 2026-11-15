@@ -138,7 +138,7 @@ export function buildSharePreview(input: ShareBuildInput): SharePackagePreview {
   const delayNotice = `Earth one-way light-time delay is ${oneWayMinMinutes} to ${oneWayMaxMinutes} minutes. Urgent symptoms must alert a crewmate or medical officer immediately rather than waiting for Earth.`;
 
   const lines: string[] = [
-    "CREWPULSE FLIGHT SURGEON SUMMARY",
+    "NABZ FLIGHT SURGEON SUMMARY",
     `Crewmember: ${input.subjectId} | Mission Day: ${input.missionDay} | Generated: ${input.nowIso}`,
     `Transmission window: ${oneWayMinMinutes}-${oneWayMaxMinutes} min one-way (~${oneWayMaxMinutes * 2} min max round-trip)`,
     "",

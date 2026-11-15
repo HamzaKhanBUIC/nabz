@@ -1,4 +1,4 @@
-export const APP_NAME = "CrewPulse";
+export const APP_NAME = "Nabz";
 
 export const NAV_ITEMS = [
   {

@@ -149,6 +149,23 @@
   --color-bad-soft: #fde2e2;
 }
 
+/* Brand logos keyed on [data-theme] (dark is default when unset). */
+.logo-on-dark {
+  display: block;
+}
+
+.logo-on-light {
+  display: none;
+}
+
+[data-theme="light"] .logo-on-dark {
+  display: none;
+}
+
+[data-theme="light"] .logo-on-light {
+  display: block;
+}
+
 /* ============================================================================
    Material Symbols — self-hosted (offline-safe) static instances.
    ========================================================================= */

@@ -30,7 +30,7 @@
       }
     ],
     "cards": [],
-    "summaryText": "CREWPULSE FLIGHT SURGEON SUMMARY\nCrewmember: sara | Mission Day: 120 | Generated: 2026-11-15T08:00:00+00:00\nTransmission window: 3-22 min one-way (~44 min max round-trip)\n\nSelected entries (1):\n- Day 120: PVT-B 3.71 1/s, 9 lapses (Below your normal, z=-1.88)\n\nDecision support, not a diagnosis.",
+    "summaryText": "NABZ FLIGHT SURGEON SUMMARY\nCrewmember: sara | Mission Day: 120 | Generated: 2026-11-15T08:00:00+00:00\nTransmission window: 3-22 min one-way (~44 min max round-trip)\n\nSelected entries (1):\n- Day 120: PVT-B 3.71 1/s, 9 lapses (Below your normal, z=-1.88)\n\nDecision support, not a diagnosis.",
     "disclaimer": "Decision support, not a diagnosis."
   }
 }

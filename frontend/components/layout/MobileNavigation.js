@@ -11,7 +11,8 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Icon from "@/components/ui/Icon";
-import { APP_NAME, NAV_ITEMS, SECTION_FOR_PATH, sectionForPath } from "@/lib/data/nav";
+import BrandLogo from "@/components/ui/BrandLogo";
+import { NAV_ITEMS, SECTION_FOR_PATH, sectionForPath } from "@/lib/data/nav";
 import { NavList, UserRow } from "@/components/layout/Sidebar";
 
 const DRAWER_EASE = [0.22, 1, 0.36, 1];
@@ -109,9 +110,8 @@ export function MobileDrawer({ open, onClose }) {
             className="absolute inset-y-0 left-0 flex w-72 max-w-[85dvw] flex-col overscroll-contain border-r border-line bg-surface shadow-2xl"
           >
             <div className="flex min-h-16 items-center justify-between border-b border-line px-4 py-2">
-              <span className="flex items-center gap-2.5">
-                <Icon name="pulse_alert" size={28} className="shrink-0 text-accent" />
-                <span className="t-h3 text-primary">{APP_NAME}</span>
+              <span className="flex items-center">
+                <BrandLogo />
               </span>
               <button
                 type="button"

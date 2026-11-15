@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Shared Recharts tooltip styled for the CrewPulse design system.
+ * Shared Recharts tooltip styled for the Nabz design system.
  * Uses monospace for values and labels the record source (demo vs recorded).
  */
 
