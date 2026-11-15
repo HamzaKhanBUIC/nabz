@@ -8,3 +8,4 @@ export * from "./bp";
 export * from "./reminders";
 export * from "./share";
 export * from "./coach";
+export * from "./environment";

@@ -1,0 +1,47 @@
+{
+  "active": {
+    "id": "mars-transit",
+    "name": "Mars transit",
+    "oneWayDelay": {
+      "text": "3 to 22 min",
+      "minSeconds": 180,
+      "maxSeconds": 1320
+    },
+    "blackoutNote": "About 2 to 3 weeks of disrupted contact at solar conjunction, every 26 months or so.",
+    "timeToCare": "No evacuation",
+    "careLead": "Crew medical officer on board",
+    "gravity": "Microgravity",
+    "dayLengthHours": 24,
+    "radiationRateKey": "mars-transit",
+    "escalation": "Act now with the crew medical officer; tell Earth after.",
+    "sourceIds": [
+      "ascend-2022-mars-comms",
+      "nasa-mars-conjunction",
+      "thompson-2021-cmo",
+      "george-2024-artemis",
+      "zeitlin-2013-msl"
+    ]
+  },
+  "options": [
+    {
+      "id": "iss",
+      "name": "Space station (ISS)"
+    },
+    {
+      "id": "moon",
+      "name": "Moon"
+    },
+    {
+      "id": "mars-transit",
+      "name": "Mars transit"
+    },
+    {
+      "id": "mars-surface",
+      "name": "Mars surface"
+    },
+    {
+      "id": "remote-earth",
+      "name": "Remote Earth station (Concordia, winter)"
+    }
+  ]
+}

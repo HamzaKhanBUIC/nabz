@@ -6,12 +6,16 @@ import {
   BpGuideFile,
   CardTemplateFile,
   CoachKnowledgeFile,
+  EnvironmentFile,
+  HazardFile,
   Procedure,
   ProcedureFile,
   Routine,
   RoutineFile,
   SourceFile,
   type CoachKnowledgeSnippet,
+  type Environment,
+  type Hazard,
   type SourceRef,
 } from "../schemas";
 
@@ -47,6 +51,10 @@ export interface LoadedContent {
   routines: Routine[];
   routinesVersion: number;
   coachSnippets: CoachKnowledgeSnippet[];
+  /** E03 */
+  hazards: Hazard[];
+  /** E06 */
+  environments: Environment[];
 }
 
 function readJson(filePath: string): unknown {
@@ -72,8 +80,9 @@ export function loadContentBundle(contentDir: string): LoadedContent {
   const { sources } = SourceFile.parse(readJson(path.join(contentDir, "sources.json")));
   const sourceMap = new Map<string, SourceRef>(sources.map((s) => [s.id, s]));
 
+  const { hazards } = HazardFile.parse(readJson(path.join(contentDir, "hazards.json")));
   const { templates } = CardTemplateFile.parse(readJson(path.join(contentDir, "cards.json")));
-  const catalog: CardCatalog = { templates, sources };
+  const catalog: CardCatalog = { templates, sources, hazards: hazards.map((h) => ({ id: h.id, name: h.name })) };
   validateCardCatalog(catalog);
 
   const guideRaw = BpGuideFile.parse(readJson(path.join(contentDir, "bp-guide.json")));
@@ -149,6 +158,9 @@ export function loadContentBundle(contentDir: string): LoadedContent {
   const proceduresVersion = procedures.reduce((max, p) => Math.max(max, p.version), 1);
   const routinesVersion = routines.reduce((max, r) => Math.max(max, r.version), 1);
 
+  const { environments } = EnvironmentFile.parse(readJson(path.join(contentDir, "environments.json")));
+  for (const env of environments) resolveSources(env.sourceIds, sourceMap, `environments.json ${env.id}`);
+
   return {
     catalog,
     sourceMap,
@@ -158,5 +170,7 @@ export function loadContentBundle(contentDir: string): LoadedContent {
     routines,
     routinesVersion,
     coachSnippets: coachRaw.snippets,
+    hazards,
+    environments,
   };
 }

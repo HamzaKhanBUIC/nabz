@@ -28,5 +28,9 @@
       "name": "Crew 4",
       "role": "Engineer"
     }
-  ]
+  ],
+  "environment": {
+    "id": "mars-transit",
+    "name": "Mars transit"
+  }
 }

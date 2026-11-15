@@ -12,9 +12,12 @@ import {
   ShareSendInput,
   TrendQuery,
 } from "../schemas";
+import { withEscalation } from "../core";
 import { createStore, type CrewPulseStore } from "../store";
+import { createMissionState } from "../store/mission-state";
 import { loadCrewAccess, verifyCode } from "../store/access";
 import { createCrewRouter } from "./routes/crew";
+import { activeEnvironment, createEnvironmentRouter } from "./routes/environment";
 import { createNasaRouter } from "./routes/nasa";
 import { bearerToken, createSessionStore, requireSession, sessionOf, type SessionStore } from "./session";
 
@@ -51,6 +54,9 @@ export function createApp(options: CreateAppOptions = {}): Express {
   const sessions = options.sessions ?? createSessionStore();
   const auth = requireSession(sessions);
   const mine = (locals: Record<string, unknown>): CrewPulseStore => storeFor(sessionOf(locals).crew.id);
+  // E06: the active environment is mission-level state, shared by the whole crew.
+  const missionState = createMissionState(options.runtimeDir ?? path.join(process.cwd(), "data", "runtime"));
+  const env = () => activeEnvironment(store, missionState);
 
   const app = express();
   app.disable("x-powered-by");
@@ -115,17 +121,29 @@ export function createApp(options: CreateAppOptions = {}): Express {
     }),
   );
 
+  // E03 hazards, E06 environment, E04 radiation
+  app.use(createEnvironmentRouter({ auth, store, missionState }));
+
   // Must endpoints
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true });
   });
 
   app.get("/api/mission", (_req, res) => {
-    res.json(store.getMission());
+    const e = env();
+    res.json({ ...store.getMission(), environment: { id: e.id, name: e.name } });
   });
 
   app.get("/api/today", auth, (_req, res) => {
-    res.json(mine(res.locals).getToday());
+    const today = mine(res.locals).getToday();
+    const e = env();
+    res.json({
+      ...today,
+      checkin: today.checkin ? { ...today.checkin, card: withEscalation(today.checkin.card, e) } : null,
+      bp: today.bp ? { ...today.bp, card: withEscalation(today.bp.card, e) } : null,
+      card: today.card ? withEscalation(today.card, e) : null,
+      cards: today.cards.map((c) => withEscalation(c, e)),
+    });
   });
 
   app.get("/api/checkin/protocol", (_req, res) => {
@@ -145,7 +163,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
       return;
     }
     const created = mine(res.locals).createCheckin(parsed.data);
-    res.status(201).json(created);
+    res.status(201).json({ ...created, card: withEscalation(created.card, env()) });
   });
 
   app.get("/api/trends", auth, (req, res) => {
@@ -180,7 +198,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
       return;
     }
     const created = mine(res.locals).createBpMeasurement(parsed.data);
-    res.status(201).json(created);
+    res.status(201).json({ ...created, card: withEscalation(created.card, env()) });
   });
 
   app.get("/api/emergency/procedures", (req, res) => {

@@ -3,6 +3,7 @@ import type {
   CoachIntent,
   CoachKnowledgeSnippet,
   Routine,
+  HazardRef,
   SourceRef,
   Status,
 } from "../schemas";
@@ -404,7 +405,9 @@ export function buildDeterministicCoachAnswer(ctx: CoachContext): CoachAnswer {
  * Fallback card object used only when no check-in or BP measurement has been
  * recorded yet today and the user opens the Coach tab first.
  */
-export function buildEmptyDayFallbackCard(sources: readonly SourceRef[]): Card {
+export function buildEmptyDayFallbackCard(sources: readonly SourceRef[], hazards: readonly HazardRef[]): Card {
+  // design choice (CHECKS R11): the overview card covers reaction (isolation) and BP (gravity).
+  const hazardIds = ["isolation-confinement", "gravity-fields"];
   const preferredIds = ["basner-2011-pvtb", "cognition-iss-pmc11614644", "cdc-bp-measure"];
   const picked = preferredIds
     .map((id) => sources.find((s) => s.id === id))
@@ -425,5 +428,7 @@ export function buildEmptyDayFallbackCard(sources: readonly SourceRef[]): Card {
     facts: {},
     sources: picked.length > 0 ? picked : sources.slice(0, 1),
     disclaimer: "Decision support, not a diagnosis.",
+    hazards: hazards.filter((h) => hazardIds.includes(h.id)).map((h) => ({ id: h.id, name: h.name })),
+    hrpRiskIds: [99, 179],
   };
 }

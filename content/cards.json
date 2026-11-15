@@ -12,6 +12,13 @@
       ],
       "sourceIds": [
         "basner-2011-pvtb"
+      ],
+      "hazardIds": [
+        "distance-from-earth"
+      ],
+      "hrpRiskIds": [
+        99,
+        175
       ]
     },
     {
@@ -26,6 +33,13 @@
       "sourceIds": [
         "basner-2011-pvtb",
         "cognition-iss-pmc11614644"
+      ],
+      "hazardIds": [
+        "isolation-confinement"
+      ],
+      "hrpRiskIds": [
+        99,
+        100
       ]
     },
     {
@@ -44,7 +58,16 @@
       ],
       "links": {
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "isolation-confinement"
+      ],
+      "hrpRiskIds": [
+        99,
+        100,
+        95,
+        175
+      ]
     },
     {
       "id": "reaction-slow-short-sleep",
@@ -63,7 +86,15 @@
       ],
       "links": {
         "routineId": "tension-winddown"
-      }
+      },
+      "hazardIds": [
+        "isolation-confinement"
+      ],
+      "hrpRiskIds": [
+        100,
+        99,
+        175
+      ]
     },
     {
       "id": "reaction-slow",
@@ -78,6 +109,13 @@
       "sourceIds": [
         "cognition-iss-pmc11614644",
         "basner-2011-pvtb"
+      ],
+      "hazardIds": [
+        "isolation-confinement"
+      ],
+      "hrpRiskIds": [
+        99,
+        175
       ]
     },
     {
@@ -96,7 +134,14 @@
       ],
       "links": {
         "routineId": "hands-microbreak"
-      }
+      },
+      "hazardIds": [
+        "isolation-confinement"
+      ],
+      "hrpRiskIds": [
+        99,
+        100
+      ]
     },
     {
       "id": "all-normal",
@@ -110,6 +155,12 @@
       "sourceIds": [
         "basner-2011-pvtb",
         "cognition-iss-pmc11614644"
+      ],
+      "hazardIds": [
+        "isolation-confinement"
+      ],
+      "hrpRiskIds": [
+        99
       ]
     },
     {
@@ -127,7 +178,16 @@
       ],
       "links": {
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields",
+        "distance-from-earth"
+      ],
+      "hrpRiskIds": [
+        179,
+        95,
+        175
+      ]
     },
     {
       "id": "bp-low-symptoms",
@@ -146,7 +206,16 @@
       "links": {
         "emergencyProcedureId": "near-fainting",
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields",
+        "distance-from-earth"
+      ],
+      "hrpRiskIds": [
+        179,
+        95,
+        175
+      ]
     },
     {
       "id": "bp-severe-confirmed",
@@ -163,7 +232,16 @@
       ],
       "links": {
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields",
+        "distance-from-earth"
+      ],
+      "hrpRiskIds": [
+        179,
+        95,
+        175
+      ]
     },
     {
       "id": "bp-severe-retest",
@@ -180,7 +258,15 @@
       ],
       "links": {
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95,
+        175
+      ]
     },
     {
       "id": "bp-sustained-high",
@@ -194,6 +280,13 @@
       "sourceIds": [
         "ochmo-std-100-1a",
         "aha-acc-2025-bp"
+      ],
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95
       ]
     },
     {
@@ -208,6 +301,13 @@
       "sourceIds": [
         "aha-acc-2025-bp",
         "ochmo-std-100-1a"
+      ],
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95
       ]
     },
     {
@@ -225,7 +325,14 @@
       ],
       "links": {
         "emergencyProcedureId": "near-fainting"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95
+      ]
     },
     {
       "id": "bp-off-normal",
@@ -242,7 +349,14 @@
       "links": {
         "routineId": "bp-quiet-rest",
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95
+      ]
     },
     {
       "id": "bp-above-ideal",
@@ -260,7 +374,14 @@
       "links": {
         "routineId": "bp-quiet-rest",
         "measurement": "bp"
-      }
+      },
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95
+      ]
     },
     {
       "id": "bp-normal",
@@ -272,6 +393,13 @@
       ],
       "sourceIds": [
         "aha-acc-2025-bp"
+      ],
+      "hazardIds": [
+        "gravity-fields"
+      ],
+      "hrpRiskIds": [
+        179,
+        95
       ]
     }
   ]

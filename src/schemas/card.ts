@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Disclaimer, Level, SourceRef, Status } from "./common";
+import { HazardId, HazardRef } from "./environment";
 
 /** The numbers a rule used. The AI coach (a later feature) reads these and nothing else about the user. */
 export const Facts = z.record(z.string(), z.union([z.number(), z.string(), z.boolean()]));
@@ -24,6 +25,12 @@ export const Card = z.object({
   sources: z.array(SourceRef).min(1),
   disclaimer: Disclaimer,
   links: CardLinks.optional(),
+  /** E03: NASA hazards this card relates to (at least one). */
+  hazards: z.array(HazardRef).min(1),
+  /** E03: HRP risk IDs this card relates to. */
+  hrpRiskIds: z.array(z.number().int().positive()).min(1),
+  /** E06: who to contact in the active environment; set on act and urgent cards in API responses, never stored. */
+  escalation: z.string().min(1).optional(),
 });
 export type Card = z.infer<typeof Card>;
 
@@ -36,6 +43,8 @@ export const CardTemplate = z.strictObject({
   whatToDo: z.array(z.string().min(1)).min(1),
   sourceIds: z.array(z.string().min(1)).min(1),
   links: CardLinks.optional(),
+  hazardIds: z.array(HazardId).min(1),
+  hrpRiskIds: z.array(z.number().int().positive()).min(1),
 });
 export type CardTemplate = z.infer<typeof CardTemplate>;
 

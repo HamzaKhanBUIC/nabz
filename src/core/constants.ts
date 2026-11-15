@@ -191,3 +191,24 @@ export const COACH_RED_FLAG_TERMS = [
   "anaphylaxis",
   "swelling throat",
 ] as const;
+
+/** research/CHECKS.md R1/R5 row 5: NASA-STD-3001 V1 [4030], career effective dose < 600 mSv. */
+export const CAREER_LIMIT_MSV = 600;
+
+/**
+ * research/CHECKS.md R9 row 1: George et al. 2024 (Nature 634:48-52) Table 2, average dose
+ * equivalent rate in mSv/day for the December 2022 time frame. One source, one solar period,
+ * so environments compare fairly.
+ */
+export const RADIATION_RATE_MSV_PER_DAY = {
+  iss: 0.68,
+  "lunar-surface": 0.81,
+  "mars-transit": 1.58,
+  "mars-surface": 0.65,
+} as const;
+
+/** research/CHECKS.md R1/R5 row 12: Zeitlin et al. 2013, Curiosity's measured cruise GCR dose, 1.84 mSv/day (2011-12). */
+export const CURIOSITY_CRUISE_MSV_PER_DAY = 1.84;
+
+/** design choice (docs/blueprint/03-data-model.md): card levels that show the environment's escalation line. */
+export const ESCALATION_LEVELS = ["act", "urgent"] as const;

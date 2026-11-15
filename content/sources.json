@@ -60,6 +60,76 @@
       "id": "nasa-std-3001",
       "title": "NASA Space Flight Human-System Standard Volume 1: Crew Health (NASA-STD-3001)",
       "url": "https://www.nasa.gov/humans-in-space/human-spaceflight-standards-nasa-std-3001/"
+    },
+    {
+      "id": "george-2024-artemis",
+      "title": "Space radiation measurements during the Artemis I lunar mission (George et al., Nature, 2024)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11446838/"
+    },
+    {
+      "id": "zeitlin-2013-msl",
+      "title": "Measurements of energetic particle radiation in transit to Mars on the Mars Science Laboratory (Zeitlin et al., Science, 2013)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23723233/"
+    },
+    {
+      "id": "nasa-hrp-hazards",
+      "title": "NASA Human Research Program: 5 Hazards of Human Spaceflight",
+      "url": "https://www.nasa.gov/hrp/hazards/"
+    },
+    {
+      "id": "nasa-iss-tdrs",
+      "title": "Data Rate Increase on the International Space Station Supports Future Exploration (NASA)",
+      "url": "https://www.nasa.gov/missions/station/data-rate-increase-on-the-international-space-station-supports-future-exploration/"
+    },
+    {
+      "id": "thompson-2021-cmo",
+      "title": "The Exploration Crew Medical Officer of the Future (Thompson, NASA, 2021)",
+      "url": "https://ntrs.nasa.gov/api/citations/20210020201/downloads/Exploration%20CMO%20of%20the%20Future_Thompson.pptx.pdf"
+    },
+    {
+      "id": "ntrs-1993-lunar-comms",
+      "title": "Considerations for lunar colony communications systems (NASA NTRS 19930018794)",
+      "url": "https://ntrs.nasa.gov/api/citations/19930018794/downloads/19930018794.pdf"
+    },
+    {
+      "id": "nasa-lcrns",
+      "title": "Lunar Communications Relay and Navigation Systems (NASA)",
+      "url": "https://www.nasa.gov/goddard/esc/lcrns/"
+    },
+    {
+      "id": "nssdc-moon",
+      "title": "Moon Fact Sheet (NASA NSSDC)",
+      "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"
+    },
+    {
+      "id": "nssdc-mars",
+      "title": "Mars Fact Sheet (NASA NSSDC)",
+      "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+    },
+    {
+      "id": "ascend-2022-mars-comms",
+      "title": "Communication Delays, Disruptions, and Blackouts for Crewed Mars Missions (NASA, 2022)",
+      "url": "https://ntrs.nasa.gov/api/citations/20220013418/downloads/ASCEND-Communication%20Delays%2C%20Disruptions%2C%20and%20Blackouts%20for%20Crewed%20Mars%20Missions.pdf"
+    },
+    {
+      "id": "nasa-mars-conjunction",
+      "title": "What's Mars Solar Conjunction, and Why Does It Matter? (NASA)",
+      "url": "https://www.nasa.gov/solar-system/whats-mars-solar-conjunction-and-why-does-it-matter/"
+    },
+    {
+      "id": "nasa-mars-relay",
+      "title": "Mars Relay Network (NASA)",
+      "url": "https://science.nasa.gov/mars/mars-relay-network/"
+    },
+    {
+      "id": "esa-concordia-hospital",
+      "title": "Concordia hospital: peak remote medicine (ESA Concordia blog, 2018)",
+      "url": "https://blogs.esa.int/concordia/2018/01/18/concordia-hospital-peak-remote-medicine/"
+    },
+    {
+      "id": "esa-concordia-communication",
+      "title": "Concordia communication (ESA)",
+      "url": "https://www.esa.int/media/concordia-communication"
     }
   ]
 }

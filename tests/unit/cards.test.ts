@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { Card, CardTemplateFile, SourceFile } from "../../src/schemas";
+import { Card, CardTemplateFile, HazardFile, SourceFile } from "../../src/schemas";
 import {
   pickMostSevereCard,
   selectCard,
@@ -17,7 +17,8 @@ function loadCatalog(): CardCatalog {
   const sourcesRaw = JSON.parse(readFileSync(path.join(root, "content/sources.json"), "utf8"));
   const { templates } = CardTemplateFile.parse(cardsRaw);
   const { sources } = SourceFile.parse(sourcesRaw);
-  return { templates, sources };
+  const { hazards } = HazardFile.parse(JSON.parse(readFileSync(path.join(root, "content/hazards.json"), "utf8")));
+  return { templates, sources, hazards: hazards.map((h) => ({ id: h.id, name: h.name })) };
 }
 
 function assertValidRenderedCard(card: Card): void {
@@ -65,6 +66,7 @@ describe("F05 priority rule table and action cards (M3)", () => {
           },
         ],
         sources: catalog.sources,
+        hazards: catalog.hazards,
       }),
     ).toThrow(/missing source/i);
   });
@@ -280,14 +282,14 @@ describe("F05 priority rule table and action cards (M3)", () => {
 
   it("throws clearly on missing template or unfilled placeholder", () => {
     expect(() =>
-      selectCard(baseReaction, { templates: [], sources: catalog.sources }),
+      selectCard(baseReaction, { templates: [], sources: catalog.sources, hazards: catalog.hazards }),
     ).toThrow(/missing card template/i);
 
     const brokenTemplates = catalog.templates.map((t) =>
       t.id === "all-normal" ? { ...t, whatChanged: "Missing {unknownKey} placeholder." } : t,
     );
     expect(() =>
-      selectCard(baseReaction, { templates: brokenTemplates, sources: catalog.sources }),
+      selectCard(baseReaction, { templates: brokenTemplates, sources: catalog.sources, hazards: catalog.hazards }),
     ).toThrow(/unknownKey/);
   });
 });

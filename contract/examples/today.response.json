@@ -75,7 +75,19 @@
       "disclaimer": "Decision support, not a diagnosis.",
       "links": {
         "routineId": "tension-winddown"
-      }
+      },
+      "hazards": [
+        {
+          "id": "isolation-confinement",
+          "name": "Isolation and confinement"
+        }
+      ],
+      "hrpRiskIds": [
+        100,
+        99,
+        175
+      ],
+      "escalation": "Act now with the crew medical officer; tell Earth after."
     }
   },
   "bp": null,
@@ -117,7 +129,19 @@
     "disclaimer": "Decision support, not a diagnosis.",
     "links": {
       "routineId": "tension-winddown"
-    }
+    },
+    "hazards": [
+      {
+        "id": "isolation-confinement",
+        "name": "Isolation and confinement"
+      }
+    ],
+    "hrpRiskIds": [
+      100,
+      99,
+      175
+    ],
+    "escalation": "Act now with the crew medical officer; tell Earth after."
   },
   "cards": [
     {
@@ -158,7 +182,19 @@
       "disclaimer": "Decision support, not a diagnosis.",
       "links": {
         "routineId": "tension-winddown"
-      }
+      },
+      "hazards": [
+        {
+          "id": "isolation-confinement",
+          "name": "Isolation and confinement"
+        }
+      ],
+      "hrpRiskIds": [
+        100,
+        99,
+        175
+      ],
+      "escalation": "Act now with the crew medical officer; tell Earth after."
     }
   ],
   "nextDue": "2026-11-16T08:00:00+00:00"

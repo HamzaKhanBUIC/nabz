@@ -33,6 +33,8 @@ import type {
   CoachAskResponse,
   ConsentResponse,
   CrewHealthSummary,
+  Environment,
+  Hazard,
   Mission,
   Procedure,
   ProcedureBundle,
@@ -45,6 +47,7 @@ import type {
   SharePreviewInput,
   ShareQueuedPackage,
   ShareSendInput,
+  SourceRef,
   Today,
   Trend,
   TrendQuery,
@@ -70,8 +73,11 @@ export interface CreateStoreOptions {
   coachProvider?: CoachProvider;
 }
 
+/** The mission as the store knows it; the API adds the active environment (E06). */
+export type MissionCore = Omit<Mission, "environment">;
+
 export interface CrewPulseStore {
-  getMission(): Mission;
+  getMission(): MissionCore;
   getToday(): Today;
   getProtocol(): Protocol;
   createCheckin(input: CheckinInput): CheckinResponse;
@@ -91,6 +97,12 @@ export interface CrewPulseStore {
   setConsent(share: boolean): ConsentResponse;
   recordAccess(entry: AccessLogEntry): void;
   getHealthSummary(): CrewHealthSummary;
+  /** E03 */
+  getHazards(): Hazard[];
+  /** E06 */
+  getEnvironments(): Environment[];
+  /** Resolves verified source IDs from content/sources.json; throws on an unknown ID. */
+  getSources(ids: readonly string[]): SourceRef[];
 }
 
 /** E05 design choice: keep the newest 200 access-log entries per person. */
@@ -266,7 +278,23 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
   };
 
   return {
-    getMission(): Mission {
+    getHazards(): Hazard[] {
+      return content.hazards;
+    },
+
+    getEnvironments(): Environment[] {
+      return content.environments;
+    },
+
+    getSources(ids: readonly string[]): SourceRef[] {
+      return ids.map((id) => {
+        const ref = content.sourceMap.get(id);
+        if (!ref) throw new Error(`Unknown source "${id}".`);
+        return ref;
+      });
+    },
+
+    getMission(): MissionCore {
       return {
         name: missionFile.name,
         profile: missionFile.profile,
@@ -616,7 +644,7 @@ export function createStore(options: CreateStoreOptions = {}): CrewPulseStore {
         hasActiveCard = true;
       }
 
-      const card = targetCard ?? buildEmptyDayFallbackCard(content.catalog.sources);
+      const card = targetCard ?? buildEmptyDayFallbackCard(content.catalog.sources, content.catalog.hazards);
       const linkedRoutine = card.links?.routineId
         ? content.routines.find((r) => r.id === card.links?.routineId)
         : undefined;

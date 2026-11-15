@@ -92,6 +92,30 @@
               ],
               "additionalProperties": false
             }
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "iss",
+                  "moon",
+                  "mars-transit",
+                  "mars-surface",
+                  "remote-earth"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -100,7 +124,8 @@
           "launchDate",
           "missionDay",
           "commsDelay",
-          "crew"
+          "crew",
+          "environment"
         ],
         "additionalProperties": false
       }
@@ -472,6 +497,47 @@
                           }
                         },
                         "additionalProperties": false
+                      },
+                      "hazards": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "enum": [
+                                "space-radiation",
+                                "isolation-confinement",
+                                "distance-from-earth",
+                                "gravity-fields",
+                                "hostile-closed-environments"
+                              ]
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "hrpRiskIds": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "escalation": {
+                        "type": "string",
+                        "minLength": 1
                       }
                     },
                     "required": [
@@ -485,7 +551,9 @@
                       "whatToDo",
                       "facts",
                       "sources",
-                      "disclaimer"
+                      "disclaimer",
+                      "hazards",
+                      "hrpRiskIds"
                     ],
                     "additionalProperties": false
                   }
@@ -904,6 +972,47 @@
                           }
                         },
                         "additionalProperties": false
+                      },
+                      "hazards": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "enum": [
+                                "space-radiation",
+                                "isolation-confinement",
+                                "distance-from-earth",
+                                "gravity-fields",
+                                "hostile-closed-environments"
+                              ]
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "hrpRiskIds": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "escalation": {
+                        "type": "string",
+                        "minLength": 1
                       }
                     },
                     "required": [
@@ -917,7 +1026,9 @@
                       "whatToDo",
                       "facts",
                       "sources",
-                      "disclaimer"
+                      "disclaimer",
+                      "hazards",
+                      "hrpRiskIds"
                     ],
                     "additionalProperties": false
                   },
@@ -1088,6 +1199,47 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "hazards": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "enum": [
+                            "space-radiation",
+                            "isolation-confinement",
+                            "distance-from-earth",
+                            "gravity-fields",
+                            "hostile-closed-environments"
+                          ]
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "hrpRiskIds": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "escalation": {
+                    "type": "string",
+                    "minLength": 1
                   }
                 },
                 "required": [
@@ -1101,7 +1253,9 @@
                   "whatToDo",
                   "facts",
                   "sources",
-                  "disclaimer"
+                  "disclaimer",
+                  "hazards",
+                  "hrpRiskIds"
                 ],
                 "additionalProperties": false
               },
@@ -1248,6 +1402,47 @@
                     }
                   },
                   "additionalProperties": false
+                },
+                "hazards": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "enum": [
+                          "space-radiation",
+                          "isolation-confinement",
+                          "distance-from-earth",
+                          "gravity-fields",
+                          "hostile-closed-environments"
+                        ]
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "hrpRiskIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "escalation": {
+                  "type": "string",
+                  "minLength": 1
                 }
               },
               "required": [
@@ -1261,7 +1456,9 @@
                 "whatToDo",
                 "facts",
                 "sources",
-                "disclaimer"
+                "disclaimer",
+                "hazards",
+                "hrpRiskIds"
               ],
               "additionalProperties": false
             }
@@ -1777,6 +1974,47 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "hazards": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "space-radiation",
+                        "isolation-confinement",
+                        "distance-from-earth",
+                        "gravity-fields",
+                        "hostile-closed-environments"
+                      ]
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "hrpRiskIds": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "escalation": {
+                "type": "string",
+                "minLength": 1
               }
             },
             "required": [
@@ -1790,7 +2028,9 @@
               "whatToDo",
               "facts",
               "sources",
-              "disclaimer"
+              "disclaimer",
+              "hazards",
+              "hrpRiskIds"
             ],
             "additionalProperties": false
           }
@@ -2620,6 +2860,47 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "hazards": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "space-radiation",
+                        "isolation-confinement",
+                        "distance-from-earth",
+                        "gravity-fields",
+                        "hostile-closed-environments"
+                      ]
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "hrpRiskIds": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "escalation": {
+                "type": "string",
+                "minLength": 1
               }
             },
             "required": [
@@ -2633,7 +2914,9 @@
               "whatToDo",
               "facts",
               "sources",
-              "disclaimer"
+              "disclaimer",
+              "hazards",
+              "hrpRiskIds"
             ],
             "additionalProperties": false
           },
@@ -3563,6 +3846,47 @@
                     }
                   },
                   "additionalProperties": false
+                },
+                "hazards": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "enum": [
+                          "space-radiation",
+                          "isolation-confinement",
+                          "distance-from-earth",
+                          "gravity-fields",
+                          "hostile-closed-environments"
+                        ]
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "hrpRiskIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "escalation": {
+                  "type": "string",
+                  "minLength": 1
                 }
               },
               "required": [
@@ -3576,7 +3900,9 @@
                 "whatToDo",
                 "facts",
                 "sources",
-                "disclaimer"
+                "disclaimer",
+                "hazards",
+                "hrpRiskIds"
               ],
               "additionalProperties": false
             }
@@ -3929,6 +4255,47 @@
                         }
                       },
                       "additionalProperties": false
+                    },
+                    "hazards": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "enum": [
+                              "space-radiation",
+                              "isolation-confinement",
+                              "distance-from-earth",
+                              "gravity-fields",
+                              "hostile-closed-environments"
+                            ]
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "hrpRiskIds": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "escalation": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "required": [
@@ -3942,7 +4309,9 @@
                     "whatToDo",
                     "facts",
                     "sources",
-                    "disclaimer"
+                    "disclaimer",
+                    "hazards",
+                    "hrpRiskIds"
                   ],
                   "additionalProperties": false
                 }
@@ -4956,6 +5325,613 @@
           "source",
           "points",
           "band"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/hazards": {
+      "id": "hazards.list",
+      "tier": "extra",
+      "access": "public",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "hazards": {
+            "minItems": 5,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "space-radiation",
+                    "isolation-confinement",
+                    "distance-from-earth",
+                    "gravity-fields",
+                    "hostile-closed-environments"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "hrpRiskIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "watches": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "summary",
+                "url",
+                "hrpRiskIds",
+                "watches"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "hazards"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/environment": {
+      "id": "environment.get",
+      "tier": "extra",
+      "access": "public",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "iss",
+                  "moon",
+                  "mars-transit",
+                  "mars-surface",
+                  "remote-earth"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "oneWayDelay": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minSeconds": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maxSeconds": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "minSeconds",
+                  "maxSeconds"
+                ],
+                "additionalProperties": false
+              },
+              "blackoutNote": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "timeToCare": {
+                "type": "string",
+                "minLength": 1
+              },
+              "careLead": {
+                "type": "string",
+                "minLength": 1
+              },
+              "gravity": {
+                "type": "string",
+                "minLength": 1
+              },
+              "dayLengthHours": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "radiationRateKey": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "iss",
+                      "lunar-surface",
+                      "mars-transit",
+                      "mars-surface"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "escalation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceIds": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "oneWayDelay",
+              "blackoutNote",
+              "timeToCare",
+              "careLead",
+              "gravity",
+              "dayLengthHours",
+              "radiationRateKey",
+              "escalation",
+              "sourceIds"
+            ],
+            "additionalProperties": false
+          },
+          "options": {
+            "minItems": 5,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "iss",
+                    "moon",
+                    "mars-transit",
+                    "mars-surface",
+                    "remote-earth"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "active",
+          "options"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "PUT /api/environment": {
+      "id": "environment.put",
+      "tier": "extra",
+      "access": "session",
+      "status": 200,
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "iss",
+              "moon",
+              "mars-transit",
+              "mars-surface",
+              "remote-earth"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "iss",
+                  "moon",
+                  "mars-transit",
+                  "mars-surface",
+                  "remote-earth"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "oneWayDelay": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minSeconds": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maxSeconds": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "minSeconds",
+                  "maxSeconds"
+                ],
+                "additionalProperties": false
+              },
+              "blackoutNote": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "timeToCare": {
+                "type": "string",
+                "minLength": 1
+              },
+              "careLead": {
+                "type": "string",
+                "minLength": 1
+              },
+              "gravity": {
+                "type": "string",
+                "minLength": 1
+              },
+              "dayLengthHours": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "radiationRateKey": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "iss",
+                      "lunar-surface",
+                      "mars-transit",
+                      "mars-surface"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "escalation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceIds": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "oneWayDelay",
+              "blackoutNote",
+              "timeToCare",
+              "careLead",
+              "gravity",
+              "dayLengthHours",
+              "radiationRateKey",
+              "escalation",
+              "sourceIds"
+            ],
+            "additionalProperties": false
+          },
+          "options": {
+            "minItems": 5,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "iss",
+                    "moon",
+                    "mars-transit",
+                    "mars-surface",
+                    "remote-earth"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "active",
+          "options"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "GET /api/radiation": {
+      "id": "radiation.get",
+      "tier": "extra",
+      "access": "public",
+      "status": 200,
+      "response": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "environment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "iss",
+                  "moon",
+                  "mars-transit",
+                  "mars-surface",
+                  "remote-earth"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "missionDay": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "basis": {
+            "type": "string",
+            "const": "published-average"
+          },
+          "dailyRateMsv": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "doseToDateMsv": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "careerLimitMsv": {
+            "type": "number",
+            "const": 600
+          },
+          "percentOfCareerLimit": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "daysUntilLimit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sources": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "in_zone",
+                  "watch",
+                  "act",
+                  "urgent"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "iconKey": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "hourglass",
+                  "check",
+                  "eye",
+                  "alert",
+                  "siren"
+                ]
+              }
+            },
+            "required": [
+              "level",
+              "label",
+              "iconKey"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "environment",
+          "missionDay",
+          "basis",
+          "dailyRateMsv",
+          "doseToDateMsv",
+          "careerLimitMsv",
+          "percentOfCareerLimit",
+          "daysUntilLimit",
+          "note",
+          "sources",
+          "status"
         ],
         "additionalProperties": false
       }

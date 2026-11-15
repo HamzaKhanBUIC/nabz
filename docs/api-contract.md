@@ -204,7 +204,7 @@ Send request (`POST /api/share`): same body plus `"confirm": true` (returns `201
 Schedule body for `PUT /api/reminders`: `{ "enabled": true, "checkinTimeUtc": "08:00", "bpIntervalDays": 3, "bpTimeUtc": "08:30" }`.
 Response `200`: `{ "version": 1, "schedule": { … }, "nextDue": "2026-11-15T08:00:00+00:00", "items": [ { "kind": "checkin", "label": "…", "dueAt": "…", "overdue": false, "reason": "…" } ] }`.
 
-## Extra endpoints (E01, E02, E05; design in `docs/features/E-extras.md`)
+## Extra endpoints (E01–E06; design in `docs/features/E-extras.md`)
 
 ### Signing in (E01)
 
@@ -249,9 +249,24 @@ Without a valid token they answer `401 { error: { code: "no_session" } }`. Every
 | `GET /api/nasa/osd-569/trend` | `crew=C001&analyte=<key>` | a `Trend`, the same shape as `GET /api/trends` |
 
 - `missionDay` is the day relative to launch: negative before launch, and after return counted from launch.
-- `band` is the personal baseline from the pre-launch samples.
+- `band` is the personal baseline before the latest sample, built from all earlier samples (pre-launch and post-flight).
 - `referenceRange` is the lab's normal range.
 - An unknown crew id or analyte gets `400 invalid_input`.
+
+### Hazards, environments and radiation (E03, E06, E04)
+
+| Call | Who | Body | Answer |
+|---|---|---|---|
+| `GET /api/hazards` | public | — | `{ hazards: [{ id, name, summary, url, hrpRiskIds, watches }] }`: NASA's 5 hazards |
+| `GET /api/environment` | public | — | `{ active: Environment, options: [{ id, name }] }` |
+| `PUT /api/environment` | Commander only (others get `403 forbidden`) | `{ id }`: `iss`, `moon`, `mars-transit`, `mars-surface` or `remote-earth` | same as `GET` |
+| `GET /api/radiation` | public | — | `{ environment, missionDay, basis: "published-average", dailyRateMsv, doseToDateMsv, careerLimitMsv: 600, percentOfCareerLimit, daysUntilLimit, note, sources, status }` |
+
+- Every card now carries `hazards: [{ id, name }]` (at least 1) and `hrpRiskIds`.
+- On `act` and `urgent` cards, `escalation` is the active environment's "who to contact" line. The environment changes this line only: never `severity`, `status`, `ruleId` or the card id.
+- `Environment` is `{ id, name, oneWayDelay: { text, minSeconds, maxSeconds }, blackoutNote, timeToCare, careLead, gravity, dayLengthHours, radiationRateKey, escalation, sourceIds }`.
+- `GET /api/mission` gains `environment: { id, name }`.
+- Radiation is an **estimate** from published averages (the whole mission so far at the active environment's rate), never a dosimeter reading. For `remote-earth` the rate fields are `null` and the status says "Not tracked here".
 
 ## Changes
 

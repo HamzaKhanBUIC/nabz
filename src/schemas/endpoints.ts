@@ -4,6 +4,7 @@ import { CheckinInput, CheckinResponse, Protocol } from "./checkin";
 import { CoachAskInput, CoachAskResponse } from "./coach";
 import { ErrorBody, HealthResponse } from "./common";
 import { ConsentInput, ConsentResponse, CrewOverview } from "./crew";
+import { EnvironmentInput, EnvironmentState, HazardList, RadiationEstimate } from "./environment";
 import { Mission, Today } from "./mission";
 import { NasaCatalog, NasaTrendQuery } from "./nasa";
 import { Procedure, ProcedureBundle, ProcedureQuery } from "./procedure";
@@ -62,6 +63,10 @@ export const ENDPOINTS: EndpointSpec[] = [
   { id: "crew.overview", method: "GET", path: "/api/crew/overview", access: "officer", tier: "extra", status: 200, response: CrewOverview, examples: { response: "crew-overview.response.json" } },
   { id: "nasa.catalog", method: "GET", path: "/api/nasa/osd-569", tier: "extra", status: 200, response: NasaCatalog, examples: { response: "nasa-catalog.response.json" } },
   { id: "nasa.trend", method: "GET", path: "/api/nasa/osd-569/trend", tier: "extra", status: 200, query: NasaTrendQuery, response: Trend, examples: { response: "nasa-trend.response.json" } },
+  { id: "hazards.list", method: "GET", path: "/api/hazards", tier: "extra", status: 200, response: HazardList, examples: { response: "hazards.response.json" } },
+  { id: "environment.get", method: "GET", path: "/api/environment", tier: "extra", status: 200, response: EnvironmentState, examples: { response: "environment.response.json" } },
+  { id: "environment.put", method: "PUT", path: "/api/environment", access: "session", tier: "extra", status: 200, request: EnvironmentInput, response: EnvironmentState, examples: { request: "environment-put.request.json", response: "environment-put.response.json" } },
+  { id: "radiation.get", method: "GET", path: "/api/radiation", tier: "extra", status: 200, response: RadiationEstimate, examples: { response: "radiation.response.json" } },
 ];
 
 /** Error examples that belong to no single endpoint. */

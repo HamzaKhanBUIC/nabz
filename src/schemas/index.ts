@@ -14,3 +14,4 @@ export * from "./trend";
 export * from "./crew";
 export * from "./nasa";
 export * from "./session";
+export * from "./environment";

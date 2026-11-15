@@ -73,6 +73,18 @@
     "disclaimer": "Decision support, not a diagnosis.",
     "links": {
       "routineId": "tension-winddown"
-    }
+    },
+    "hazards": [
+      {
+        "id": "isolation-confinement",
+        "name": "Isolation and confinement"
+      }
+    ],
+    "hrpRiskIds": [
+      100,
+      99,
+      175
+    ],
+    "escalation": "Act now with the crew medical officer; tell Earth after."
   }
 }
